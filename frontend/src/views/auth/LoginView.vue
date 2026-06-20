@@ -89,10 +89,42 @@
           />
         </div>
 
+        <!-- Legal Consent -->
+        <div class="rounded-xl border border-gray-200 bg-gray-50/80 p-3 dark:border-dark-700 dark:bg-dark-800/70">
+          <label for="login-legal-consent" class="flex cursor-pointer items-start gap-2.5">
+            <input
+              id="login-legal-consent"
+              v-model="legalTermsAccepted"
+              type="checkbox"
+              class="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-900"
+            />
+            <span class="text-[13px] leading-5 text-gray-600 dark:text-dark-300">
+              <span class="text-gray-700 dark:text-dark-200">
+                {{ t('auth.legalConsentPrefix') }}
+              </span>
+              <template v-for="(item, index) in legalConsentLinks" :key="item.key">
+                <a
+                  :href="item.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="font-medium text-primary-600 underline-offset-4 transition hover:text-primary-700 hover:underline dark:text-primary-300 dark:hover:text-primary-200"
+                  @click.stop
+                >
+                  {{ t(item.labelKey) }}
+                </a>
+                <span v-if="index < legalConsentLinks.length - 1">、</span>
+              </template>
+            </span>
+          </label>
+          <p v-if="errors.legalTerms" class="mt-2 text-xs text-red-600 dark:text-red-400">
+            {{ errors.legalTerms }}
+          </p>
+        </div>
+
         <!-- Submit Button -->
         <button
           type="submit"
-          :disabled="authActionDisabled || (turnstileEnabled && !turnstileToken)"
+          :disabled="loginSubmitDisabled"
           class="btn btn-primary w-full"
         >
           <svg
@@ -141,7 +173,7 @@
           </div>
 
           <EmailOAuthButtons
-            :disabled="authActionDisabled"
+            :disabled="authProviderDisabled"
             :github-enabled="githubOAuthEnabled"
             :google-enabled="googleOAuthEnabled"
             :show-divider="false"
@@ -149,22 +181,22 @@
 
           <LinuxDoOAuthSection
             v-if="linuxdoOAuthEnabled"
-            :disabled="authActionDisabled"
+            :disabled="authProviderDisabled"
             :show-divider="false"
           />
           <DingTalkOAuthSection
             v-if="dingtalkOAuthEnabled"
-            :disabled="authActionDisabled"
+            :disabled="authProviderDisabled"
             :show-divider="false"
           />
           <WechatOAuthSection
             v-if="wechatOAuthEnabled"
-            :disabled="authActionDisabled"
+            :disabled="authProviderDisabled"
             :show-divider="false"
           />
           <OidcOAuthSection
             v-if="oidcOAuthEnabled"
-            :disabled="authActionDisabled"
+            :disabled="authProviderDisabled"
             :provider-name="oidcOAuthProviderName"
             :show-divider="false"
           />
@@ -232,6 +264,7 @@ const isLoading = ref<boolean>(false)
 const errorMessage = ref<string>('')
 const showPassword = ref<boolean>(false)
 const publicSettingsLoaded = ref<boolean>(false)
+const legalTermsAccepted = ref<boolean>(false)
 
 // Public settings
 const turnstileEnabled = ref<boolean>(false)
@@ -271,11 +304,12 @@ const formData = reactive({
 const errors = reactive({
   email: '',
   password: '',
-  turnstile: ''
+  turnstile: '',
+  legalTerms: ''
 })
 
 const validationToastMessage = computed(
-  () => errors.email || errors.password || errors.turnstile || ''
+  () => errors.email || errors.password || errors.turnstile || errors.legalTerms || ''
 )
 
 const agreementGateActive = computed(
@@ -284,6 +318,17 @@ const agreementGateActive = computed(
 
 const authActionDisabled = computed(
   () => isLoading.value || !publicSettingsLoaded.value || agreementGateActive.value
+)
+
+const loginSubmitDisabled = computed(
+  () =>
+    authActionDisabled.value ||
+    !legalTermsAccepted.value ||
+    (turnstileEnabled.value && !turnstileToken.value)
+)
+
+const authProviderDisabled = computed(
+  () => authActionDisabled.value || !legalTermsAccepted.value
 )
 
 const showOAuthLogin = computed(
@@ -296,6 +341,29 @@ const showOAuthLogin = computed(
       githubOAuthEnabled.value ||
       googleOAuthEnabled.value)
 )
+
+const legalConsentLinks = [
+  {
+    key: 'terms',
+    labelKey: 'auth.legalConsentTerms',
+    href: '/legal/terms'
+  },
+  {
+    key: 'usage-policy',
+    labelKey: 'auth.legalConsentUsagePolicy',
+    href: '/legal/usage-policy'
+  },
+  {
+    key: 'supported-countries',
+    labelKey: 'auth.legalConsentSupportedCountries',
+    href: '/legal/supported-countries'
+  },
+  {
+    key: 'service-specific-terms',
+    labelKey: 'auth.legalConsentServiceTerms',
+    href: '/legal/service-specific-terms'
+  }
+] as const
 
 watch(validationToastMessage, (value, previousValue) => {
   if (value && value !== previousValue) {
@@ -424,6 +492,7 @@ function validateForm(): boolean {
   errors.email = ''
   errors.password = ''
   errors.turnstile = ''
+  errors.legalTerms = ''
 
   let isValid = true
 
@@ -433,6 +502,11 @@ function validateForm(): boolean {
       showAgreementModal.value = true
     }
     return false
+  }
+
+  if (!legalTermsAccepted.value) {
+    errors.legalTerms = t('auth.legalConsentRequired')
+    isValid = false
   }
 
   // Email validation

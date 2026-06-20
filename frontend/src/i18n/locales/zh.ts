@@ -187,8 +187,8 @@ export default {
 
   // Setup Wizard
   setup: {
-    title: 'Sub2API 安装向导',
-    description: '配置您的 Sub2API 实例',
+    title: 'YOUC 安装向导',
+    description: '配置您的 YOUC 实例',
     database: {
       title: '数据库配置',
       description: '连接到您的 PostgreSQL 数据库',
@@ -389,6 +389,7 @@ export default {
     groups: '分组管理',
     channels: '渠道管理',
     availableChannels: '可用渠道',
+    modelMarket: '模型广场',
     subscriptions: '订阅管理',
     accounts: '账号管理',
     proxies: 'IP管理',
@@ -443,6 +444,12 @@ export default {
     invalidEmail: '请输入有效的邮箱地址',
     passwordRequired: '请输入密码',
     passwordMinLength: '密码至少需要 6 个字符',
+    legalConsentPrefix: '我已阅读并同意 ',
+    legalConsentTerms: '服务条款',
+    legalConsentUsagePolicy: '使用政策',
+    legalConsentSupportedCountries: '支持的国家和地区',
+    legalConsentServiceTerms: '服务特定条款',
+    legalConsentRequired: '请先阅读并同意服务条款、使用政策、支持的国家和地区、服务特定条款。',
     loginFailed: '登录失败，请检查您的凭据后重试。',
     errors: {
       USER_NOT_ACTIVE: '账号已被禁用',
@@ -1106,6 +1113,124 @@ export default {
       intervals: '阶梯定价',
       unitPerMillion: '/ 1M token',
       unitPerRequest: '/ 次'
+    }
+  },
+
+  modelMarket: {
+    title: '模型广场',
+    description: '查看当前站点实际支持的 ChatGPT / OpenAI 与 Claude / Claude Code 模型、平台、基础价格与分组实际价格',
+    searchPlaceholder: '搜索模型、平台或分组...',
+    empty: '暂无匹配的模型',
+    loadError: '加载模型广场失败',
+    groupCount: '{count} 个分组',
+    noGroup: '暂无可用分组',
+    stats: {
+      models: '可见模型',
+      modelsHint: '仅展示当前用户可用的 GPT / Claude',
+      lowestRate: '最低倍率',
+      lowestRateHint: '来自当前可用分组',
+      lowestInput: '最低输入价',
+      lowestInputHint: '按最低实际倍率 / 1M tokens',
+      groups: '可用分组',
+      groupsHint: '含默认倍率与用户专属倍率'
+    },
+    filters: {
+      platform: '平台',
+      allPlatforms: '全部平台',
+      claude: 'Claude / Claude Code',
+      billingMode: '计费模式',
+      allBillingModes: '全部计费模式',
+      tier: '模型层级',
+      allTiers: '全部层级',
+      group: '分组',
+      allGroups: '全部分组',
+      sort: '排序',
+      tokenOnly: '仅 Token 模型'
+    },
+    sort: {
+      platformName: '平台 / 名称',
+      lowestInput: '最低输入价',
+      lowestOutput: '最低输出价',
+      lowestRate: '最低倍率'
+    },
+    view: {
+      cards: '卡片',
+      table: '表格'
+    },
+    billing: {
+      token: '按 Token',
+      image: '图片',
+      perRequest: '按次'
+    },
+    table: {
+      model: '模型',
+      platform: '平台',
+      mode: '模式',
+      context: '上下文',
+      basePrice: '基础价格',
+      lowestRate: '最低实际倍率',
+      lowestActualPrice: '最低实际价格',
+      groups: '分组数'
+    },
+    price: {
+      input: '输入',
+      output: '输出',
+      cacheWrite: '缓存写入',
+      cacheWrite1h: '缓存写入 1h',
+      cacheRead: '缓存读取',
+      cacheReadShort: '缓存 R',
+      perRequest: '按次',
+      imageOutput: '图片输出',
+      rate: '倍率'
+    },
+    capabilities: {
+      reasoning: '推理',
+      vision: '视觉',
+      tools: '工具选择',
+      webSearch: '联网搜索',
+      promptCache: 'Prompt Cache',
+      code: '代码',
+      pdf: 'PDF',
+      computerUse: '电脑操作',
+      serviceTier: '服务层级'
+    },
+    tiers: {
+      flagship: '旗舰',
+      pro: 'Pro',
+      mini: 'Mini',
+      nano: 'Nano',
+      opus: 'Opus',
+      sonnet: 'Sonnet',
+      haiku: 'Haiku'
+    },
+    source: {
+      fallback: '兜底价'
+    },
+    card: {
+      lowestActual: '最低实际'
+    },
+    actions: {
+      viewDetail: '查看详情',
+      copyModel: '复制模型名',
+      copied: '模型名已复制',
+      copyFailed: '复制失败'
+    },
+    detail: {
+      description: '说明',
+      descriptionText: '{family} 模型，平台为 {platform}。当前价格按站点可访问分组计算，优先使用用户专属倍率，否则使用分组默认倍率。',
+      channels: '可用渠道',
+      lowestRate: '最低倍率',
+      priceUnit: '价格单位',
+      maxInput: '最大输入',
+      maxOutput: '最大输出',
+      basePrice: '基础价格',
+      groupPricing: '分组价格视图',
+      group: '分组',
+      channel: '渠道',
+      defaultRate: '默认倍率',
+      userRate: '用户倍率',
+      effectiveRate: '实际倍率',
+      finalPrice: '最终价格'
     }
   },
 
@@ -5726,7 +5851,7 @@ export default {
       },
       linuxdo: {
         title: 'LinuxDo Connect 登录',
-        description: '配置 LinuxDo Connect OAuth，用于 Sub2API 用户登录',
+        description: '配置 LinuxDo Connect OAuth，用于 YOUC 用户登录',
         enable: '启用 LinuxDo 登录',
         enableHint: '在登录/注册页面显示 LinuxDo 登录入口',
         clientId: 'Client ID',
@@ -5745,7 +5870,7 @@ export default {
       },
       dingtalk: {
         title: '钉钉登录',
-        description: '配置钉钉 OAuth，用于 Sub2API 用户登录',
+        description: '配置钉钉 OAuth，用于 YOUC 用户登录',
         enable: '启用钉钉登录-企业内部应用',
         enableHint: '在登录/注册页面显示钉钉登录入口',
         clientId: 'Client ID（AppKey）',
@@ -5968,7 +6093,7 @@ export default {
           '禁用用户注册、公开页面和自助服务功能。仅管理员可以登录和管理平台。',
         siteName: '站点名称',
         siteNameHint: '显示在邮件和页面标题中',
-        siteNamePlaceholder: 'Sub2API',
+        siteNamePlaceholder: 'YOUC',
         siteSubtitle: '站点副标题',
         siteSubtitleHint: '显示在登录和注册页面',
         siteSubtitlePlaceholder: '订阅转 API 转换平台',
@@ -6259,7 +6384,7 @@ export default {
         fromEmail: '发件人邮箱',
         fromEmailPlaceholder: "noreply{'@'}example.com",
         fromName: '发件人名称',
-        fromNamePlaceholder: 'Sub2API',
+        fromNamePlaceholder: 'YOUC',
         useTls: '使用 TLS',
         useTlsHint: '为 SMTP 连接启用 TLS 加密'
       },
@@ -6905,16 +7030,16 @@ export default {
     // Admin tour steps
     admin: {
       welcome: {
-        title: '👋 欢迎使用 Sub2API',
+        title: '👋 欢迎使用 YOUC',
         description:
-          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Sub2API 是一个强大的 AI 服务中转平台，让您轻松管理和分发 AI 服务。</p><p style="margin-bottom: 12px;"><b>🎯 核心功能：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>分组管理</b> - 创建不同的服务套餐（VIP、免费试用等）</li><li>🔗 <b>账号池</b> - 连接多个上游 AI 服务商账号</li><li>🔑 <b>密钥分发</b> - 为用户生成独立的 API Key</li><li>💰 <b>计费管理</b> - 灵活的费率和配额控制</li></ul><p style="color: #10b981; font-weight: 600;">接下来，我们将用 3 分钟带您完成首次配置 →</p></div>',
+          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">YOUC 是一个强大的 AI 服务中转平台，让您轻松管理和分发 AI 服务。</p><p style="margin-bottom: 12px;"><b>🎯 核心功能：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>分组管理</b> - 创建不同的服务套餐（VIP、免费试用等）</li><li>🔗 <b>账号池</b> - 连接多个上游 AI 服务商账号</li><li>🔑 <b>密钥分发</b> - 为用户生成独立的 API Key</li><li>💰 <b>计费管理</b> - 灵活的费率和配额控制</li></ul><p style="color: #10b981; font-weight: 600;">接下来，我们将用 3 分钟带您完成首次配置 →</p></div>',
         nextBtn: '开始配置 🚀',
         prevBtn: '跳过'
       },
       groupManage: {
         title: '📦 第一步：分组管理',
         description:
-          '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>什么是分组？</b></p><p style="margin-bottom: 12px;">分组是 Sub2API 的核心概念，它就像一个"服务套餐"：</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 每个分组可以包含多个上游账号</li><li>💰 每个分组有独立的计费倍率</li><li>👥 可以设置为公开或专属分组</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 示例：</b>您可以创建"VIP专线"（高倍率）和"免费试用"（低倍率）两个分组</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 点击左侧的"分组管理"开始</p></div>'
+          '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>什么是分组？</b></p><p style="margin-bottom: 12px;">分组是 YOUC 的核心概念，它就像一个"服务套餐"：</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 每个分组可以包含多个上游账号</li><li>💰 每个分组有独立的计费倍率</li><li>👥 可以设置为公开或专属分组</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 示例：</b>您可以创建"VIP专线"（高倍率）和"免费试用"（低倍率）两个分组</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 点击左侧的"分组管理"开始</p></div>'
       },
       createGroup: {
         title: '➕ 创建新分组',
@@ -7026,9 +7151,9 @@ export default {
     // User tour steps
     user: {
       welcome: {
-        title: '👋 欢迎使用 Sub2API',
+        title: '👋 欢迎使用 YOUC',
         description:
-          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">您好！欢迎来到 Sub2API AI 服务平台。</p><p style="margin-bottom: 12px;"><b>🎯 快速开始：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 创建 API 密钥</li><li>📋 复制密钥到您的应用</li><li>🚀 开始使用 AI 服务</li></ul><p style="color: #10b981; font-weight: 600;">只需 1 分钟，让我们开始吧 →</p></div>',
+          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">您好！欢迎来到 YOUC AI 服务平台。</p><p style="margin-bottom: 12px;"><b>🎯 快速开始：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 创建 API 密钥</li><li>📋 复制密钥到您的应用</li><li>🚀 开始使用 AI 服务</li></ul><p style="color: #10b981; font-weight: 600;">只需 1 分钟，让我们开始吧 →</p></div>',
         nextBtn: '开始 🚀',
         prevBtn: '跳过'
       },

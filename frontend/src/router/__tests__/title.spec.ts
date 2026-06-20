@@ -22,4 +22,19 @@ describe('resolveDocumentTitle', () => {
     expect(before).toBe('Admin Dashboard - Alpha')
     expect(after).toBe('Admin Dashboard - Beta')
   })
+
+  it('法律文档路由按 documentId 生成具体标题', () => {
+    expect(
+      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'terms' })
+    ).toBe('服务条款 - YOUC AI')
+    expect(
+      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'usage-policy' })
+    ).toBe('使用政策 - YOUC AI')
+    expect(
+      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'supported-countries' })
+    ).toBe('支持的国家和地区 - YOUC AI')
+    expect(
+      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'service-specific-terms' })
+    ).toBe('服务特定条款 - YOUC AI')
+  })
 })

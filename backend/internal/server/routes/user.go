@@ -78,6 +78,12 @@ func RegisterUserRoutes(
 			channels.GET("/available", h.AvailableChannel.List)
 		}
 
+		// 模型广场（任意登录用户可见，不依赖可用渠道开关）
+		modelMarket := authenticated.Group("/model-market")
+		{
+			modelMarket.GET("", h.ModelMarket.List)
+		}
+
 		// 使用记录
 		usage := authenticated.Group("/usage")
 		{

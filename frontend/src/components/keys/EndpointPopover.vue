@@ -17,16 +17,19 @@ let copiedResetTimer: number | undefined
 
 const allEndpoints = computed(() => {
   const items: Array<{ name: string; endpoint: string; description: string; isDefault: boolean }> = []
-  if (props.apiBaseUrl) {
+  const apiBaseUrl = props.apiBaseUrl.trim()
+  if (apiBaseUrl) {
     items.push({
       name: t('keys.endpoints.title'),
-      endpoint: props.apiBaseUrl,
+      endpoint: apiBaseUrl,
       description: '',
       isDefault: true,
     })
   }
   for (const ep of props.customEndpoints) {
-    items.push({ ...ep, isDefault: false })
+    const endpoint = ep.endpoint.trim()
+    if (!endpoint) continue
+    items.push({ ...ep, endpoint, isDefault: false })
   }
   return items
 })

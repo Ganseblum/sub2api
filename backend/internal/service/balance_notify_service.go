@@ -22,8 +22,17 @@ const (
 	quotaDimWeekly = "weekly"
 	quotaDimTotal  = "total"
 
-	defaultSiteName = "Sub2API"
+	defaultSiteName       = "YOUC"
+	legacyDefaultSiteName = "Sub2API"
 )
+
+func normalizeSiteName(name string) string {
+	trimmed := strings.TrimSpace(name)
+	if trimmed == "" || trimmed == legacyDefaultSiteName {
+		return defaultSiteName
+	}
+	return trimmed
+}
 
 // quotaDimLabels maps dimension names to display labels.
 var quotaDimLabels = map[string]string{

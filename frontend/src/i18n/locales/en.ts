@@ -187,8 +187,8 @@ export default {
 
   // Setup Wizard
   setup: {
-    title: 'Sub2API Setup',
-    description: 'Configure your Sub2API instance',
+    title: 'YOUC Setup',
+    description: 'Configure your YOUC instance',
     database: {
       title: 'Database Configuration',
       description: 'Connect to your PostgreSQL database',
@@ -389,6 +389,7 @@ export default {
     groups: 'Groups',
     channels: 'Channels',
     availableChannels: 'Available Channels',
+    modelMarket: 'Model Market',
     subscriptions: 'Subscriptions',
     accounts: 'Accounts',
     proxies: 'Proxies',
@@ -443,6 +444,12 @@ export default {
     invalidEmail: 'Please enter a valid email address',
     passwordRequired: 'Password is required',
     passwordMinLength: 'Password must be at least 6 characters',
+    legalConsentPrefix: 'I have read and agree to ',
+    legalConsentTerms: 'Terms of Service',
+    legalConsentUsagePolicy: 'Usage Policies',
+    legalConsentSupportedCountries: 'Supported countries and regions',
+    legalConsentServiceTerms: 'Service-specific terms',
+    legalConsentRequired: 'Please read and agree to the Terms of Service, Usage Policies, supported countries and regions, and service-specific terms.',
     loginFailed: 'Login failed. Please check your credentials and try again.',
     errors: {
       USER_NOT_ACTIVE: 'Account has been disabled.',
@@ -1102,6 +1109,124 @@ export default {
       intervals: 'Tiered Pricing',
       unitPerMillion: '/ 1M tokens',
       unitPerRequest: '/ request'
+    }
+  },
+
+  modelMarket: {
+    title: 'Model Market',
+    description: 'Current ChatGPT / OpenAI and Claude / Claude Code models available to you, with base prices and group-adjusted pricing',
+    searchPlaceholder: 'Search models, platforms, or groups...',
+    empty: 'No matching models',
+    loadError: 'Failed to load model market',
+    groupCount: '{count} groups',
+    noGroup: 'No available group',
+    stats: {
+      models: 'Visible Models',
+      modelsHint: 'Only GPT / Claude models available to you',
+      lowestRate: 'Lowest Rate',
+      lowestRateHint: 'From your accessible groups',
+      lowestInput: 'Lowest Input',
+      lowestInputHint: 'Adjusted by the lowest rate / 1M tokens',
+      groups: 'Groups',
+      groupsHint: 'Default and user-specific rates'
+    },
+    filters: {
+      platform: 'Platform',
+      allPlatforms: 'All Platforms',
+      claude: 'Claude / Claude Code',
+      billingMode: 'Billing Mode',
+      allBillingModes: 'All Billing Modes',
+      tier: 'Model Tier',
+      allTiers: 'All Tiers',
+      group: 'Group',
+      allGroups: 'All Groups',
+      sort: 'Sort',
+      tokenOnly: 'Token models only'
+    },
+    sort: {
+      platformName: 'Platform / Name',
+      lowestInput: 'Lowest Input',
+      lowestOutput: 'Lowest Output',
+      lowestRate: 'Lowest Rate'
+    },
+    view: {
+      cards: 'Cards',
+      table: 'Table'
+    },
+    billing: {
+      token: 'Per Token',
+      image: 'Image',
+      perRequest: 'Per Request'
+    },
+    table: {
+      model: 'Model',
+      platform: 'Platform',
+      mode: 'Mode',
+      context: 'Context',
+      basePrice: 'Base Price',
+      lowestRate: 'Lowest Effective Rate',
+      lowestActualPrice: 'Lowest Actual Price',
+      groups: 'Groups'
+    },
+    price: {
+      input: 'Input',
+      output: 'Output',
+      cacheWrite: 'Cache Write',
+      cacheWrite1h: 'Cache Write 1h',
+      cacheRead: 'Cache Read',
+      cacheReadShort: 'Cache R',
+      perRequest: 'Per Request',
+      imageOutput: 'Image Output',
+      rate: 'Rate'
+    },
+    capabilities: {
+      reasoning: 'Reasoning',
+      vision: 'Vision',
+      tools: 'Tool Choice',
+      webSearch: 'Web Search',
+      promptCache: 'Prompt Cache',
+      code: 'Code',
+      pdf: 'PDF',
+      computerUse: 'Computer Use',
+      serviceTier: 'Service Tier'
+    },
+    tiers: {
+      flagship: 'Flagship',
+      pro: 'Pro',
+      mini: 'Mini',
+      nano: 'Nano',
+      opus: 'Opus',
+      sonnet: 'Sonnet',
+      haiku: 'Haiku'
+    },
+    source: {
+      fallback: 'Fallback'
+    },
+    card: {
+      lowestActual: 'Lowest Actual'
+    },
+    actions: {
+      viewDetail: 'View Details',
+      copyModel: 'Copy Model',
+      copied: 'Model name copied',
+      copyFailed: 'Copy failed'
+    },
+    detail: {
+      description: 'Description',
+      descriptionText: '{family} model on {platform}. Pricing is calculated from accessible groups, using your user-specific rate first and the group default rate otherwise.',
+      channels: 'Channels',
+      lowestRate: 'Lowest Rate',
+      priceUnit: 'Price Unit',
+      maxInput: 'Max Input',
+      maxOutput: 'Max Output',
+      basePrice: 'Base Price',
+      groupPricing: 'Group Pricing View',
+      group: 'Group',
+      channel: 'Channel',
+      defaultRate: 'Default Rate',
+      userRate: 'User Rate',
+      effectiveRate: 'Effective Rate',
+      finalPrice: 'Final Price'
     }
   },
 
@@ -5566,7 +5691,7 @@ export default {
       },
       linuxdo: {
         title: 'LinuxDo Connect Login',
-        description: 'Configure LinuxDo Connect OAuth for Sub2API end-user login',
+        description: 'Configure LinuxDo Connect OAuth for YOUC end-user login',
         enable: 'Enable LinuxDo Login',
         enableHint: 'Show LinuxDo login on the login/register pages',
         clientId: 'Client ID',
@@ -5586,7 +5711,7 @@ export default {
       },
       dingtalk: {
         title: 'DingTalk Login',
-        description: 'Configure DingTalk OAuth for Sub2API end-user login',
+        description: 'Configure DingTalk OAuth for YOUC end-user login',
         enable: 'Enable DingTalk Login (Internal Corporate App)',
         enableHint: 'Show DingTalk login on the login/register pages',
         clientId: 'Client ID (AppKey)',
@@ -5813,7 +5938,7 @@ export default {
         backendModeDescription:
           'Disables user registration, public site, and self-service features. Only admin can log in and manage the platform.',
         siteName: 'Site Name',
-        siteNamePlaceholder: 'Sub2API',
+        siteNamePlaceholder: 'YOUC',
         siteNameHint: 'Displayed in emails and page titles',
         siteSubtitle: 'Site Subtitle',
         siteSubtitlePlaceholder: 'Subscription to API Conversion Platform',
@@ -6103,7 +6228,7 @@ export default {
         fromEmail: 'From Email',
         fromEmailPlaceholder: "noreply{'@'}example.com",
         fromName: 'From Name',
-        fromNamePlaceholder: 'Sub2API',
+        fromNamePlaceholder: 'YOUC',
         useTls: 'Use TLS',
         useTlsHint: 'Enable TLS encryption for SMTP connection'
       },
@@ -6752,14 +6877,14 @@ export default {
     // Admin tour steps
     admin: {
       welcome: {
-        title: '👋 Welcome to Sub2API',
-        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Sub2API is a powerful AI service gateway platform that helps you easily manage and distribute AI services.</p><p style="margin-bottom: 12px;"><b>🎯 Core Features:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>Group Management</b> - Create service tiers (VIP, Free Trial, etc.)</li><li>🔗 <b>Account Pool</b> - Connect multiple upstream AI service accounts</li><li>🔑 <b>Key Distribution</b> - Generate independent API Keys for users</li><li>💰 <b>Billing Control</b> - Flexible rate and quota management</li></ul><p style="color: #10b981; font-weight: 600;">Let\'s complete the initial setup in 3 minutes →</p></div>',
+        title: '👋 Welcome to YOUC',
+        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">YOUC is a powerful AI service gateway platform that helps you easily manage and distribute AI services.</p><p style="margin-bottom: 12px;"><b>🎯 Core Features:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>Group Management</b> - Create service tiers (VIP, Free Trial, etc.)</li><li>🔗 <b>Account Pool</b> - Connect multiple upstream AI service accounts</li><li>🔑 <b>Key Distribution</b> - Generate independent API Keys for users</li><li>💰 <b>Billing Control</b> - Flexible rate and quota management</li></ul><p style="color: #10b981; font-weight: 600;">Let\'s complete the initial setup in 3 minutes →</p></div>',
         nextBtn: 'Start Setup 🚀',
         prevBtn: 'Skip'
       },
       groupManage: {
         title: '📦 Step 1: Group Management',
-        description: '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>What is a Group?</b></p><p style="margin-bottom: 12px;">Groups are the core concept of Sub2API, like a "service package":</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 Each group can contain multiple upstream accounts</li><li>💰 Each group has independent billing multiplier</li><li>👥 Can be set as public or exclusive</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 Example:</b> You can create "VIP Premium" (high rate) and "Free Trial" (low rate) groups</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 Click "Group Management" on the left sidebar</p></div>'
+        description: '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>What is a Group?</b></p><p style="margin-bottom: 12px;">Groups are the core concept of YOUC, like a "service package":</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 Each group can contain multiple upstream accounts</li><li>💰 Each group has independent billing multiplier</li><li>👥 Can be set as public or exclusive</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 Example:</b> You can create "VIP Premium" (high rate) and "Free Trial" (low rate) groups</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 Click "Group Management" on the left sidebar</p></div>'
       },
       createGroup: {
         title: '➕ Create New Group',
@@ -6852,8 +6977,8 @@ export default {
     // User tour steps
     user: {
       welcome: {
-        title: '👋 Welcome to Sub2API',
-        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Hello! Welcome to the Sub2API AI service platform.</p><p style="margin-bottom: 12px;"><b>🎯 Quick Start:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 Create API Key</li><li>📋 Copy key to your application</li><li>🚀 Start using AI services</li></ul><p style="color: #10b981; font-weight: 600;">Just 1 minute, let\'s get started →</p></div>',
+        title: '👋 Welcome to YOUC',
+        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Hello! Welcome to the YOUC AI service platform.</p><p style="margin-bottom: 12px;"><b>🎯 Quick Start:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 Create API Key</li><li>📋 Copy key to your application</li><li>🚀 Start using AI services</li></ul><p style="color: #10b981; font-weight: 600;">Just 1 minute, let\'s get started →</p></div>',
         nextBtn: 'Start 🚀',
         prevBtn: 'Skip'
       },

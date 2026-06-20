@@ -11,6 +11,7 @@ import { useAdminComplianceStore } from '@/stores/adminCompliance'
 import { useNavigationLoadingState } from '@/composables/useNavigationLoading'
 import { useRoutePrefetch } from '@/composables/useRoutePrefetch'
 import { getSetupStatus } from '@/api/setup'
+import { normalizeBrandName } from '@/config/brand'
 import { resolveCompletedSetupRedirectPath } from './setupRedirect'
 import { resolveDocumentTitle } from './title'
 
@@ -251,6 +252,18 @@ const routes: RouteRecordRaw[] = [
       title: 'Available Channels',
       titleKey: 'availableChannels.title',
       descriptionKey: 'availableChannels.description'
+    }
+  },
+  {
+    path: '/model-market',
+    name: 'ModelMarket',
+    component: () => import('@/views/user/ModelMarketView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Model Market',
+      titleKey: 'modelMarket.title',
+      descriptionKey: 'modelMarket.description'
     }
   },
   {
@@ -740,13 +753,13 @@ router.beforeEach(async (to, _from, next) => {
     const menuItem = publicItems.find((item) => item.id === id)
       ?? (authStore.isAdmin ? adminSettingsStore.customMenuItems.find((item) => item.id === id) : undefined)
     if (menuItem?.label) {
-      const siteName = appStore.siteName || 'Sub2API'
+      const siteName = normalizeBrandName(appStore.siteName)
       document.title = `${menuItem.label} - ${siteName}`
     } else {
-      document.title = resolveDocumentTitle(to.meta.title, appStore.siteName, to.meta.titleKey as string)
+      document.title = resolveDocumentTitle(to.meta.title, appStore.siteName, to.meta.titleKey as string, to.params)
     }
   } else {
-    document.title = resolveDocumentTitle(to.meta.title, appStore.siteName, to.meta.titleKey as string)
+    document.title = resolveDocumentTitle(to.meta.title, appStore.siteName, to.meta.titleKey as string, to.params)
   }
 
   // Check if route requires authentication

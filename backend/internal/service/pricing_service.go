@@ -56,23 +56,46 @@ var (
 // LiteLLMModelPricing LiteLLM价格数据结构
 // 只保留我们需要的字段，使用指针来处理可能缺失的值
 type LiteLLMModelPricing struct {
-	InputCostPerToken                   float64 `json:"input_cost_per_token"`
-	InputCostPerTokenPriority           float64 `json:"input_cost_per_token_priority"`
-	OutputCostPerToken                  float64 `json:"output_cost_per_token"`
-	OutputCostPerTokenPriority          float64 `json:"output_cost_per_token_priority"`
-	CacheCreationInputTokenCost         float64 `json:"cache_creation_input_token_cost"`
-	CacheCreationInputTokenCostAbove1hr float64 `json:"cache_creation_input_token_cost_above_1hr"`
-	CacheReadInputTokenCost             float64 `json:"cache_read_input_token_cost"`
-	CacheReadInputTokenCostPriority     float64 `json:"cache_read_input_token_cost_priority"`
-	LongContextInputTokenThreshold      int     `json:"long_context_input_token_threshold,omitempty"`
-	LongContextInputCostMultiplier      float64 `json:"long_context_input_cost_multiplier,omitempty"`
-	LongContextOutputCostMultiplier     float64 `json:"long_context_output_cost_multiplier,omitempty"`
-	SupportsServiceTier                 bool    `json:"supports_service_tier"`
-	LiteLLMProvider                     string  `json:"litellm_provider"`
-	Mode                                string  `json:"mode"`
-	SupportsPromptCaching               bool    `json:"supports_prompt_caching"`
-	OutputCostPerImage                  float64 `json:"output_cost_per_image"`       // 图片生成模型每张图片价格
-	OutputCostPerImageToken             float64 `json:"output_cost_per_image_token"` // 图片输出 token 价格
+	InputCostPerToken                   float64  `json:"input_cost_per_token"`
+	InputCostPerTokenPriority           float64  `json:"input_cost_per_token_priority"`
+	OutputCostPerToken                  float64  `json:"output_cost_per_token"`
+	OutputCostPerTokenPriority          float64  `json:"output_cost_per_token_priority"`
+	CacheCreationInputTokenCost         float64  `json:"cache_creation_input_token_cost"`
+	CacheCreationInputTokenCostAbove1hr float64  `json:"cache_creation_input_token_cost_above_1hr"`
+	CacheReadInputTokenCost             float64  `json:"cache_read_input_token_cost"`
+	CacheReadInputTokenCostPriority     float64  `json:"cache_read_input_token_cost_priority"`
+	LongContextInputTokenThreshold      int      `json:"long_context_input_token_threshold,omitempty"`
+	LongContextInputCostMultiplier      float64  `json:"long_context_input_cost_multiplier,omitempty"`
+	LongContextOutputCostMultiplier     float64  `json:"long_context_output_cost_multiplier,omitempty"`
+	SupportsServiceTier                 bool     `json:"supports_service_tier"`
+	LiteLLMProvider                     string   `json:"litellm_provider"`
+	Mode                                string   `json:"mode"`
+	SupportsPromptCaching               bool     `json:"supports_prompt_caching"`
+	OutputCostPerImage                  float64  `json:"output_cost_per_image"`       // 图片生成模型每张图片价格
+	OutputCostPerImageToken             float64  `json:"output_cost_per_image_token"` // 图片输出 token 价格
+	MaxInputTokens                      int      `json:"max_input_tokens,omitempty"`
+	MaxOutputTokens                     int      `json:"max_output_tokens,omitempty"`
+	MaxTokens                           int      `json:"max_tokens,omitempty"`
+	SupportedEndpoints                  []string `json:"supported_endpoints,omitempty"`
+	SupportedModalities                 []string `json:"supported_modalities,omitempty"`
+	SupportedOutputModalities           []string `json:"supported_output_modalities,omitempty"`
+	SupportsAdaptiveThinking            bool     `json:"supports_adaptive_thinking"`
+	SupportsAssistantPrefill            bool     `json:"supports_assistant_prefill"`
+	SupportsComputerUse                 bool     `json:"supports_computer_use"`
+	SupportsFunctionCalling             bool     `json:"supports_function_calling"`
+	SupportsMaxReasoningEffort          bool     `json:"supports_max_reasoning_effort"`
+	SupportsMinimalReasoningEffort      bool     `json:"supports_minimal_reasoning_effort"`
+	SupportsNativeStreaming             bool     `json:"supports_native_streaming"`
+	SupportsOutputConfig                bool     `json:"supports_output_config"`
+	SupportsParallelFunctionCalling     bool     `json:"supports_parallel_function_calling"`
+	SupportsPDFInput                    bool     `json:"supports_pdf_input"`
+	SupportsReasoning                   bool     `json:"supports_reasoning"`
+	SupportsResponseSchema              bool     `json:"supports_response_schema"`
+	SupportsSystemMessages              bool     `json:"supports_system_messages"`
+	SupportsToolChoice                  bool     `json:"supports_tool_choice"`
+	SupportsVision                      bool     `json:"supports_vision"`
+	SupportsWebSearch                   bool     `json:"supports_web_search"`
+	SupportsXHighReasoningEffort        bool     `json:"supports_xhigh_reasoning_effort"`
 }
 
 // PricingRemoteClient 远程价格数据获取接口
@@ -97,6 +120,29 @@ type LiteLLMRawEntry struct {
 	SupportsPromptCaching               bool     `json:"supports_prompt_caching"`
 	OutputCostPerImage                  *float64 `json:"output_cost_per_image"`
 	OutputCostPerImageToken             *float64 `json:"output_cost_per_image_token"`
+	MaxInputTokens                      int      `json:"max_input_tokens"`
+	MaxOutputTokens                     int      `json:"max_output_tokens"`
+	MaxTokens                           int      `json:"max_tokens"`
+	SupportedEndpoints                  []string `json:"supported_endpoints"`
+	SupportedModalities                 []string `json:"supported_modalities"`
+	SupportedOutputModalities           []string `json:"supported_output_modalities"`
+	SupportsAdaptiveThinking            bool     `json:"supports_adaptive_thinking"`
+	SupportsAssistantPrefill            bool     `json:"supports_assistant_prefill"`
+	SupportsComputerUse                 bool     `json:"supports_computer_use"`
+	SupportsFunctionCalling             bool     `json:"supports_function_calling"`
+	SupportsMaxReasoningEffort          bool     `json:"supports_max_reasoning_effort"`
+	SupportsMinimalReasoningEffort      bool     `json:"supports_minimal_reasoning_effort"`
+	SupportsNativeStreaming             bool     `json:"supports_native_streaming"`
+	SupportsOutputConfig                bool     `json:"supports_output_config"`
+	SupportsParallelFunctionCalling     bool     `json:"supports_parallel_function_calling"`
+	SupportsPDFInput                    bool     `json:"supports_pdf_input"`
+	SupportsReasoning                   bool     `json:"supports_reasoning"`
+	SupportsResponseSchema              bool     `json:"supports_response_schema"`
+	SupportsSystemMessages              bool     `json:"supports_system_messages"`
+	SupportsToolChoice                  bool     `json:"supports_tool_choice"`
+	SupportsVision                      bool     `json:"supports_vision"`
+	SupportsWebSearch                   bool     `json:"supports_web_search"`
+	SupportsXHighReasoningEffort        bool     `json:"supports_xhigh_reasoning_effort"`
 }
 
 // PricingService 动态价格服务
@@ -378,10 +424,33 @@ func (s *PricingService) parsePricingData(body []byte) (map[string]*LiteLLMModel
 		}
 
 		pricing := &LiteLLMModelPricing{
-			LiteLLMProvider:       entry.LiteLLMProvider,
-			Mode:                  entry.Mode,
-			SupportsPromptCaching: entry.SupportsPromptCaching,
-			SupportsServiceTier:   entry.SupportsServiceTier,
+			LiteLLMProvider:                 entry.LiteLLMProvider,
+			Mode:                            entry.Mode,
+			SupportsPromptCaching:           entry.SupportsPromptCaching,
+			SupportsServiceTier:             entry.SupportsServiceTier,
+			MaxInputTokens:                  entry.MaxInputTokens,
+			MaxOutputTokens:                 entry.MaxOutputTokens,
+			MaxTokens:                       entry.MaxTokens,
+			SupportedEndpoints:              append([]string(nil), entry.SupportedEndpoints...),
+			SupportedModalities:             append([]string(nil), entry.SupportedModalities...),
+			SupportedOutputModalities:       append([]string(nil), entry.SupportedOutputModalities...),
+			SupportsAdaptiveThinking:        entry.SupportsAdaptiveThinking,
+			SupportsAssistantPrefill:        entry.SupportsAssistantPrefill,
+			SupportsComputerUse:             entry.SupportsComputerUse,
+			SupportsFunctionCalling:         entry.SupportsFunctionCalling,
+			SupportsMaxReasoningEffort:      entry.SupportsMaxReasoningEffort,
+			SupportsMinimalReasoningEffort:  entry.SupportsMinimalReasoningEffort,
+			SupportsNativeStreaming:         entry.SupportsNativeStreaming,
+			SupportsOutputConfig:            entry.SupportsOutputConfig,
+			SupportsParallelFunctionCalling: entry.SupportsParallelFunctionCalling,
+			SupportsPDFInput:                entry.SupportsPDFInput,
+			SupportsReasoning:               entry.SupportsReasoning,
+			SupportsResponseSchema:          entry.SupportsResponseSchema,
+			SupportsSystemMessages:          entry.SupportsSystemMessages,
+			SupportsToolChoice:              entry.SupportsToolChoice,
+			SupportsVision:                  entry.SupportsVision,
+			SupportsWebSearch:               entry.SupportsWebSearch,
+			SupportsXHighReasoningEffort:    entry.SupportsXHighReasoningEffort,
 		}
 
 		if entry.InputCostPerToken != nil {
@@ -575,6 +644,25 @@ func (s *PricingService) GetModelPricing(modelName string) *LiteLLMModelPricing 
 	}
 
 	return nil
+}
+
+// HasExactModelPricing reports whether the loaded pricing catalog contains the
+// model directly, after applying the same canonical-name normalization used by
+// GetModelPricing. It intentionally does not use family/static fallback.
+func (s *PricingService) HasExactModelPricing(modelName string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if modelName == "" {
+		return false
+	}
+	modelLower := strings.ToLower(strings.TrimSpace(modelName))
+	for _, candidate := range s.buildModelLookupCandidates(modelLower) {
+		if _, ok := s.pricingData[candidate]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *PricingService) buildModelLookupCandidates(modelLower string) []string {

@@ -66,4 +66,21 @@ describe('EndpointPopover', () => {
     expect(wrapper.text()).toContain('已复制到剪贴板')
     expect(wrapper.find('button[aria-label="已复制到剪贴板"]').exists()).toBe(true)
   })
+
+  it('会修剪端点并跳过空的自定义端点', () => {
+    const wrapper = mount(EndpointPopover, {
+      props: {
+        apiBaseUrl: '  https://default.example.com/v1  ',
+        customEndpoints: [
+          { name: '空端点', endpoint: '   ', description: '' },
+          { name: '备用线路', endpoint: '  https://backup.example.com/v1  ', description: '' },
+        ],
+      },
+    })
+
+    expect(wrapper.text()).toContain('https://default.example.com/v1')
+    expect(wrapper.text()).toContain('https://backup.example.com/v1')
+    expect(wrapper.text()).not.toContain('空端点')
+    expect(wrapper.findAll('[role="button"]')).toHaveLength(2)
+  })
 })

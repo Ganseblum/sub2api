@@ -24,8 +24,7 @@
             />
           </div>
           <EndpointPopover
-            v-if="publicSettings?.api_base_url || (publicSettings?.custom_endpoints?.length ?? 0) > 0"
-            :api-base-url="publicSettings?.api_base_url || ''"
+            :api-base-url="effectiveApiBaseUrl"
             :custom-endpoints="publicSettings?.custom_endpoints || []"
           />
         </div>
@@ -924,7 +923,7 @@
     <UseKeyModal
       :show="showUseKeyModal"
       :api-key="selectedKey?.key || ''"
-      :base-url="publicSettings?.api_base_url || ''"
+      :base-url="effectiveApiBaseUrl"
       :platform="selectedKey?.group?.platform || null"
       :allow-messages-dispatch="selectedKey?.group?.allow_messages_dispatch || false"
       @close="closeUseKeyModal"
@@ -1153,6 +1152,15 @@ const dropdownRef = ref<HTMLElement | null>(null)
 const dropdownPosition = ref<{ top?: number; bottom?: number; left: number } | null>(null)
 const groupButtonRefs = ref<Map<number, HTMLElement>>(new Map())
 let abortController: AbortController | null = null
+
+const DEFAULT_API_BASE_URL = 'https://ai.youc.online'
+const normalizeApiBaseUrl = (value?: string | null) => (value || '').trim().replace(/\/+$/, '')
+
+const effectiveApiBaseUrl = computed(() => {
+  const configured = normalizeApiBaseUrl(publicSettings.value?.api_base_url)
+  if (configured) return configured
+  return DEFAULT_API_BASE_URL
+})
 
 // Get the currently selected key for group change
 const selectedKeyForGroup = computed(() => {
@@ -1705,7 +1713,7 @@ const importToCcswitch = (row: ApiKey) => {
 }
 
 const executeCcsImport = (row: ApiKey, clientType: CcSwitchClientType) => {
-  const baseUrl = publicSettings.value?.api_base_url || window.location.origin
+  const baseUrl = effectiveApiBaseUrl.value
   const platform = row.group?.platform || 'anthropic'
 
   const usageScript = `({

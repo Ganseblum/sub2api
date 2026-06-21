@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IP 管理 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>IP / 代理管理</h1><p>为上游账号配置出口代理，分散来源 IP</p></div>
+        <button class="btn btn-acc" data-open="newProxy">+ 添加代理</button></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>名称</th><th>类型</th><th>地址</th><th>绑定账号</th><th>延迟</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>us-west-1</b></td><td><span class="badge b-mute">HTTP</span></td><td class="mono">10.0.•••:8080</td><td class="mono">acc-1, acc-2</td><td class="mono">82ms</td><td><span class="badge b-on">可用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newProxy">编辑</a><a>测速</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+          <tr><td><b>sg-1</b></td><td><span class="badge b-mute">SOCKS5</span></td><td class="mono">10.0.•••:1080</td><td class="mono">acc-7</td><td class="mono">120ms</td><td><span class="badge b-on">可用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newProxy">编辑</a><a>测速</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+          <tr><td><b>eu-1</b></td><td><span class="badge b-mute">HTTP</span></td><td class="mono">10.0.•••:3128</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge b-danger">超时</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newProxy">编辑</a><a>测速</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newProxy"><div class="modal">
+  <div class="modal-head"><h3>代理配置</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <label class="field"><span class="label">名称</span><input class="input" value="us-west-1"></label>
+    <div class="grid-2">
+      <label class="field"><span class="label">类型</span><select class="select"><option>HTTP</option><option>HTTPS</option><option>SOCKS5</option></select></label>
+      <label class="field"><span class="label">端口</span><input class="input" value="8080"></label>
+    </div>
+    <label class="field"><span class="label">地址</span><input class="input mono" placeholder="host:port"></label>
+    <div class="grid-2">
+      <label class="field"><span class="label">用户名</span><input class="input"></label>
+      <label class="field"><span class="label">密码</span><input class="input" type="password"></label>
+    </div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="代理已保存">保存</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/proxies',title:'IP 管理',idx:'ADMIN / PROXIES'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

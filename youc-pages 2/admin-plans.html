@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>订阅套餐 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>订阅套餐</h1><p>配置面向用户售卖的套餐与价格</p></div>
+        <button class="btn btn-acc" data-open="newPlan">+ 新建套餐</button></div>
+      <div class="grid-3">
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between"><b style="text-transform:uppercase">入门</b><span class="badge b-on">在售</span></div>
+          <div style="font-size:30px;font-weight:850;margin:10px 0">¥39<small style="font-size:13px">/月</small></div>
+          <div class="kv"><span class="k">额度</span><b>10M Tokens</b></div><div class="kv"><span class="k">密钥</span><b>3</b></div><div class="kv"><span class="k">已售</span><b>116</b></div>
+          <button class="btn btn-block" style="margin-top:14px" data-open="newPlan">编辑</button>
+        </div>
+        <div class="card card-pad" style="box-shadow:6px 6px 0 var(--accent2)">
+          <div style="display:flex;justify-content:space-between"><b style="text-transform:uppercase">Pro</b><span class="badge b-on">在售 · 推荐</span></div>
+          <div style="font-size:30px;font-weight:850;margin:10px 0">¥99<small style="font-size:13px">/月</small></div>
+          <div class="kv"><span class="k">额度</span><b>50M Tokens</b></div><div class="kv"><span class="k">密钥</span><b>∞</b></div><div class="kv"><span class="k">已售</span><b>312</b></div>
+          <button class="btn btn-block" style="margin-top:14px" data-open="newPlan">编辑</button>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between"><b style="text-transform:uppercase">团队</b><span class="badge b-on">在售</span></div>
+          <div style="font-size:30px;font-weight:850;margin:10px 0">¥299<small style="font-size:13px">/月</small></div>
+          <div class="kv"><span class="k">额度</span><b>200M Tokens</b></div><div class="kv"><span class="k">密钥</span><b>∞</b></div><div class="kv"><span class="k">已售</span><b>58</b></div>
+          <button class="btn btn-block" style="margin-top:14px" data-open="newPlan">编辑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newPlan"><div class="modal lg">
+  <div class="modal-head"><h3>套餐配置</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <label class="field"><span class="label">套餐名称</span><input class="input" value="Pro"></label>
+      <label class="field"><span class="label">价格 (¥)</span><input class="input" value="99"></label>
+      <label class="field"><span class="label">计费周期</span><select class="select"><option>月付</option><option>季付</option><option>年付</option></select></label>
+      <label class="field"><span class="label">Token 额度</span><input class="input" value="50000000"></label>
+      <label class="field"><span class="label">密钥上限</span><input class="input" value="0（不限）"></label>
+      <label class="field"><span class="label">绑定分组</span><select class="select"><option>default</option><option>vip</option></select></label>
+    </div>
+    <label class="field"><span class="label">特性 (每行一条)</span><textarea class="textarea">全部模型 + 多账号调度
+会话保持 / 并发限流
+成员额度与成本分析</textarea></label>
+    <label class="checkrow"><input type="checkbox" checked> 在售</label> &nbsp; <label class="checkrow"><input type="checkbox" checked> 标记为推荐</label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="套餐已保存">保存</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/orders/plans',title:'订阅套餐',idx:'ADMIN / PLANS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

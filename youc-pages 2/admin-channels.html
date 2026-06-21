@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>渠道定价 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>渠道定价</h1><p>配置各模型的输入/输出单价与倍率</p></div>
+        <button class="btn btn-acc" data-open="newModel">+ 新增模型</button></div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">Claude</div><div class="tab">GPT</div><div class="tab">Gemini</div></div>
+        <div class="spacer"></div><input class="input" style="max-width:220px" placeholder="搜索模型…"></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>模型</th><th>厂商</th><th>输入价 /M</th><th>输出价 /M</th><th>倍率</th><th>上下文</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>claude-3.5-sonnet</b></td><td>Claude</td><td class="mono">¥21.0</td><td class="mono">¥105.0</td><td class="mono">1.0x</td><td class="mono">200K</td><td><span class="badge b-on">上架</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newModel">编辑</a><a>复制</a><div class="sep"></div><a class="danger">下架</a></div></div></td></tr>
+          <tr><td><b>gpt-4o</b></td><td>GPT</td><td class="mono">¥18.0</td><td class="mono">¥72.0</td><td class="mono">1.0x</td><td class="mono">128K</td><td><span class="badge b-on">上架</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newModel">编辑</a><a>复制</a><div class="sep"></div><a class="danger">下架</a></div></div></td></tr>
+          <tr><td><b>gemini-2.0-flash</b></td><td>Gemini</td><td class="mono">¥5.0</td><td class="mono">¥15.0</td><td class="mono">1.0x</td><td class="mono">1M</td><td><span class="badge b-on">上架</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newModel">编辑</a><a>复制</a><div class="sep"></div><a class="danger">下架</a></div></div></td></tr>
+          <tr><td><b>antigravity-pro</b></td><td>Antigravity</td><td class="mono">¥12.0</td><td class="mono">¥48.0</td><td class="mono">1.2x</td><td class="mono">256K</td><td><span class="badge b-mute">下架</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newModel">编辑</a><a>上架</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newModel"><div class="modal lg">
+  <div class="modal-head"><h3>模型定价</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <label class="field"><span class="label">模型 ID</span><input class="input" value="claude-3.5-sonnet"></label>
+      <label class="field"><span class="label">厂商</span><select class="select"><option>Claude</option><option>GPT</option><option>Gemini</option><option>Antigravity</option></select></label>
+      <label class="field"><span class="label">输入价 (¥/M)</span><input class="input" value="21.0"></label>
+      <label class="field"><span class="label">输出价 (¥/M)</span><input class="input" value="105.0"></label>
+      <label class="field"><span class="label">倍率</span><input class="input" value="1.0"></label>
+      <label class="field"><span class="label">上下文</span><input class="input" value="200K"></label>
+    </div>
+    <label class="checkrow"><input type="checkbox" checked> 立即上架</label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="定价已保存">保存</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/channels/pricing',title:'渠道定价',idx:'ADMIN / CHANNEL PRICING'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>系统设置 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>系统设置</h1><p>站点、登录、支付、邮件与功能开关</p></div>
+        <button class="btn btn-acc" data-toast="ok" data-toast-title="设置已保存">保存全部</button></div>
+      <div class="tabs" style="margin-bottom:20px">
+        <div class="tab active" data-tab="site" data-tabs="set">站点</div>
+        <div class="tab" data-tab="auth" data-tabs="set">登录注册</div>
+        <div class="tab" data-tab="pay" data-tabs="set">支付</div>
+        <div class="tab" data-tab="mail" data-tabs="set">邮件</div>
+        <div class="tab" data-tab="feat" data-tabs="set">功能开关</div>
+      </div>
+      <div data-tabhost="set">
+        <div data-pane="site">
+          <div class="card card-pad" style="max-width:640px">
+            <label class="field"><span class="label">站点名称</span><input class="input" value="YOUC"></label>
+            <label class="field"><span class="label">站点域名</span><input class="input" value="https://youc.io"></label>
+            <label class="field"><span class="label">API BaseURL</span><input class="input mono" value="https://api.youc.io"></label>
+            <label class="field"><span class="label">Logo 文案</span><input class="input" value="YC"></label>
+            <label class="field"><span class="label">页脚版权</span><input class="input" value="© 2026 YOUC — AI API Gateway"></label>
+          </div>
+        </div>
+        <div data-pane="auth" style="display:none">
+          <div class="card card-pad" style="max-width:640px">
+            <div class="kv"><span><b>允许新用户注册</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>注册需邮箱验证</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>开启图形/Turnstile 验证</b></span><span class="toggle on"></span></div>
+            <label class="field" style="margin-top:14px"><span class="label">允许的邮箱域名 (逗号分隔，留空=全部)</span><input class="input" placeholder="gmail.com, youc.io"></label>
+            <span class="label">第三方登录</span>
+            <div class="kv"><span>GitHub OAuth</span><span class="toggle on"></span></div>
+            <div class="kv"><span>Google OAuth</span><span class="toggle on"></span></div>
+            <div class="kv"><span>微信 / 钉钉</span><span class="toggle"></span></div>
+            <div class="kv"><span>LinuxDo / OIDC</span><span class="toggle on"></span></div>
+          </div>
+        </div>
+        <div data-pane="pay" style="display:none">
+          <div class="card card-pad" style="max-width:640px">
+            <div class="kv"><span><b>微信支付</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>支付宝</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>Stripe</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>Airwallex</b></span><span class="toggle"></span></div>
+            <label class="field" style="margin-top:14px"><span class="label">Stripe Secret Key</span><input class="input mono" type="password" value="sk_live_••••••••"></label>
+            <label class="field"><span class="label">货币</span><select class="select"><option>CNY</option><option>USD</option></select></label>
+          </div>
+        </div>
+        <div data-pane="mail" style="display:none">
+          <div class="card card-pad" style="max-width:640px">
+            <div class="grid-2">
+              <label class="field"><span class="label">SMTP 主机</span><input class="input" value="smtp.youc.io"></label>
+              <label class="field"><span class="label">端口</span><input class="input" value="465"></label>
+              <label class="field"><span class="label">用户名</span><input class="input" value="noreply@youc.io"></label>
+              <label class="field"><span class="label">密码</span><input class="input" type="password" value="••••••••"></label>
+            </div>
+            <label class="field"><span class="label">发件人名称</span><input class="input" value="YOUC"></label>
+            <button class="btn" data-toast="info" data-toast-title="测试邮件已发送">发送测试邮件</button>
+          </div>
+        </div>
+        <div data-pane="feat" style="display:none">
+          <div class="card card-pad" style="max-width:640px">
+            <div class="kv"><span><b>简易模式</b><p class="hint">隐藏高级菜单</p></span><span class="toggle"></span></div>
+            <div class="kv"><span><b>可用渠道页</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>渠道监控</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>邀请返利</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>支付/订阅</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>风控中心</b></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>运维监控</b></span><span class="toggle on"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'admin',active:'/admin/settings',title:'系统设置',idx:'ADMIN / SETTINGS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

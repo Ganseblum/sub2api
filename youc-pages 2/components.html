@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>组件库 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+<style>
+.cs-head{border-bottom:2.5px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:60}
+.cs-head .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.demo{border:2.5px solid var(--line);background:var(--paper);box-shadow:4px 4px 0 var(--line);padding:24px;margin-bottom:22px}
+.demo h3{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.demo h3:before{content:"";width:14px;height:14px;background:var(--accent2);border:2.5px solid var(--line)}
+.row-wrap{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:820px){.cs-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="cs-head"><div class="wrap">
+  <div class="logo" style="display:flex;align-items:center;gap:10px;font-weight:800"><span class="sb-mark">YC</span> YOUC · 组件库</div>
+  <a class="btn btn-sm" href="index.html">← 返回总览</a>
+</div></header>
+
+<div class="wrap" style="padding:30px 24px 60px">
+  <div class="page-head"><div><h1>组件库 / Components</h1><p>设计系统中的全部 UI 组件 · 青色硬边框等宽风</p></div></div>
+
+  <div class="cs-grid">
+    <div class="demo"><h3>按钮 Buttons</h3>
+      <div class="row-wrap" style="margin-bottom:12px"><button class="btn">默认</button><button class="btn btn-fill">填充</button><button class="btn btn-acc">主色</button><button class="btn btn-danger">危险</button><button class="btn btn-ghost">幽灵</button></div>
+      <div class="row-wrap"><button class="btn btn-sm">小号</button><button class="btn">中号</button><button class="btn btn-lg">大号</button><button class="btn" disabled>禁用</button></div>
+    </div>
+
+    <div class="demo"><h3>徽章 Badges</h3>
+      <div class="row-wrap"><span class="badge">默认</span><span class="badge b-ok">成功</span><span class="badge b-on">启用</span><span class="badge b-warn">警告</span><span class="badge b-danger">错误</span><span class="badge b-mute">禁用</span></div>
+      <div class="row-wrap" style="margin-top:12px"><span class="dot g"></span> 在线 <span class="dot y"></span> 降级 <span class="dot r"></span> 离线 <span class="dot x"></span> 未知</div>
+    </div>
+
+    <div class="demo"><h3>输入 / 表单 Inputs</h3>
+      <label class="field"><span class="label">文本输入</span><input class="input" placeholder="请输入…"></label>
+      <label class="field"><span class="label">下拉选择</span><select class="select"><option>选项 A</option><option>选项 B</option></select></label>
+      <label class="field"><span class="label">多行文本</span><textarea class="textarea" placeholder="多行…"></textarea></label>
+      <label class="field"><span class="label">错误态</span><input class="input" value="无效值" style="box-shadow:4px 4px 0 var(--danger)"><span class="err">该字段填写有误</span></label>
+    </div>
+
+    <div class="demo"><h3>开关 / 勾选 Toggle</h3>
+      <div class="row-wrap" style="margin-bottom:14px"><span class="toggle on"></span> 已开启 &nbsp;&nbsp; <span class="toggle"></span> 已关闭</div>
+      <label class="checkrow" style="margin-bottom:8px"><input type="checkbox" checked> 已勾选</label>
+      <label class="checkrow"><input type="checkbox"> 未勾选</label>
+    </div>
+
+    <div class="demo"><h3>选项卡 Tabs</h3>
+      <div class="tabs" data-tabs="cs"><div class="tab active" data-tab="a">概览</div><div class="tab" data-tab="b">明细</div><div class="tab" data-tab="c">设置</div></div>
+      <div data-tabhost="cs" style="margin-top:14px">
+        <div data-pane="a">概览面板内容。</div>
+        <div data-pane="b" style="display:none">明细面板内容。</div>
+        <div data-pane="c" style="display:none">设置面板内容。</div>
+      </div>
+    </div>
+
+    <div class="demo"><h3>下拉菜单 Dropdown</h3>
+      <div class="dropdown"><button class="btn" data-menu>操作 ▾</button>
+        <div class="menu"><a>编辑</a><a>复制</a><div class="sep"></div><a class="danger">删除</a></div></div>
+    </div>
+
+    <div class="demo"><h3>弹窗 Modal / Dialog</h3>
+      <div class="row-wrap"><button class="btn btn-fill" data-open="demoModal">打开表单弹窗</button><button class="btn btn-danger" data-open="demoConfirm">打开确认框</button></div>
+    </div>
+
+    <div class="demo"><h3>消息提示 Toast</h3>
+      <div class="row-wrap"><button class="btn" data-toast="ok" data-toast-title="成功" data-toast-msg="操作已完成">成功</button>
+        <button class="btn" data-toast="err" data-toast-title="失败" data-toast-msg="请稍后重试">错误</button>
+        <button class="btn" data-toast="warn" data-toast-title="警告" data-toast-msg="额度即将用尽">警告</button>
+        <button class="btn" data-toast="info" data-toast-title="提示" data-toast-msg="有新版本可用">信息</button></div>
+    </div>
+
+    <div class="demo"><h3>进度 / 工具提示</h3>
+      <div class="kv"><span>额度使用</span><b>62%</b></div><div class="bar" style="margin:8px 0 16px"><span style="width:62%"></span></div>
+      <span class="tip" data-tip="这是一个工具提示">悬停查看 Tooltip</span>
+    </div>
+
+    <div class="demo"><h3>统计卡 Stat</h3>
+      <div class="stats" style="grid-template-columns:1fr 1fr"><div class="stat"><div class="n">¥86.4</div><div class="l">余额</div><div class="d up">↑ 12%</div></div><div class="stat"><div class="n">1,902</div><div class="l">请求</div><div class="d down">↓ 4%</div></div></div>
+    </div>
+
+    <div class="demo"><h3>分页 Pagination</h3>
+      <div class="pager"><a>‹</a><span class="cur">1</span><a>2</a><a>3</a><a>…</a><a>27</a><a>›</a></div>
+    </div>
+
+    <div class="demo"><h3>空状态 Empty</h3>
+      <div class="empty"><div class="ico">∅</div><h4>暂无数据</h4><p>当前筛选条件下没有记录</p></div>
+    </div>
+  </div>
+
+  <div class="demo"><h3>表格 Table</h3>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>名称</th><th>状态</th><th>用量</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>prod-key</td><td><span class="badge b-on">启用</span></td><td class="mono">8.2M</td><td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a>编辑</a><a class="danger">删除</a></div></div></td></tr>
+        <tr><td>test-key</td><td><span class="badge b-mute">禁用</span></td><td class="mono">1.1M</td><td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a>编辑</a><a class="danger">删除</a></div></div></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="demo"><h3>代码块 Code</h3>
+    <div class="codeblock"><div>$ curl <span class="k">api.youc.io</span>/v1/messages \</div><div>&nbsp;&nbsp;-H <span class="s">"Authorization: Bearer sk-youc-•••"</span></div><div><span class="ok">200 OK</span> <span class="c"># 1,240 tokens</span></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="demoModal"><div class="modal">
+  <div class="modal-head"><h3>表单弹窗</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body"><label class="field"><span class="label">名称</span><input class="input" placeholder="请输入…"></label><label class="field"><span class="label">类型</span><select class="select"><option>A</option><option>B</option></select></label></div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="已保存">确定</button></div>
+</div></div>
+<div class="overlay" id="demoConfirm"><div class="modal" style="max-width:420px">
+  <div class="modal-head"><h3>确认删除</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body"><p class="sans">此操作不可撤销，确定要删除该项吗？</p></div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-danger" data-close data-toast="warn" data-toast-title="已删除">删除</button></div>
+</div></div>
+
+<script src="assets/shell.js"></script>
+</body>
+</html>

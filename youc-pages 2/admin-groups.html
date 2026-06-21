@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>分组管理 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>分组管理</h1><p>为用户与密钥配置模型权限与倍率分组</p></div>
+        <button class="btn btn-acc" data-open="newGroup">+ 新建分组</button></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>分组</th><th>说明</th><th>倍率</th><th>可用模型</th><th>成员</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>default</b></td><td>默认分组</td><td class="mono">1.0x</td><td><span class="badge b-mute">全部</span></td><td class="mono">1,102</td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newGroup">编辑</a><a>复制</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+          <tr><td><b>vip</b></td><td>高优先级，独享账号池</td><td class="mono">0.8x</td><td><span class="badge b-mute">全部</span></td><td class="mono">86</td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newGroup">编辑</a><a>复制</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+          <tr><td><b>trial</b></td><td>试用，仅低价模型</td><td class="mono">1.0x</td><td><span class="badge b-mute">Gemini</span></td><td class="mono">214</td><td><span class="badge b-mute">受限</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newGroup">编辑</a><a>复制</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newGroup"><div class="modal lg">
+  <div class="modal-head"><h3>分组配置</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <label class="field"><span class="label">分组名称</span><input class="input" value="vip"></label>
+      <label class="field"><span class="label">倍率</span><input class="input" value="0.8"></label>
+    </div>
+    <label class="field"><span class="label">说明</span><input class="input" value="高优先级，独享账号池"></label>
+    <span class="label">可用模型</span>
+    <div class="toolbar"><label class="checkrow"><input type="checkbox" checked> claude-3.5-sonnet</label><label class="checkrow"><input type="checkbox" checked> gpt-4o</label><label class="checkrow"><input type="checkbox" checked> gemini-2.0-flash</label><label class="checkrow"><input type="checkbox"> antigravity-pro</label></div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="分组已保存">保存</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/groups',title:'分组管理',idx:'ADMIN / GROUPS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

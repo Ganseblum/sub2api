@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>订单管理 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>订单管理</h1><p>查询、退款与对账</p></div>
+        <button class="btn" data-toast="info" data-toast-title="正在导出">导出</button></div>
+      <div class="toolbar">
+        <input class="input" style="max-width:220px" placeholder="搜索订单号 / 用户…">
+        <select class="select" style="max-width:150px"><option>全部状态</option><option>已支付</option><option>待支付</option><option>已退款</option></select>
+        <select class="select" style="max-width:150px"><option>全部渠道</option><option>微信</option><option>支付宝</option><option>Stripe</option></select>
+        <button class="btn btn-fill">筛选</button>
+      </div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>订单号</th><th>用户</th><th>商品</th><th>金额</th><th>渠道</th><th>状态</th><th>时间</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">ORD-9210</td><td class="mono">u-8842</td><td>Pro · 月付</td><td class="mono">¥99.00</td><td>微信</td><td><span class="badge b-ok">已支付</span></td><td class="mono">06-20 11:02</td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="ordView">详情</a><a class="danger" data-open="refund">退款</a></div></div></td></tr>
+          <tr><td class="mono">ORD-9188</td><td class="mono">team@acme.io</td><td>团队 · 月付</td><td class="mono">¥299.00</td><td>Stripe</td><td><span class="badge b-ok">已支付</span></td><td class="mono">06-18 09:41</td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="ordView">详情</a><a class="danger" data-open="refund">退款</a></div></div></td></tr>
+          <tr><td class="mono">ORD-9151</td><td class="mono">u-9150</td><td>余额充值</td><td class="mono">¥39.00</td><td>支付宝</td><td><span class="badge b-warn">待支付</span></td><td class="mono">06-15 18:33</td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="ordView">详情</a><a class="danger">关闭订单</a></div></div></td></tr>
+          <tr><td class="mono">ORD-9012</td><td class="mono">u-8790</td><td>体验包</td><td class="mono">¥9.90</td><td>微信</td><td><span class="badge b-mute">已退款</span></td><td class="mono">06-11 14:12</td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="ordView">详情</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+      <div class="pager"><a>‹</a><span class="cur">1</span><a>2</a><a>3</a><a>…</a><a>61</a><a>›</a></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="ordView"><div class="modal">
+  <div class="modal-head"><h3>订单详情</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="kv"><span class="k">订单号</span><span class="mono">ORD-9210</span></div>
+    <div class="kv"><span class="k">用户</span><span class="mono">u-8842 · dev@youc.io</span></div>
+    <div class="kv"><span class="k">商品</span><span>Pro · 月付订阅</span></div>
+    <div class="kv"><span class="k">金额</span><b>¥99.00</b></div>
+    <div class="kv"><span class="k">渠道交易号</span><span class="mono">wx_4200001998</span></div>
+    <div class="kv"><span class="k">状态</span><span class="badge b-ok">已支付</span></div>
+  </div>
+  <div class="modal-foot"><button class="btn btn-fill" data-close>关闭</button></div>
+</div></div>
+<div class="overlay" id="refund"><div class="modal">
+  <div class="modal-head"><h3>发起退款</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <p class="hint" style="margin-bottom:14px">退款将原路退回，且对应订阅额度将被回收。</p>
+    <label class="field"><span class="label">退款金额 (¥)</span><input class="input" value="99.00"></label>
+    <label class="field"><span class="label">退款原因</span><input class="input" placeholder="请填写退款原因"></label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-danger" data-close data-toast="warn" data-toast-title="退款已提交">确认退款</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/orders',title:'订单管理',idx:'ADMIN / ORDERS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

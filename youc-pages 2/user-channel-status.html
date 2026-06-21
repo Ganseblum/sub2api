@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>渠道状态 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>渠道状态</h1><p>各上游模型的实时可用性与延迟监控</p></div>
+        <span class="badge b-on">全部系统正常</span></div>
+      <div class="grid-3">
+        <div class="card card-pad"><div style="display:flex;justify-content:space-between;align-items:center"><b style="text-transform:uppercase">Claude</b><span class="dot g"></span></div>
+          <div class="kv" style="margin-top:12px"><span class="k">可用性</span><b>99.98%</b></div><div class="kv"><span class="k">延迟</span><b>312ms</b></div>
+          <div style="display:flex;gap:3px;margin-top:12px">
+            <span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:#f59e0b;border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span></div></div>
+        <div class="card card-pad"><div style="display:flex;justify-content:space-between;align-items:center"><b style="text-transform:uppercase">GPT</b><span class="dot g"></span></div>
+          <div class="kv" style="margin-top:12px"><span class="k">可用性</span><b>99.91%</b></div><div class="kv"><span class="k">延迟</span><b>280ms</b></div>
+          <div style="display:flex;gap:3px;margin-top:12px">
+            <span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span></div></div>
+        <div class="card card-pad"><div style="display:flex;justify-content:space-between;align-items:center"><b style="text-transform:uppercase">Gemini</b><span class="dot y"></span></div>
+          <div class="kv" style="margin-top:12px"><span class="k">可用性</span><b>98.40%</b></div><div class="kv"><span class="k">延迟</span><b>540ms</b></div>
+          <div style="display:flex;gap:3px;margin-top:12px">
+            <span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:#f59e0b;border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--danger);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span><span style="flex:1;height:30px;background:var(--accent2);border:2px solid var(--line)"></span></div></div>
+      </div>
+      <div class="section-title">事件历史</div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>时间</th><th>渠道</th><th>事件</th><th>影响</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">06-21 03:10</td><td>Gemini</td><td>上游延迟升高</td><td>部分请求 &gt;1s</td><td><span class="badge b-warn">已恢复</span></td></tr>
+          <tr><td class="mono">06-20 22:41</td><td>Gemini</td><td>上游 5xx 错误率上升</td><td>自动切换备用账号</td><td><span class="badge b-ok">已解决</span></td></tr>
+          <tr><td class="mono">06-19 11:02</td><td>Claude</td><td>限流抖动</td><td>少量 429</td><td><span class="badge b-ok">已解决</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/monitor',title:'渠道状态',idx:'USER / STATUS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

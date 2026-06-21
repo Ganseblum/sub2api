@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>验证邮箱 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+<style>.otp{display:flex;gap:10px;justify-content:center;margin:8px 0 18px}
+.otp input{width:48px;height:56px;text-align:center;font-size:22px;font-weight:800;border:2.5px solid var(--line);background:var(--paper)}
+.otp input:focus{outline:none;box-shadow:4px 4px 0 var(--accent2)}</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="auth-brand"><span class="mark" style="width:34px;height:34px;display:grid;place-items:center;font-weight:900;font-size:13px;background:var(--ink);color:var(--bg);border:2.5px solid var(--line)">YC</span><b style="font-size:18px;letter-spacing:.5px">YOUC</b></div>
+      <h1>验证您的邮箱</h1>
+      <p>请输入发送到 dev@youc.io 的 6 位验证码</p>
+    </div>
+    <div class="auth-body">
+      <div class="otp"><input value="3"><input value="9"><input value="2"><input value="0"><input value=""><input value=""></div>
+      <a class="btn btn-fill btn-block btn-lg" href="user-dashboard.html">验证并继续</a>
+      <p class="hint" style="text-align:center;margin-top:14px">没有收到？ <a href="#" style="border-bottom:2px solid var(--accent)">59s 后重新发送</a></p>
+    </div>
+    <div class="auth-foot"><a href="register.html" style="border-bottom:2px solid var(--accent);font-weight:700">← 返回注册</a></div>
+  </div>
+</div>
+</body>
+</html>

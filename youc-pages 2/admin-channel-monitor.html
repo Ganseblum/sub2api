@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>渠道监控 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>渠道监控</h1><p>主动探活与延迟监控，自动剔除异常上游</p></div>
+        <button class="btn btn-fill" data-toast="info" data-toast-title="已触发探活" data-toast-msg="正在检测全部渠道…">立即探活</button></div>
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat"><div class="n">15</div><div class="l">监控渠道</div></div>
+        <div class="stat"><div class="n">13</div><div class="l">健康</div></div>
+        <div class="stat"><div class="n">1</div><div class="l">降级</div></div>
+        <div class="stat"><div class="n">1</div><div class="l">离线</div></div>
+      </div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>渠道</th><th>探活</th><th>延迟</th><th>成功率 1h</th><th>最后检测</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>Claude 池 #2</b></td><td><span class="dot g"></span> 正常</td><td class="mono">312ms</td><td class="mono">99.9%</td><td class="mono">12s 前</td><td><span class="badge b-on">健康</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td><b>GPT 池 #1</b></td><td><span class="dot g"></span> 正常</td><td class="mono">280ms</td><td class="mono">99.7%</td><td class="mono">14s 前</td><td><span class="badge b-on">健康</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td><b>Gemini 池</b></td><td><span class="dot y"></span> 抖动</td><td class="mono">540ms</td><td class="mono">96.2%</td><td class="mono">9s 前</td><td><span class="badge b-warn">降级</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td><b>Antigravity 池</b></td><td><span class="dot r"></span> 失败</td><td class="mono">—</td><td class="mono">0%</td><td class="mono">3s 前</td><td><span class="badge b-danger">离线</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'admin',active:'/admin/channels/monitor',title:'渠道监控',idx:'ADMIN / CHANNEL MONITOR'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

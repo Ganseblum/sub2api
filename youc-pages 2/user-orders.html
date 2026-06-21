@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的订单 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>我的订单</h1><p>查看历史订单与支付状态</p></div></div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">已支付</div><div class="tab">待支付</div><div class="tab">已退款</div></div></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>订单号</th><th>商品</th><th>金额</th><th>支付方式</th><th>状态</th><th>时间</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">#ORD-20260602-8841</td><td>Pro · 月付</td><td class="mono">¥99.00</td><td>微信支付</td><td><span class="badge b-ok">已支付</span></td><td class="mono">2026-06-02 10:21</td><td><button class="btn btn-sm" data-open="orderDetail">详情</button></td></tr>
+          <tr><td class="mono">#ORD-20260520-7720</td><td>余额充值</td><td class="mono">¥100.00</td><td>支付宝</td><td><span class="badge b-ok">已支付</span></td><td class="mono">2026-05-20 19:03</td><td><button class="btn btn-sm" data-open="orderDetail">详情</button></td></tr>
+          <tr><td class="mono">#ORD-20260618-9912</td><td>团队 · 月付</td><td class="mono">¥299.00</td><td>Stripe</td><td><span class="badge b-warn">待支付</span></td><td class="mono">2026-06-18 08:44</td><td><button class="btn btn-sm btn-acc">去支付</button></td></tr>
+          <tr><td class="mono">#ORD-20260411-3301</td><td>体验包</td><td class="mono">¥9.90</td><td>微信支付</td><td><span class="badge b-mute">已退款</span></td><td class="mono">2026-04-11 14:12</td><td><button class="btn btn-sm" data-open="orderDetail">详情</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="orderDetail">
+  <div class="modal">
+    <div class="modal-head"><h3>订单详情</h3><span class="modal-x" data-close>×</span></div>
+    <div class="modal-body">
+      <div class="kv"><span class="k">订单号</span><span class="mono">#ORD-20260602-8841</span></div>
+      <div class="kv"><span class="k">商品</span><span>Pro · 月付订阅</span></div>
+      <div class="kv"><span class="k">金额</span><b>¥99.00</b></div>
+      <div class="kv"><span class="k">支付方式</span><span>微信支付</span></div>
+      <div class="kv"><span class="k">交易号</span><span class="mono">wx_4200001998202606021021</span></div>
+      <div class="kv"><span class="k">状态</span><span class="badge b-ok">已支付</span></div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close data-toast="info" data-toast-title="发票申请已提交">申请发票</button><button class="btn btn-fill" data-close>关闭</button></div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/orders',title:'我的订单',idx:'USER / ORDERS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

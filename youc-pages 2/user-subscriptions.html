@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的订阅 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>我的订阅</h1><p>查看当前生效的订阅套餐与剩余额度</p></div>
+        <a class="btn btn-acc" href="user-purchase.html">+ 购买订阅</a></div>
+
+      <div class="grid-3">
+        <div class="card card-pad">
+          <span class="badge b-on">生效中</span>
+          <h3 style="text-transform:uppercase;letter-spacing:-.5px;margin:12px 0 4px;font-size:22px">Pro · 月付</h3>
+          <p class="hint">到期 2026-07-02 · 自动续费</p>
+          <div class="kv" style="margin-top:16px"><span class="k">额度</span><b>50M Tokens / 月</b></div>
+          <div class="kv"><span class="k">已用</span><b>12.4M (25%)</b></div>
+          <div class="bar" style="margin-top:8px"><span style="width:25%"></span></div>
+          <button class="btn btn-block" style="margin-top:18px">管理</button>
+        </div>
+        <div class="card card-pad">
+          <span class="badge b-mute">已过期</span>
+          <h3 style="text-transform:uppercase;letter-spacing:-.5px;margin:12px 0 4px;font-size:22px">体验包</h3>
+          <p class="hint">已于 2026-05-02 到期</p>
+          <div class="kv" style="margin-top:16px"><span class="k">额度</span><b>2M Tokens</b></div>
+          <div class="kv"><span class="k">已用</span><b>2M (100%)</b></div>
+          <div class="bar" style="margin-top:8px"><span style="width:100%;background:var(--soft)"></span></div>
+          <button class="btn btn-block" style="margin-top:18px" disabled>已结束</button>
+        </div>
+        <div class="card card-pad" style="border-style:dashed;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div style="font-size:30px">＋</div>
+          <p class="hint" style="margin:8px 0 14px">需要更多额度？</p>
+          <a class="btn btn-fill" href="user-purchase.html">选购套餐</a>
+        </div>
+      </div>
+
+      <div class="section-title">续费 / 变更记录</div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>时间</th><th>操作</th><th>套餐</th><th>金额</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">2026-06-02</td><td>续费</td><td>Pro · 月付</td><td class="mono">¥99.00</td><td><span class="badge b-ok">成功</span></td></tr>
+          <tr><td class="mono">2026-05-02</td><td>升级</td><td>体验包 → Pro</td><td class="mono">¥99.00</td><td><span class="badge b-ok">成功</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/subscriptions',title:'我的订阅',idx:'USER / SUBSCRIPTIONS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>初始化向导 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+<style>
+.wiz{width:100%;max-width:640px}
+.steps-bar{display:flex;border:2.5px solid var(--line);background:var(--paper);margin-bottom:22px}
+.steps-bar div{flex:1;padding:12px;text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-right:2.5px solid var(--line)}
+.steps-bar div:last-child{border-right:none}
+.steps-bar .done{background:var(--accent);color:#fff}
+.steps-bar .cur{background:var(--ink);color:var(--bg)}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="wiz">
+    <div class="auth-brand" style="justify-content:center;margin-bottom:18px"><span class="sb-mark">YC</span><b style="font-size:20px;letter-spacing:.5px">YOUC 初始化向导</b></div>
+    <div class="steps-bar"><div class="done">01 数据库</div><div class="cur">02 管理员</div><div>03 站点</div><div>04 完成</div></div>
+    <div class="card hard">
+      <div class="modal-head"><h3>创建管理员账户</h3><span class="badge b-mute">步骤 2 / 4</span></div>
+      <div class="card-pad">
+        <label class="field"><span class="label">管理员邮箱</span><input class="input" type="email" placeholder="admin@youc.io"></label>
+        <label class="field"><span class="label">管理员密码</span><input class="input" type="password" placeholder="设置一个强密码"></label>
+        <label class="field"><span class="label">站点名称</span><input class="input" value="YOUC"></label>
+        <div class="kv"><span class="k">数据库连接</span><span class="badge b-on">已连接</span></div>
+        <div class="kv"><span class="k">缓存 Redis</span><span class="badge b-on">已连接</span></div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-ghost">← 上一步</button><a class="btn btn-fill" href="admin-dashboard.html">下一步 →</a></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

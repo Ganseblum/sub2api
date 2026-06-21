@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>可用渠道 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>可用渠道</h1><p>查看可调用的模型、定价与支持的能力</p></div></div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">Claude</div><div class="tab">GPT</div><div class="tab">Gemini</div></div>
+        <div class="spacer"></div><input class="input" style="max-width:240px" placeholder="搜索模型…"></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>模型</th><th>厂商</th><th>输入价 (/M)</th><th>输出价 (/M)</th><th>上下文</th><th>能力</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td><b>claude-3.5-sonnet</b></td><td><span class="badge" style="background:#ea580c;color:#fff">Claude</span></td><td class="mono">¥21.0</td><td class="mono">¥105.0</td><td class="mono">200K</td><td><span class="badge b-mute">视觉</span> <span class="badge b-mute">工具</span></td><td><span class="badge b-on">可用</span></td></tr>
+          <tr><td><b>gpt-4o</b></td><td><span class="badge" style="background:#059669;color:#fff">GPT</span></td><td class="mono">¥18.0</td><td class="mono">¥72.0</td><td class="mono">128K</td><td><span class="badge b-mute">视觉</span> <span class="badge b-mute">工具</span></td><td><span class="badge b-on">可用</span></td></tr>
+          <tr><td><b>gemini-2.0-flash</b></td><td><span class="badge" style="background:#1d4ed8;color:#fff">Gemini</span></td><td class="mono">¥5.0</td><td class="mono">¥15.0</td><td class="mono">1M</td><td><span class="badge b-mute">视觉</span></td><td><span class="badge b-on">可用</span></td></tr>
+          <tr><td><b>antigravity-pro</b></td><td><span class="badge" style="background:#db2777;color:#fff">Antigravity</span></td><td class="mono">¥12.0</td><td class="mono">¥48.0</td><td class="mono">256K</td><td><span class="badge b-mute">工具</span></td><td><span class="badge b-warn">受限</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/available-channels',title:'可用渠道',idx:'USER / CHANNELS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

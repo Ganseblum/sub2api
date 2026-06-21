@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>使用记录 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>使用记录</h1><p>全平台 API 调用明细</p></div>
+        <button class="btn" data-toast="info" data-toast-title="正在导出">导出 CSV</button></div>
+      <div class="toolbar">
+        <input class="input" style="max-width:200px" placeholder="搜索用户 / 密钥…">
+        <select class="select" style="max-width:160px"><option>全部模型</option><option>claude-3.5-sonnet</option><option>gpt-4o</option></select>
+        <select class="select" style="max-width:140px"><option>全部状态</option><option>200</option><option>4xx</option><option>5xx</option></select>
+        <input class="input" type="date" style="max-width:160px">
+        <button class="btn btn-fill">筛选</button>
+      </div>
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat"><div class="n">312M</div><div class="l">总 Tokens</div></div>
+        <div class="stat"><div class="n">¥48.2K</div><div class="l">总费用</div></div>
+        <div class="stat"><div class="n">1.2M</div><div class="l">总请求</div></div>
+        <div class="stat"><div class="n">0.42%</div><div class="l">错误率</div></div>
+      </div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>时间</th><th>用户</th><th>密钥</th><th>模型</th><th>账号</th><th>Tokens</th><th>费用</th><th>状态</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">04:55:12</td><td class="mono">u-8842</td><td class="mono">•••3c1d</td><td>claude-3.5-sonnet</td><td class="mono">acc-2</td><td class="mono">2,060</td><td class="mono">¥0.018</td><td><span class="badge b-ok">200</span></td></tr>
+          <tr><td class="mono">04:55:08</td><td class="mono">u-9210</td><td class="mono">•••88a1</td><td>gpt-4o</td><td class="mono">acc-1</td><td class="mono">1,050</td><td class="mono">¥0.011</td><td><span class="badge b-ok">200</span></td></tr>
+          <tr><td class="mono">04:55:01</td><td class="mono">u-9150</td><td class="mono">•••f520</td><td>gemini-2.0-flash</td><td class="mono">acc-7</td><td class="mono">0</td><td class="mono">¥0.000</td><td><span class="badge b-warn">429</span></td></tr>
+          <tr><td class="mono">04:54:40</td><td class="mono">u-8842</td><td class="mono">•••3c1d</td><td>claude-3.5-sonnet</td><td class="mono">acc-2</td><td class="mono">880</td><td class="mono">¥0.012</td><td><span class="badge b-ok">200</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="pager"><a>‹</a><span class="cur">1</span><a>2</a><a>3</a><a>…</a><a>9210</a><a>›</a></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'admin',active:'/admin/usage',title:'使用记录',idx:'ADMIN / USAGE'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

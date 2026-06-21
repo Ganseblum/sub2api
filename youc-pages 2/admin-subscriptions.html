@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>订阅管理 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>订阅管理</h1><p>查看与管理所有用户的订阅状态</p></div></div>
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat"><div class="n">486</div><div class="l">生效订阅</div></div>
+        <div class="stat"><div class="n">312</div><div class="l">Pro</div></div>
+        <div class="stat"><div class="n">58</div><div class="l">团队</div></div>
+        <div class="stat"><div class="n">¥48.2K</div><div class="l">月度收入</div></div>
+      </div>
+      <div class="toolbar"><select class="select" style="max-width:160px"><option>全部套餐</option><option>入门</option><option>Pro</option><option>团队</option></select>
+        <select class="select" style="max-width:160px"><option>全部状态</option><option>生效中</option><option>即将到期</option><option>已过期</option></select>
+        <div class="spacer"></div><input class="input" style="max-width:220px" placeholder="搜索用户…"></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>用户</th><th>套餐</th><th>额度</th><th>已用</th><th>开始</th><th>到期</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>dev@youc.io</td><td><span class="badge b-on">Pro</span></td><td class="mono">50M</td><td class="mono">12.4M</td><td class="mono">06-02</td><td class="mono">07-02</td><td><span class="badge b-on">生效中</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td>team@acme.io</td><td><span class="badge b-on">团队</span></td><td class="mono">200M</td><td class="mono">188M</td><td class="mono">06-10</td><td class="mono">07-10</td><td><span class="badge b-warn">额度告急</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td>u***45@x.io</td><td><span class="badge b-mute">入门</span></td><td class="mono">10M</td><td class="mono">9.8M</td><td class="mono">05-25</td><td class="mono">06-25</td><td><span class="badge b-warn">即将到期</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'admin',active:'/admin/subscriptions',title:'订阅管理',idx:'ADMIN / SUBSCRIPTIONS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

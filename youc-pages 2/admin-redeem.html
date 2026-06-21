@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>兑换码 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>兑换码</h1><p>批量生成与管理兑换码</p></div>
+        <button class="btn btn-acc" data-open="genCode">+ 批量生成</button></div>
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat"><div class="n">1,200</div><div class="l">已生成</div></div>
+        <div class="stat"><div class="n">842</div><div class="l">已使用</div></div>
+        <div class="stat"><div class="n">358</div><div class="l">未使用</div></div>
+        <div class="stat"><div class="n">¥42.1K</div><div class="l">兑换总额</div></div>
+      </div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">未使用</div><div class="tab">已使用</div><div class="tab">已作废</div></div>
+        <div class="spacer"></div><input class="input" style="max-width:220px" placeholder="搜索批次 / 兑换码…"></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>兑换码</th><th>批次</th><th>面值</th><th>类型</th><th>使用者</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">WELCOME-50AB-CD12</td><td class="mono">B-0612</td><td class="mono">¥50</td><td>余额</td><td class="mono">u-8842</td><td><span class="badge b-mute">已使用</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td class="mono">SPRING-10EF-GH34</td><td class="mono">B-0501</td><td class="mono">¥10</td><td>余额</td><td>—</td><td><span class="badge b-on">未使用</span></td><td><button class="btn btn-sm btn-ghost" style="color:var(--danger)">作废</button></td></tr>
+          <tr><td class="mono">TRIAL-2MTK-IJ56</td><td class="mono">B-0402</td><td class="mono">2M</td><td>Tokens</td><td>—</td><td><span class="badge b-danger">已作废</span></td><td><button class="btn btn-sm" disabled>—</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="genCode"><div class="modal">
+  <div class="modal-head"><h3>批量生成兑换码</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <label class="field"><span class="label">类型</span><select class="select"><option>余额</option><option>Tokens</option></select></label>
+      <label class="field"><span class="label">面值</span><input class="input" value="50"></label>
+      <label class="field"><span class="label">数量</span><input class="input" value="100"></label>
+      <label class="field"><span class="label">前缀</span><input class="input" value="WELCOME"></label>
+    </div>
+    <label class="field"><span class="label">有效期</span><input class="input" type="date"></label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="已生成 100 个兑换码">生成</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/redeem',title:'兑换码',idx:'ADMIN / REDEEM CODES'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

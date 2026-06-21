@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YOUC · 全站页面总览</title>
+<link rel="stylesheet" href="assets/youc.css" />
+<style>
+.idx-head{border-bottom:2.5px solid var(--line);background:var(--paper)}
+.idx-head .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.grp{margin-bottom:34px}
+.grp-title{font-size:14px;text-transform:uppercase;letter-spacing:2px;font-weight:850;margin-bottom:16px;display:flex;align-items:center;gap:10px;border-bottom:2.5px solid var(--line);padding-bottom:10px}
+.grp-title .c{font-size:11px;color:var(--accent);letter-spacing:1px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pcard{background:var(--paper);border:2.5px solid var(--line);box-shadow:4px 4px 0 var(--line);padding:16px;transition:.12s;display:block}
+.pcard:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--accent2)}
+.pcard b{font-size:14px;display:block;margin-bottom:4px}
+.pcard span{font-size:11px;color:var(--muted);font-family:monospace}
+.tag{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1px;border:2px solid var(--line);padding:1px 6px;margin-bottom:8px}
+@media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="idx-head"><div class="wrap">
+  <div class="logo" style="display:flex;align-items:center;gap:12px;font-weight:850;font-size:20px"><span class="sb-mark" style="width:40px;height:40px;font-size:15px">YC</span> YOUC · 页面总览</div>
+  <div class="row-wrap" style="display:flex;gap:10px"><a class="btn btn-sm" href="components.html">组件库</a><a class="btn btn-sm btn-fill" href="home.html">首页 →</a></div>
+</div></div></header>
+
+<div class="wrap" style="padding:32px 24px 60px">
+  <p class="sans muted" style="margin-bottom:28px;font-size:14px">完整静态原型 · 共 <b>40+</b> 页面 + 组件库 · 全部采用统一「青色硬边框等宽风」设计系统（共享 <code>assets/youc.css</code> + <code>shell.js</code>）。点击任意卡片查看。</p>
+
+  <div class="grp"><div class="grp-title">公共 / 认证 <span class="c">Public / Auth</span></div>
+    <div class="cards">
+      <a class="pcard" href="home.html"><span class="tag">PUBLIC</span><b>首页</b><span>/home</span></a>
+      <a class="pcard" href="login.html"><span class="tag">AUTH</span><b>登录</b><span>/login</span></a>
+      <a class="pcard" href="register.html"><span class="tag">AUTH</span><b>注册</b><span>/register</span></a>
+      <a class="pcard" href="email-verify.html"><span class="tag">AUTH</span><b>邮箱验证</b><span>/email-verify</span></a>
+      <a class="pcard" href="forgot-password.html"><span class="tag">AUTH</span><b>忘记密码</b><span>/forgot-password</span></a>
+      <a class="pcard" href="reset-password.html"><span class="tag">AUTH</span><b>重置密码</b><span>/reset-password</span></a>
+      <a class="pcard" href="setup.html"><span class="tag">SETUP</span><b>初始化向导</b><span>/setup</span></a>
+      <a class="pcard" href="key-usage.html"><span class="tag">PUBLIC</span><b>密钥用量查询</b><span>/key-usage</span></a>
+      <a class="pcard" href="legal.html"><span class="tag">PUBLIC</span><b>法律文档</b><span>/legal/:id</span></a>
+      <a class="pcard" href="notfound.html"><span class="tag">PUBLIC</span><b>404 未找到</b><span>/404</span></a>
+    </div>
+  </div>
+
+  <div class="grp"><div class="grp-title">用户端 <span class="c">User</span></div>
+    <div class="cards">
+      <a class="pcard" href="user-dashboard.html"><span class="tag">USER</span><b>仪表盘</b><span>/dashboard</span></a>
+      <a class="pcard" href="user-keys.html"><span class="tag">USER</span><b>API 密钥</b><span>/keys</span></a>
+      <a class="pcard" href="user-usage.html"><span class="tag">USER</span><b>使用记录</b><span>/usage</span></a>
+      <a class="pcard" href="user-available-channels.html"><span class="tag">USER</span><b>可用渠道</b><span>/available-channels</span></a>
+      <a class="pcard" href="user-channel-status.html"><span class="tag">USER</span><b>渠道状态</b><span>/monitor</span></a>
+      <a class="pcard" href="user-subscriptions.html"><span class="tag">USER</span><b>我的订阅</b><span>/subscriptions</span></a>
+      <a class="pcard" href="user-purchase.html"><span class="tag">USER</span><b>充值/订阅</b><span>/purchase</span></a>
+      <a class="pcard" href="user-orders.html"><span class="tag">USER</span><b>我的订单</b><span>/orders</span></a>
+      <a class="pcard" href="user-redeem.html"><span class="tag">USER</span><b>兑换</b><span>/redeem</span></a>
+      <a class="pcard" href="user-affiliate.html"><span class="tag">USER</span><b>邀请返利</b><span>/affiliate</span></a>
+      <a class="pcard" href="user-profile.html"><span class="tag">USER</span><b>个人资料</b><span>/profile</span></a>
+    </div>
+  </div>
+
+  <div class="grp"><div class="grp-title">管理后台 <span class="c">Admin</span></div>
+    <div class="cards">
+      <a class="pcard" href="admin-dashboard.html"><span class="tag">ADMIN</span><b>管理仪表盘</b><span>/admin/dashboard</span></a>
+      <a class="pcard" href="admin-ops.html"><span class="tag">ADMIN</span><b>运维监控</b><span>/admin/ops</span></a>
+      <a class="pcard" href="admin-users.html"><span class="tag">ADMIN</span><b>用户管理</b><span>/admin/users</span></a>
+      <a class="pcard" href="admin-groups.html"><span class="tag">ADMIN</span><b>分组管理</b><span>/admin/groups</span></a>
+      <a class="pcard" href="admin-channels.html"><span class="tag">ADMIN</span><b>渠道定价</b><span>/admin/channels/pricing</span></a>
+      <a class="pcard" href="admin-channel-monitor.html"><span class="tag">ADMIN</span><b>渠道监控</b><span>/admin/channels/monitor</span></a>
+      <a class="pcard" href="admin-subscriptions.html"><span class="tag">ADMIN</span><b>订阅管理</b><span>/admin/subscriptions</span></a>
+      <a class="pcard" href="admin-accounts.html"><span class="tag">ADMIN</span><b>账号管理</b><span>/admin/accounts</span></a>
+      <a class="pcard" href="admin-announcements.html"><span class="tag">ADMIN</span><b>公告</b><span>/admin/announcements</span></a>
+      <a class="pcard" href="admin-proxies.html"><span class="tag">ADMIN</span><b>IP 管理</b><span>/admin/proxies</span></a>
+      <a class="pcard" href="admin-risk-control.html"><span class="tag">ADMIN</span><b>风控中心</b><span>/admin/risk-control</span></a>
+      <a class="pcard" href="admin-redeem.html"><span class="tag">ADMIN</span><b>兑换码</b><span>/admin/redeem</span></a>
+      <a class="pcard" href="admin-promo-codes.html"><span class="tag">ADMIN</span><b>优惠码</b><span>/admin/promo-codes</span></a>
+      <a class="pcard" href="admin-affiliate-invites.html"><span class="tag">ADMIN</span><b>邀请记录</b><span>/admin/affiliates/invites</span></a>
+      <a class="pcard" href="admin-affiliate-rebates.html"><span class="tag">ADMIN</span><b>返利记录</b><span>/admin/affiliates/rebates</span></a>
+      <a class="pcard" href="admin-affiliate-transfers.html"><span class="tag">ADMIN</span><b>提取记录</b><span>/admin/affiliates/transfers</span></a>
+      <a class="pcard" href="admin-payment-dashboard.html"><span class="tag">ADMIN</span><b>支付概览</b><span>/admin/orders/dashboard</span></a>
+      <a class="pcard" href="admin-orders.html"><span class="tag">ADMIN</span><b>订单管理</b><span>/admin/orders</span></a>
+      <a class="pcard" href="admin-plans.html"><span class="tag">ADMIN</span><b>订阅套餐</b><span>/admin/orders/plans</span></a>
+      <a class="pcard" href="admin-usage.html"><span class="tag">ADMIN</span><b>使用记录</b><span>/admin/usage</span></a>
+      <a class="pcard" href="admin-settings.html"><span class="tag">ADMIN</span><b>系统设置</b><span>/admin/settings</span></a>
+    </div>
+  </div>
+
+  <div class="grp"><div class="grp-title">设计系统 <span class="c">Design System</span></div>
+    <div class="cards">
+      <a class="pcard" href="components.html"><span class="tag">DOCS</span><b>组件库</b><span>buttons / modal / table…</span></a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

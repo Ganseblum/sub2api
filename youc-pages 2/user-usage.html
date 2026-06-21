@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>使用记录 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>使用记录</h1><p>查询每一次 API 调用的 Token 消耗与费用</p></div>
+        <button class="btn" data-toast="info" data-toast-title="正在导出" data-toast-msg="CSV 文件准备中…">导出 CSV</button></div>
+
+      <div class="toolbar">
+        <select class="select" style="max-width:160px"><option>全部密钥</option><option>prod-key</option><option>test-key</option></select>
+        <select class="select" style="max-width:160px"><option>全部模型</option><option>claude-3.5-sonnet</option><option>gpt-4o</option></select>
+        <input class="input" type="date" style="max-width:160px" value="2026-06-21">
+        <button class="btn btn-fill">筛选</button>
+      </div>
+
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat"><div class="n">12.4M</div><div class="l">输入 Tokens</div></div>
+        <div class="stat"><div class="n">6.8M</div><div class="l">输出 Tokens</div></div>
+        <div class="stat"><div class="n">¥38.20</div><div class="l">总费用</div></div>
+        <div class="stat"><div class="n">1,902</div><div class="l">请求数</div></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>时间</th><th>密钥</th><th>模型</th><th>渠道</th><th>输入</th><th>输出</th><th>耗时</th><th>费用</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">06-21 04:55:12</td><td class="mono">prod-key</td><td>claude-3.5-sonnet</td><td>Claude 池 #2</td><td class="mono">1,240</td><td class="mono">820</td><td class="mono">1.2s</td><td class="mono">¥0.018</td><td><span class="badge b-ok">200</span></td></tr>
+            <tr><td class="mono">06-21 04:51:03</td><td class="mono">prod-key</td><td>gpt-4o</td><td>GPT 池 #1</td><td class="mono">640</td><td class="mono">410</td><td class="mono">0.9s</td><td class="mono">¥0.011</td><td><span class="badge b-ok">200</span></td></tr>
+            <tr><td class="mono">06-21 04:47:51</td><td class="mono">test-key</td><td>gemini-2.0-flash</td><td>Gemini 池</td><td class="mono">2,010</td><td class="mono">1,330</td><td class="mono">0.7s</td><td class="mono">¥0.006</td><td><span class="badge b-ok">200</span></td></tr>
+            <tr><td class="mono">06-21 04:44:30</td><td class="mono">test-key</td><td>claude-3.5-sonnet</td><td>Claude 池 #1</td><td class="mono">320</td><td class="mono">0</td><td class="mono">—</td><td class="mono">¥0.001</td><td><span class="badge b-danger">429</span></td></tr>
+            <tr><td class="mono">06-21 04:40:18</td><td class="mono">prod-key</td><td>claude-3.5-sonnet</td><td>Claude 池 #2</td><td class="mono">880</td><td class="mono">540</td><td class="mono">1.0s</td><td class="mono">¥0.012</td><td><span class="badge b-ok">200</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pager"><a>‹</a><span class="cur">1</span><a>2</a><a>3</a><a>…</a><a>27</a><a>›</a></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/usage',title:'使用记录',idx:'USER / USAGE'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

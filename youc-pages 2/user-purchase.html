@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>充值/订阅 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+<style>.plan2{background:var(--paper);border:2.5px solid var(--line);box-shadow:4px 4px 0 var(--line);padding:26px;display:flex;flex-direction:column}
+.plan2.hot{box-shadow:6px 6px 0 var(--accent2)}.plan2 .amt{font-size:36px;font-weight:850;margin:10px 0;letter-spacing:-1px}
+.plan2 ul{list-style:none;font-size:13px;margin:14px 0 20px}.plan2 li{padding:6px 0;border-bottom:1px dashed rgba(0,0,0,.2);display:flex;gap:8px}
+.plan2 li:before{content:"//";color:var(--accent);font-weight:800}.plan2 .btn{margin-top:auto}</style>
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>充值 / 订阅</h1><p>选择套餐或自定义充值额度</p></div></div>
+
+      <div class="tabs" style="margin-bottom:20px"><div class="tab active" data-tab="sub" data-tabs="buy">订阅套餐</div><div class="tab" data-tab="topup" data-tabs="buy">余额充值</div></div>
+
+      <div data-tabhost="buy">
+        <div data-pane="sub">
+          <div class="grid-3">
+            <div class="plan2"><span class="badge b-mute">入门</span><div class="amt">¥39<small style="font-size:13px">/月</small></div>
+              <ul><li>10M Tokens / 月</li><li>全部模型</li><li>3 个密钥</li></ul><button class="btn btn-block" data-open="pay">选择</button></div>
+            <div class="plan2 hot"><span class="badge b-on">推荐</span><div class="amt">¥99<small style="font-size:13px">/月</small></div>
+              <ul><li>50M Tokens / 月</li><li>全部模型 + 调度</li><li>无限密钥</li><li>会话保持</li></ul><button class="btn btn-acc btn-block" data-open="pay">选择</button></div>
+            <div class="plan2"><span class="badge b-mute">团队</span><div class="amt">¥299<small style="font-size:13px">/月</small></div>
+              <ul><li>200M Tokens / 月</li><li>成员额度分配</li><li>成本分析</li><li>优先支持</li></ul><button class="btn btn-block" data-open="pay">选择</button></div>
+          </div>
+        </div>
+        <div data-pane="topup" style="display:none">
+          <div class="card card-pad" style="max-width:480px">
+            <label class="field"><span class="label">充值金额 (¥)</span><input class="input" value="100"></label>
+            <div class="toolbar"><button class="btn btn-sm">¥50</button><button class="btn btn-sm">¥100</button><button class="btn btn-sm">¥500</button><button class="btn btn-sm">¥1000</button></div>
+            <div class="kv" style="margin-top:14px"><span class="k">赠送</span><b>+¥10</b></div>
+            <div class="kv"><span class="k">实付</span><b style="font-size:18px">¥100.00</b></div>
+            <button class="btn btn-acc btn-block" style="margin-top:16px" data-open="pay">立即充值</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="pay">
+  <div class="modal">
+    <div class="modal-head"><h3>选择支付方式</h3><span class="modal-x" data-close>×</span></div>
+    <div class="modal-body">
+      <div class="kv"><span class="k">订单金额</span><b style="font-size:20px">¥99.00</b></div>
+      <div class="grid-2" style="margin-top:16px">
+        <button class="btn btn-lg">微信支付</button><button class="btn btn-lg">支付宝</button>
+        <button class="btn btn-lg">Stripe</button><button class="btn btn-lg">余额支付</button>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><a class="btn btn-acc" href="user-orders.html">前往支付 →</a></div>
+  </div>
+</div>
+<script>window.PAGE={shell:'user',active:'/purchase',title:'充值/订阅',idx:'USER / PURCHASE'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

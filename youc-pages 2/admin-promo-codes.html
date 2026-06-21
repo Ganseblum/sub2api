@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>优惠码 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>优惠码</h1><p>创建折扣码用于订单结算抵扣</p></div>
+        <button class="btn btn-acc" data-open="newPromo">+ 新建优惠码</button></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>优惠码</th><th>折扣</th><th>适用</th><th>已用 / 上限</th><th>有效期</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">SUMMER20</td><td><span class="badge b-ok">-20%</span></td><td>全部套餐</td><td class="mono">142 / 500</td><td class="mono">~07-31</td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newPromo">编辑</a><a data-toast="ok" data-toast-title="已复制">复制码</a><div class="sep"></div><a class="danger">停用</a></div></div></td></tr>
+          <tr><td class="mono">NEW10</td><td><span class="badge b-ok">-¥10</span></td><td>新用户首单</td><td class="mono">88 / ∞</td><td class="mono">长期</td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newPromo">编辑</a><a data-toast="ok" data-toast-title="已复制">复制码</a><div class="sep"></div><a class="danger">停用</a></div></div></td></tr>
+          <tr><td class="mono">FLASH50</td><td><span class="badge b-ok">-50%</span></td><td>团队套餐</td><td class="mono">50 / 50</td><td class="mono">已结束</td><td><span class="badge b-mute">已用尽</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newPromo">编辑</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newPromo"><div class="modal">
+  <div class="modal-head"><h3>新建优惠码</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <label class="field"><span class="label">优惠码</span><input class="input mono" value="SUMMER20"></label>
+    <div class="grid-2">
+      <label class="field"><span class="label">折扣类型</span><select class="select"><option>百分比</option><option>固定金额</option></select></label>
+      <label class="field"><span class="label">折扣值</span><input class="input" value="20"></label>
+      <label class="field"><span class="label">使用上限</span><input class="input" value="500"></label>
+      <label class="field"><span class="label">有效期至</span><input class="input" type="date"></label>
+    </div>
+    <label class="field"><span class="label">适用范围</span><select class="select"><option>全部套餐</option><option>新用户首单</option><option>指定套餐</option></select></label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="优惠码已创建">创建</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/promo-codes',title:'优惠码',idx:'ADMIN / PROMO CODES'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>API 密钥 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head">
+        <div><h1>API 密钥</h1><p>创建并管理用于访问网关的密钥</p></div>
+        <button class="btn btn-acc" data-open="createKey">+ 新建密钥</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs"><div class="tab active">全部</div><div class="tab">启用</div><div class="tab">已禁用</div></div>
+        <div class="spacer"></div>
+        <input class="input" style="max-width:240px" placeholder="搜索密钥名称…">
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>名称</th><th>密钥</th><th>分组</th><th>本月用量</th><th>状态</th><th>创建时间</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>prod-key</b></td><td class="mono">sk-youc-3f9a••••3c1d</td><td><span class="badge b-mute">默认组</span></td>
+              <td class="mono">8.2M tokens</td><td><span class="badge b-on">启用</span></td><td class="mono">2026-05-02</td>
+              <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button>
+                <div class="menu"><a data-toast="ok" data-toast-title="已复制密钥">复制密钥</a><a data-open="useKey">使用示例</a><a>重命名</a><div class="sep"></div><a class="danger">禁用</a><a class="danger">删除</a></div>
+              </div></td>
+            </tr>
+            <tr>
+              <td><b>test-key</b></td><td class="mono">sk-youc-7b2e••••9a04</td><td><span class="badge b-mute">测试组</span></td>
+              <td class="mono">1.1M tokens</td><td><span class="badge b-on">启用</span></td><td class="mono">2026-05-18</td>
+              <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button>
+                <div class="menu"><a data-toast="ok" data-toast-title="已复制密钥">复制密钥</a><a data-open="useKey">使用示例</a><a>重命名</a><div class="sep"></div><a class="danger">禁用</a><a class="danger">删除</a></div>
+              </div></td>
+            </tr>
+            <tr>
+              <td><b>legacy</b></td><td class="mono">sk-youc-1c8d••••f520</td><td><span class="badge b-mute">默认组</span></td>
+              <td class="mono">0 tokens</td><td><span class="badge b-mute">已禁用</span></td><td class="mono">2026-03-09</td>
+              <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button>
+                <div class="menu"><a data-toast="ok" data-toast-title="已复制密钥">复制密钥</a><a>启用</a><div class="sep"></div><a class="danger">删除</a></div>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pager"><span class="cur">1</span><a>2</a><a>3</a><a>›</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- modal: create key -->
+<div class="overlay" id="createKey">
+  <div class="modal">
+    <div class="modal-head"><h3>新建 API 密钥</h3><span class="modal-x" data-close>×</span></div>
+    <div class="modal-body">
+      <label class="field"><span class="label">密钥名称</span><input class="input" placeholder="例如 prod-key"></label>
+      <label class="field"><span class="label">所属分组</span>
+        <select class="select"><option>默认组</option><option>测试组</option><option>团队 A</option></select></label>
+      <label class="field"><span class="label">额度上限 (可选)</span><input class="input" placeholder="留空则不限制，单位 ¥"></label>
+      <label class="checkrow"><input type="checkbox" checked> 启用会话保持 (Sticky Session)</label>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="密钥已创建">创建</button></div>
+  </div>
+</div>
+
+<!-- modal: use key example -->
+<div class="overlay" id="useKey">
+  <div class="modal lg">
+    <div class="modal-head"><h3>使用示例</h3><span class="modal-x" data-close>×</span></div>
+    <div class="modal-body">
+      <p class="hint" style="margin-bottom:12px">将 BaseURL 指向网关并替换密钥，即可兼容官方 SDK。</p>
+      <div class="codeblock">
+        <div><span class="c"># cURL</span></div>
+        <div>curl <span class="k">https://api.youc.io</span>/v1/messages \</div>
+        <div>&nbsp;&nbsp;-H <span class="s">"Authorization: Bearer sk-youc-3f9a••••3c1d"</span> \</div>
+        <div>&nbsp;&nbsp;-H <span class="s">"Content-Type: application/json"</span> \</div>
+        <div>&nbsp;&nbsp;-d <span class="s">'{ "model": "claude-3.5-sonnet", "messages": [...] }'</span></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close data-toast="ok" data-toast-title="已复制到剪贴板">复制</button><button class="btn btn-fill" data-close>关闭</button></div>
+  </div>
+</div>
+
+<script>window.PAGE={shell:'user',active:'/keys',title:'API 密钥',idx:'USER / API KEYS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

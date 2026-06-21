@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>提取记录 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>提取记录</h1><p>审核与处理返利提取申请</p></div></div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">待审核</div><div class="tab">已通过</div><div class="tab">已拒绝</div></div></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>申请时间</th><th>用户</th><th>金额</th><th>方式</th><th>账号</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="mono">06-21 08:10</td><td class="mono">u-8842</td><td class="mono">¥138.20</td><td>转入余额</td><td class="mono">—</td><td><span class="badge b-warn">待审核</span></td>
+            <td style="display:flex;gap:6px"><button class="btn btn-sm btn-acc" data-toast="ok" data-toast-title="已通过">通过</button><button class="btn btn-sm btn-ghost" style="color:var(--danger)">拒绝</button></td></tr>
+          <tr><td class="mono">06-19 14:22</td><td class="mono">u-8790</td><td class="mono">¥86.00</td><td>微信</td><td class="mono">wx_•••82</td><td><span class="badge b-on">已通过</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+          <tr><td class="mono">06-17 09:01</td><td class="mono">u-8521</td><td class="mono">¥500.00</td><td>支付宝</td><td class="mono">ali_•••11</td><td><span class="badge b-danger">已拒绝</span></td><td><button class="btn btn-sm">详情</button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<script>window.PAGE={shell:'admin',active:'/admin/affiliates/transfers',title:'提取记录',idx:'ADMIN / TRANSFERS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

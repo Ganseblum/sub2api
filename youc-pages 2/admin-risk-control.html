@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>风控中心 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>风控中心</h1><p>异常行为检测、限流策略与黑名单</p></div></div>
+      <div class="tabs" style="margin-bottom:20px"><div class="tab active" data-tab="rules" data-tabs="rc">风控规则</div><div class="tab" data-tab="events" data-tabs="rc">命中记录</div><div class="tab" data-tab="block" data-tabs="rc">黑名单</div></div>
+      <div data-tabhost="rc">
+        <div data-pane="rules">
+          <div class="card card-pad">
+            <div class="kv"><span><b>单密钥 QPS 限制</b><p class="hint">超过阈值自动 429</p></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>异常地理位置登录拦截</b><p class="hint">异地登录需二次验证</p></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>新账号充值额度限制</b><p class="hint">注册 24h 内限额 ¥100</p></span><span class="toggle on"></span></div>
+            <div class="kv"><span><b>同 IP 多账号检测</b><p class="hint">标记疑似批量注册</p></span><span class="toggle"></span></div>
+            <div class="kv"><span><b>退款滥用检测</b></span><span class="toggle on"></span></div>
+          </div>
+        </div>
+        <div data-pane="events" style="display:none">
+          <div class="table-wrap"><table class="table">
+            <thead><tr><th>时间</th><th>规则</th><th>对象</th><th>详情</th><th>动作</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">04:51</td><td>单密钥 QPS 限制</td><td class="mono">sk-•••3c1d</td><td>峰值 32 QPS</td><td><span class="badge b-warn">已限流</span></td></tr>
+              <tr><td class="mono">03:22</td><td>同 IP 多账号</td><td class="mono">203.0.•••.12</td><td>关联 6 个账号</td><td><span class="badge b-mute">已标记</span></td></tr>
+              <tr><td class="mono">01:08</td><td>异地登录</td><td class="mono">u-8842</td><td>新设备 / 新城市</td><td><span class="badge b-on">已验证</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div data-pane="block" style="display:none">
+          <div class="toolbar"><button class="btn btn-acc btn-sm" data-open="addBlock">+ 添加黑名单</button></div>
+          <div class="table-wrap"><table class="table">
+            <thead><tr><th>类型</th><th>值</th><th>原因</th><th>添加时间</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-mute">IP</span></td><td class="mono">203.0.113.12</td><td>批量注册</td><td class="mono">06-20</td><td><button class="btn btn-sm btn-ghost" style="color:var(--danger)">移除</button></td></tr>
+              <tr><td><span class="badge b-mute">邮箱域</span></td><td class="mono">@tempmail.io</td><td>临时邮箱</td><td class="mono">06-12</td><td><button class="btn btn-sm btn-ghost" style="color:var(--danger)">移除</button></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="addBlock"><div class="modal">
+  <div class="modal-head"><h3>添加黑名单</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <label class="field"><span class="label">类型</span><select class="select"><option>IP</option><option>邮箱域</option><option>用户 UID</option></select></label>
+    <label class="field"><span class="label">值</span><input class="input mono"></label>
+    <label class="field"><span class="label">原因</span><input class="input"></label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-danger" data-close data-toast="warn" data-toast-title="已加入黑名单">添加</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/risk-control',title:'风控中心',idx:'ADMIN / RISK CONTROL'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

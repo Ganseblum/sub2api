@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>账号管理 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>账号管理</h1><p>管理上游订阅账号池，支持多账号调度与容错</p></div>
+        <button class="btn btn-acc" data-open="newAcc">+ 添加账号</button></div>
+      <div class="toolbar"><div class="tabs"><div class="tab active">全部</div><div class="tab">Claude</div><div class="tab">GPT</div><div class="tab">Gemini</div></div>
+        <div class="spacer"></div><input class="input" style="max-width:220px" placeholder="搜索账号备注…"></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>账号</th><th>厂商</th><th>分组</th><th>今日用量</th><th>权重</th><th>健康</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>acc-1</b> <span class="hint">claude-team-a</span></td><td>Claude</td><td><span class="badge b-mute">default</span></td><td class="mono">42.1M</td><td class="mono">10</td><td><span class="dot g"></span></td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAcc">编辑</a><a>探活</a><a>查看日志</a><div class="sep"></div><a class="danger">下线</a></div></div></td></tr>
+          <tr><td><b>acc-2</b> <span class="hint">claude-team-b</span></td><td>Claude</td><td><span class="badge b-mute">vip</span></td><td class="mono">38.4M</td><td class="mono">8</td><td><span class="dot g"></span></td><td><span class="badge b-on">启用</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAcc">编辑</a><a>探活</a><a>查看日志</a><div class="sep"></div><a class="danger">下线</a></div></div></td></tr>
+          <tr><td><b>acc-7</b> <span class="hint">gemini-pool-3</span></td><td>Gemini</td><td><span class="badge b-mute">default</span></td><td class="mono">12.0M</td><td class="mono">5</td><td><span class="dot y"></span></td><td><span class="badge b-warn">限流中</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAcc">编辑</a><a>探活</a><a>查看日志</a><div class="sep"></div><a class="danger">下线</a></div></div></td></tr>
+          <tr><td><b>acc-9</b> <span class="hint">antigravity-1</span></td><td>Antigravity</td><td><span class="badge b-mute">default</span></td><td class="mono">0</td><td class="mono">3</td><td><span class="dot r"></span></td><td><span class="badge b-danger">离线</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAcc">编辑</a><a>探活</a><a>查看日志</a><div class="sep"></div><a>上线</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newAcc"><div class="modal lg">
+  <div class="modal-head"><h3>账号配置</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <label class="field"><span class="label">备注名</span><input class="input" value="claude-team-a"></label>
+      <label class="field"><span class="label">厂商</span><select class="select"><option>Claude</option><option>GPT</option><option>Gemini</option><option>Antigravity</option></select></label>
+    </div>
+    <label class="field"><span class="label">凭据 / Cookie / Token</span><textarea class="textarea" placeholder="粘贴上游账号凭据…"></textarea></label>
+    <div class="grid-2">
+      <label class="field"><span class="label">所属分组</span><select class="select"><option>default</option><option>vip</option><option>trial</option></select></label>
+      <label class="field"><span class="label">权重</span><input class="input" value="10"></label>
+    </div>
+    <label class="checkrow"><input type="checkbox" checked> 启用并加入调度</label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="账号已保存">保存</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/accounts',title:'账号管理',idx:'ADMIN / ACCOUNTS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>公告 · YOUC</title>
+<link rel="stylesheet" href="assets/youc.css" />
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <div class="main">
+    <header id="topbar"></header>
+    <div class="content">
+      <div class="page-head"><div><h1>公告</h1><p>发布站内公告与维护通知</p></div>
+        <button class="btn btn-acc" data-open="newAnn">+ 发布公告</button></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>标题</th><th>类型</th><th>展示位置</th><th>发布时间</th><th>状态</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>Gemini 渠道维护通知</b></td><td><span class="badge b-warn">维护</span></td><td>顶部横幅</td><td class="mono">06-21 03:00</td><td><span class="badge b-on">展示中</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAnn">编辑</a><a>置顶</a><div class="sep"></div><a class="danger">下线</a></div></div></td></tr>
+          <tr><td><b>新增 Antigravity 模型支持</b></td><td><span class="badge b-ok">更新</span></td><td>弹窗</td><td class="mono">06-18 10:00</td><td><span class="badge b-on">展示中</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAnn">编辑</a><a>置顶</a><div class="sep"></div><a class="danger">下线</a></div></div></td></tr>
+          <tr><td><b>五一活动充值返利</b></td><td><span class="badge b-mute">活动</span></td><td>弹窗</td><td class="mono">05-01 00:00</td><td><span class="badge b-mute">已结束</span></td>
+            <td><div class="dropdown"><button class="btn btn-sm" data-menu>•••</button><div class="menu"><a data-open="newAnn">编辑</a><div class="sep"></div><a class="danger">删除</a></div></div></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="newAnn"><div class="modal lg">
+  <div class="modal-head"><h3>发布公告</h3><span class="modal-x" data-close>×</span></div>
+  <div class="modal-body">
+    <label class="field"><span class="label">标题</span><input class="input" placeholder="公告标题"></label>
+    <div class="grid-2">
+      <label class="field"><span class="label">类型</span><select class="select"><option>更新</option><option>维护</option><option>活动</option></select></label>
+      <label class="field"><span class="label">展示位置</span><select class="select"><option>顶部横幅</option><option>弹窗</option></select></label>
+    </div>
+    <label class="field"><span class="label">正文 (支持 Markdown)</span><textarea class="textarea" placeholder="公告内容…"></textarea></label>
+    <label class="checkrow"><input type="checkbox" checked> 立即发布</label>
+  </div>
+  <div class="modal-foot"><button class="btn btn-ghost" data-close>取消</button><button class="btn btn-acc" data-close data-toast="ok" data-toast-title="公告已发布">发布</button></div>
+</div></div>
+<script>window.PAGE={shell:'admin',active:'/admin/announcements',title:'公告',idx:'ADMIN / ANNOUNCEMENTS'}</script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

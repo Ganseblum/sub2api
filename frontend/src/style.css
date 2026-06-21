@@ -3,8 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --youc-bg: #f4f3ee;
+    --youc-paper: #ffffff;
+    --youc-ink: #111111;
+    --youc-line: #111111;
+    --youc-muted: #555555;
+    --youc-soft: #ecebe4;
+    --youc-accent: #0f766e;
+    --youc-accent-2: #14b8a6;
+    --youc-danger: #b91c1c;
+    --youc-warn: #b45309;
+    --youc-info: #1d4ed8;
+    --youc-shadow: 4px 4px 0 var(--youc-line);
+    --youc-shadow-lg: 8px 8px 0 var(--youc-line);
+  }
+
+  .dark {
+    --youc-bg: #171713;
+    --youc-paper: #24241f;
+    --youc-ink: #f4f3ee;
+    --youc-line: #f4f3ee;
+    --youc-muted: #b8b4ab;
+    --youc-soft: #303029;
+    --youc-accent: #14b8a6;
+    --youc-accent-2: #5eead4;
+    --youc-danger: #ef4444;
+    --youc-warn: #f59e0b;
+    --youc-info: #60a5fa;
+  }
+
   * {
-    @apply border-gray-200 dark:border-dark-700;
+    border-color: var(--youc-line);
   }
 
   html {
@@ -12,8 +42,38 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-dark-950 dark:text-gray-100;
     @apply min-h-screen;
+    background: var(--youc-bg);
+    color: var(--youc-ink);
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      'Liberation Mono',
+      'PingFang SC',
+      'Microsoft YaHei',
+      monospace;
+    line-height: 1.6;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #app {
+    @apply min-h-screen;
+    width: 100%;
+    overflow-x: clip;
   }
 
   /* 自定义滚动条 - 仅针对 Firefox，避免 Chrome 取消 webkit 的全局定制 */
@@ -57,7 +117,8 @@
 
   /* 选中文本样式 */
   ::selection {
-    @apply bg-primary-500/20 text-primary-900 dark:text-primary-100;
+    background: color-mix(in srgb, var(--youc-accent-2) 35%, transparent);
+    color: var(--youc-ink);
   }
 
 
@@ -67,123 +128,149 @@
   /* ============ 按钮样式 ============ */
   .btn {
     @apply inline-flex items-center justify-center gap-2;
-    @apply rounded-xl px-4 py-2.5 text-sm font-medium;
-    @apply transition-all duration-200 ease-out;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2;
+    @apply px-4 py-2.5 text-sm;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: none;
+    transition:
+      transform 120ms ease,
+      box-shadow 120ms ease,
+      background-color 120ms ease,
+      color 120ms ease;
+    @apply focus:outline-none;
     @apply disabled:transform-none disabled:cursor-not-allowed disabled:opacity-50;
-    @apply active:scale-[0.98];
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--youc-shadow);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translate(0, 0);
+    box-shadow: none;
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid var(--youc-accent-2);
+    outline-offset: 2px;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600;
-    @apply text-white shadow-md shadow-primary-500/25;
-    @apply hover:from-primary-600 hover:to-primary-700 hover:shadow-lg hover:shadow-primary-500/30;
-    @apply dark:shadow-primary-500/20;
+    background: var(--youc-ink);
+    color: var(--youc-bg);
   }
 
   .btn-secondary {
-    @apply bg-white dark:bg-dark-800;
-    @apply text-gray-700 dark:text-gray-200;
-    @apply border border-gray-200 dark:border-dark-600;
-    @apply shadow-sm hover:bg-gray-50 dark:hover:bg-dark-700;
-    @apply hover:border-gray-300 dark:hover:border-dark-500;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
   }
 
   .btn-ghost {
-    @apply bg-transparent text-gray-600 dark:text-gray-300;
-    @apply hover:bg-gray-100 dark:hover:bg-dark-800;
+    background: transparent;
+    color: var(--youc-ink);
   }
 
   .btn-danger {
-    @apply bg-gradient-to-r from-red-500 to-red-600;
-    @apply text-white shadow-md shadow-red-500/25;
-    @apply hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:shadow-red-500/30;
+    background: var(--youc-danger);
+    color: #ffffff;
   }
 
   .btn-success {
-    @apply bg-gradient-to-r from-emerald-500 to-emerald-600;
-    @apply text-white shadow-md shadow-emerald-500/25;
-    @apply hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg hover:shadow-emerald-500/30;
-    @apply dark:shadow-emerald-500/20;
+    background: var(--youc-accent);
+    color: #ffffff;
   }
 
   .btn-warning {
-    @apply bg-gradient-to-r from-amber-500 to-amber-600;
-    @apply text-white shadow-md shadow-amber-500/25;
-    @apply hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:shadow-amber-500/30;
-    @apply dark:shadow-amber-500/20;
+    background: #fde68a;
+    color: #111111;
   }
 
   .btn-stripe {
-    @apply bg-[#635bff] text-white shadow-md shadow-[#635bff]/25;
-    @apply hover:bg-[#5851ea] hover:shadow-lg hover:shadow-[#635bff]/30;
-    @apply dark:bg-[#7a73ff] dark:shadow-[#7a73ff]/20;
-    @apply dark:hover:bg-[#635bff];
+    background: #635bff;
+    color: #ffffff;
   }
 
   .btn-airwallex {
-    @apply bg-[#14171A] text-white shadow-md shadow-emerald-500/20;
-    @apply hover:bg-[#20252a] hover:shadow-lg hover:shadow-emerald-500/25;
-    @apply dark:bg-[#7AF0C4] dark:text-gray-950 dark:shadow-emerald-500/20;
-    @apply dark:hover:bg-[#62d9ad];
+    background: #14171a;
+    color: #ffffff;
   }
 
   .btn-alipay {
-    @apply bg-[#00AEEF] text-white shadow-md shadow-[#00AEEF]/25;
-    @apply hover:bg-[#009dd6] hover:shadow-lg hover:shadow-[#00AEEF]/30;
-    @apply active:bg-[#008cbe];
-    @apply dark:shadow-[#00AEEF]/20;
+    background: #00aeef;
+    color: #ffffff;
   }
 
   .btn-wxpay {
-    @apply bg-[#2BB741] text-white shadow-md shadow-[#2BB741]/25;
-    @apply hover:bg-[#24a038] hover:shadow-lg hover:shadow-[#2BB741]/30;
-    @apply active:bg-[#1d8a2f];
-    @apply dark:shadow-[#2BB741]/20;
+    background: #2bb741;
+    color: #ffffff;
   }
 
   .btn-sm {
-    @apply rounded-lg px-3 py-1.5 text-xs;
+    @apply px-3 py-1.5 text-xs;
   }
 
   .btn-md {
-    @apply rounded-xl px-4 py-2 text-sm;
+    @apply px-4 py-2 text-sm;
   }
 
   .btn-lg {
-    @apply rounded-2xl px-6 py-3 text-base;
+    @apply px-6 py-3 text-base;
   }
 
   .btn-icon {
-    @apply rounded-xl p-2.5;
+    @apply p-2.5;
   }
 
   /* ============ 输入框样式 ============ */
   .input {
-    @apply w-full rounded-xl px-4 py-2.5 text-sm;
-    @apply bg-white dark:bg-dark-800;
-    @apply border border-gray-200 dark:border-dark-600;
-    @apply text-gray-900 dark:text-gray-100;
-    @apply placeholder:text-gray-400 dark:placeholder:text-dark-400;
-    @apply transition-all duration-200;
-    @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
-    @apply disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-dark-900;
+    @apply w-full px-4 py-2.5 text-sm;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    transition:
+      box-shadow 120ms ease,
+      background-color 120ms ease;
+    @apply disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .input::placeholder {
+    color: color-mix(in srgb, var(--youc-muted) 70%, transparent);
+  }
+
+  .input:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 var(--youc-accent-2);
   }
 
   .input-error {
-    @apply border-red-500 focus:border-red-500 focus:ring-red-500/30;
+    border-color: var(--youc-danger);
   }
 
   .input-label {
-    @apply mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300;
+    @apply mb-1.5 block text-xs;
+    color: var(--youc-ink);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .input-hint {
-    @apply mt-1 text-xs text-gray-500 dark:text-dark-400;
+    @apply mt-1 text-xs;
+    color: var(--youc-muted);
   }
 
   .input-error-text {
-    @apply mt-1 text-xs text-red-500;
+    @apply mt-1 text-xs;
+    color: var(--youc-danger);
+    font-weight: 700;
   }
 
   /* Hide number input spinner buttons for cleaner UI */
@@ -199,41 +286,42 @@
 
   /* ============ 玻璃效果 ============ */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl dark:bg-dark-800/80;
+    background: var(--youc-paper);
   }
 
   .glass-card {
-    @apply bg-white/70 dark:bg-dark-800/70;
-    @apply backdrop-blur-xl;
-    @apply rounded-2xl;
-    @apply border border-white/20 dark:border-dark-700/50;
-    @apply shadow-glass;
-    @apply transition-all duration-300;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: var(--youc-shadow);
   }
 
   /* ============ 卡片样式 ============ */
   .card {
-    @apply bg-white dark:bg-dark-800/50;
-    @apply rounded-2xl;
-    @apply border border-gray-100 dark:border-dark-700/50;
-    @apply shadow-card;
-    @apply transition-all duration-300;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: var(--youc-shadow);
+    transition:
+      transform 120ms ease,
+      box-shadow 120ms ease,
+      background-color 120ms ease;
   }
 
   .card-hover {
-    @apply hover:-translate-y-0.5 hover:shadow-card-hover;
-    @apply hover:border-gray-200 dark:hover:border-dark-600;
+    @apply hover:-translate-y-0.5;
   }
 
   .card-glass {
-    @apply bg-white/70 dark:bg-dark-800/70;
-    @apply backdrop-blur-xl;
-    @apply border border-white/20 dark:border-dark-700/50;
-    @apply shadow-glass;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: var(--youc-shadow-lg);
   }
 
   .card-header {
-    @apply border-b border-gray-100 dark:border-dark-700;
+    border-bottom: 2.5px solid var(--youc-line);
     @apply px-6 py-4;
   }
 
@@ -242,7 +330,7 @@
   }
 
   .card-footer {
-    @apply border-t border-gray-100 dark:border-dark-700;
+    border-top: 2.5px solid var(--youc-line);
     @apply px-6 py-4;
   }
 
@@ -253,33 +341,46 @@
   }
 
   .stat-icon {
-    @apply h-12 w-12 rounded-xl;
+    @apply h-12 w-12;
     @apply flex items-center justify-center;
     @apply text-xl;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
   }
 
   .stat-icon-primary {
-    @apply bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400;
+    background: var(--youc-accent-2);
+    color: #04231f;
   }
 
   .stat-icon-success {
-    @apply bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400;
+    background: var(--youc-accent);
+    color: #ffffff;
   }
 
   .stat-icon-warning {
-    @apply bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400;
+    background: #fde68a;
+    color: #111111;
   }
 
   .stat-icon-danger {
-    @apply bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400;
+    background: var(--youc-danger);
+    color: #ffffff;
   }
 
   .stat-value {
-    @apply text-2xl font-bold text-gray-900 dark:text-white truncate;
+    @apply truncate text-2xl;
+    color: var(--youc-ink);
+    font-weight: 850;
+    letter-spacing: -0.02em;
   }
 
   .stat-label {
-    @apply text-sm text-gray-500 dark:text-dark-400;
+    @apply text-xs;
+    color: var(--youc-muted);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .stat-trend {
@@ -287,16 +388,20 @@
   }
 
   .stat-trend-up {
-    @apply text-emerald-600 dark:text-emerald-400;
+    color: var(--youc-accent);
   }
 
   .stat-trend-down {
-    @apply text-red-600 dark:text-red-400;
+    color: var(--youc-danger);
   }
 
   /* ============ 表格样式 ============ */
   .table-container {
-    @apply overflow-x-auto rounded-xl border border-gray-200 dark:border-dark-700;
+    @apply overflow-x-auto;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: var(--youc-shadow);
   }
 
   .table {
@@ -304,16 +409,21 @@
   }
 
   .table th {
-    @apply px-4 py-3 text-left font-medium;
-    @apply text-gray-600 dark:text-dark-300;
-    @apply bg-gray-50 dark:bg-dark-800/50;
-    @apply border-b border-gray-200 dark:border-dark-700;
+    @apply px-4 py-3 text-left;
+    border-bottom: 2.5px solid var(--youc-line);
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .table td {
     @apply px-4 py-3;
-    @apply text-gray-700 dark:text-gray-300;
-    @apply border-b border-gray-100 dark:border-dark-800;
+    border-bottom: 2px solid var(--youc-line);
+    color: var(--youc-ink);
   }
 
   .table tr:last-child td {
@@ -322,83 +432,110 @@
 
   .table tbody tr {
     @apply transition-colors duration-150;
-    @apply hover:bg-gray-50 dark:hover:bg-dark-800/30;
+  }
+
+  .table tbody tr:hover {
+    background: var(--youc-soft);
   }
 
   /* ============ 徽章样式 ============ */
   .badge {
     @apply inline-flex items-center gap-1;
-    @apply rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply px-2.5 py-0.5 text-xs;
+    border: 2px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .badge-primary {
-    @apply bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400;
+    background: var(--youc-accent);
+    color: #ffffff;
   }
 
   .badge-success {
-    @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
+    background: var(--youc-accent-2);
+    color: #04231f;
   }
 
   .badge-warning {
-    @apply bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
+    background: #fde68a;
+    color: #111111;
   }
 
   .badge-danger {
-    @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400;
+    background: var(--youc-danger);
+    color: #ffffff;
   }
 
   .badge-gray {
-    @apply bg-gray-100 text-gray-700 dark:bg-dark-700 dark:text-dark-300;
+    background: var(--youc-soft);
+    color: var(--youc-muted);
   }
 
   .badge-purple {
-    @apply bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400;
+    background: #f0abfc;
+    color: #111111;
   }
 
   /* ============ 下拉菜单 ============ */
   .dropdown {
     @apply absolute z-50;
-    @apply bg-white dark:bg-dark-800;
-    @apply rounded-xl;
-    @apply border border-gray-200 dark:border-dark-700;
-    @apply shadow-lg;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: var(--youc-shadow-lg);
     @apply py-1;
     @apply origin-top-right animate-scale-in;
   }
 
   .dropdown-item {
     @apply px-4 py-2 text-sm;
-    @apply text-gray-700 dark:text-gray-300;
-    @apply hover:bg-gray-100 dark:hover:bg-dark-700;
+    color: var(--youc-ink);
     @apply cursor-pointer transition-colors;
     @apply flex items-center gap-2;
+  }
+
+  .dropdown-item:hover {
+    background: var(--youc-soft);
   }
 
   /* ============ 模态框 ============ */
   .modal-overlay {
     @apply fixed inset-0 z-50;
-    @apply bg-black/50 backdrop-blur-sm;
+    background: color-mix(in srgb, #111111 45%, transparent);
     @apply flex items-center justify-center p-2 sm:p-4;
   }
 
   .modal-content {
     @apply w-full;
     @apply max-h-[95vh] sm:max-h-[90vh];
-    @apply bg-white dark:bg-dark-800;
-    @apply rounded-2xl shadow-2xl;
-    @apply border border-gray-200 dark:border-dark-700;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: 10px 10px 0 var(--youc-line);
     @apply flex flex-col;
   }
 
   .modal-header {
-    @apply border-b border-gray-200 px-4 py-3 dark:border-dark-700;
+    border-bottom: 2.5px solid var(--youc-line);
+    @apply px-4 py-3;
     @apply sm:px-6 sm:py-4;
     @apply flex items-center justify-between;
     @apply flex-shrink-0;
   }
 
   .modal-title {
-    @apply text-lg font-semibold text-gray-900 dark:text-white;
+    @apply text-lg;
+    color: var(--youc-ink);
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .modal-body {
@@ -408,7 +545,8 @@
   }
 
   .modal-footer {
-    @apply border-t border-gray-200 px-4 py-3 dark:border-dark-700;
+    border-top: 2.5px solid var(--youc-line);
+    @apply px-4 py-3;
     @apply sm:px-6 sm:py-4;
     @apply flex items-center justify-end gap-3;
     @apply flex-shrink-0;
@@ -470,19 +608,22 @@
   /* ============ Dialog ============ */
   .dialog-overlay {
     @apply fixed inset-0 z-50;
-    @apply bg-black/40 dark:bg-black/60;
+    background: color-mix(in srgb, #111111 45%, transparent);
     @apply flex items-center justify-center p-4;
   }
 
   .dialog-container {
     @apply flex w-full flex-col;
     @apply max-h-[90vh];
-    @apply rounded-2xl bg-white dark:bg-dark-800;
-    @apply shadow-xl;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: 10px 10px 0 var(--youc-line);
   }
 
   .dialog-header {
-    @apply border-b border-gray-100 px-6 py-4 dark:border-dark-700;
+    border-bottom: 2.5px solid var(--youc-line);
+    @apply px-6 py-4;
     @apply flex items-center justify-between;
   }
 
@@ -491,8 +632,9 @@
   }
 
   .dialog-footer {
-    @apply border-t border-gray-100 px-6 py-4 dark:border-dark-700;
-    @apply bg-gray-50/60 dark:bg-dark-900/40;
+    border-top: 2.5px solid var(--youc-line);
+    background: var(--youc-soft);
+    @apply px-6 py-4;
     @apply flex items-center justify-end gap-3;
   }
 
@@ -500,34 +642,39 @@
   .toast {
     @apply fixed right-4 top-4 z-[100];
     @apply min-w-[320px] max-w-md;
-    @apply bg-white dark:bg-dark-800;
-    @apply rounded-xl shadow-lg;
-    @apply border-l-4;
+    border: 2.5px solid var(--youc-line);
+    border-left-width: 8px;
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: var(--youc-shadow);
     @apply p-4;
     @apply animate-slide-in-right;
   }
 
   .toast-success {
-    @apply border-l-emerald-500;
+    border-left-color: var(--youc-accent);
   }
 
   .toast-error {
-    @apply border-l-red-500;
+    border-left-color: var(--youc-danger);
   }
 
   .toast-warning {
-    @apply border-l-amber-500;
+    border-left-color: #f59e0b;
   }
 
   .toast-info {
-    @apply border-l-primary-500;
+    border-left-color: var(--youc-info);
   }
 
   /* ============ 侧边栏 ============ */
   .sidebar {
     @apply fixed inset-y-0 left-0 z-40;
-    @apply w-64 bg-white dark:bg-dark-900;
-    @apply border-r border-gray-200 dark:border-dark-800;
+    width: 16rem;
+    border-right: 2.5px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--youc-ink);
     @apply flex flex-col;
     @apply transition-transform duration-300;
     transition-property: width, transform;
@@ -536,7 +683,7 @@
   .sidebar-header {
     @apply h-16 px-6;
     @apply flex items-center gap-3;
-    @apply border-b border-gray-100 dark:border-dark-800;
+    border-bottom: 2.5px solid var(--youc-line);
     transition:
       padding 0.2s ease,
       gap 0.2s ease;
@@ -547,21 +694,34 @@
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 rounded-xl py-2.5;
+    @apply flex items-center gap-3 py-2.5;
     @apply overflow-hidden;
-    @apply text-sm font-medium;
-    @apply text-gray-600 dark:text-dark-300;
+    @apply text-sm;
+    border: 2.5px solid transparent;
+    border-radius: 0;
+    color: var(--youc-ink);
+    font-weight: 700;
     @apply transition-all duration-200;
-    @apply hover:bg-gray-100 dark:hover:bg-dark-800;
-    @apply hover:text-gray-900 dark:hover:text-white;
     padding-left: 1.0625rem;
     padding-right: 0.875rem;
   }
 
+  .sidebar-link:hover {
+    border-color: var(--youc-line);
+    background: var(--youc-soft);
+    color: var(--youc-ink);
+  }
+
   .sidebar-link-active {
-    @apply bg-primary-50 dark:bg-primary-900/20;
-    @apply text-primary-600 dark:text-primary-400;
-    @apply hover:bg-primary-100 dark:hover:bg-primary-900/30;
+    border-color: var(--youc-line);
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+    box-shadow: 3px 3px 0 var(--youc-accent-2);
+  }
+
+  .sidebar-link-active:hover {
+    background: var(--youc-ink);
+    color: var(--youc-bg);
   }
 
   .sidebar-section {
@@ -570,40 +730,54 @@
 
   .sidebar-section-title {
     @apply mb-2 px-3;
-    @apply text-xs font-semibold uppercase tracking-wider;
-    @apply text-gray-400 dark:text-dark-500;
+    @apply text-xs uppercase;
+    color: var(--youc-muted);
+    font-weight: 800;
+    letter-spacing: 0.12em;
   }
 
   /* ============ 页面头部 ============ */
   .page-header {
-    @apply mb-6;
+    @apply mb-6 pb-4;
+    border-bottom: 2.5px solid var(--youc-line);
   }
 
   .page-title {
-    @apply text-2xl font-bold text-gray-900 dark:text-white;
+    @apply text-2xl;
+    color: var(--youc-ink);
+    font-weight: 850;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
   }
 
   .page-description {
-    @apply mt-1 text-sm text-gray-500 dark:text-dark-400;
+    @apply mt-1 text-sm;
+    color: var(--youc-muted);
   }
 
   /* ============ 空状态 ============ */
   .empty-state {
     @apply flex flex-col items-center justify-center px-4 py-12;
     @apply text-center;
+    border: 2.5px dashed var(--youc-line);
+    background: var(--youc-paper);
   }
 
   .empty-state-icon {
     @apply mb-4 h-16 w-16;
-    @apply text-gray-300 dark:text-dark-600;
+    color: var(--youc-muted);
   }
 
   .empty-state-title {
-    @apply mb-1 text-lg font-medium text-gray-900 dark:text-white;
+    @apply mb-1 text-lg;
+    color: var(--youc-ink);
+    font-weight: 800;
+    text-transform: uppercase;
   }
 
   .empty-state-description {
-    @apply max-w-sm text-sm text-gray-500 dark:text-dark-400;
+    @apply max-w-sm text-sm;
+    color: var(--youc-muted);
   }
 
   /* ============ 加载状态 ============ */
@@ -613,57 +787,83 @@
   }
 
   .skeleton {
-    @apply animate-pulse rounded bg-gray-200 dark:bg-dark-700;
+    @apply animate-pulse;
+    border-radius: 0;
+    background: var(--youc-soft);
   }
 
   /* ============ 分隔线 ============ */
   .divider {
-    @apply my-4 h-px bg-gray-200 dark:bg-dark-700;
+    @apply my-4 h-0;
+    border-top: 2px dashed var(--youc-line);
+    background: transparent;
   }
 
   /* ============ 标签页 ============ */
   .tabs {
-    @apply flex gap-1 p-1;
-    @apply rounded-xl bg-gray-100 dark:bg-dark-800;
+    @apply flex gap-0 p-0;
+    width: fit-content;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
   }
 
   .tab {
-    @apply rounded-lg px-4 py-2 text-sm font-medium;
-    @apply text-gray-600 dark:text-dark-400;
+    @apply px-4 py-2 text-sm;
+    border-right: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    color: var(--youc-ink);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     @apply transition-all duration-200;
-    @apply hover:text-gray-900 dark:hover:text-white;
+  }
+
+  .tab:last-child {
+    border-right: 0;
+  }
+
+  .tab:hover {
+    background: var(--youc-soft);
   }
 
   .tab-active {
-    @apply bg-white dark:bg-dark-700;
-    @apply text-gray-900 dark:text-white;
-    @apply shadow-sm;
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+    box-shadow: none;
   }
 
   /* ============ 进度条 ============ */
   .progress {
-    @apply h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-dark-700;
+    @apply h-3 overflow-hidden;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
   }
 
   .progress-bar {
-    @apply h-full bg-gradient-to-r from-primary-500 to-primary-400;
+    height: 100%;
+    background: var(--youc-accent-2);
     @apply transition-all duration-300;
   }
 
   /* ============ 开关 ============ */
   .switch {
-    @apply relative h-6 w-11 cursor-pointer rounded-full;
-    @apply bg-gray-300 dark:bg-dark-600;
+    @apply relative h-6 w-11 cursor-pointer;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
     @apply transition-colors duration-200;
   }
 
   .switch-active {
-    @apply bg-primary-500;
+    background: var(--youc-accent-2);
   }
 
   .switch-thumb {
-    @apply absolute left-0.5 top-0.5 h-5 w-5 rounded-full;
-    @apply bg-white shadow-sm;
+    @apply absolute left-0.5 top-0.5 h-4 w-4;
+    border-radius: 0;
+    background: var(--youc-ink);
     @apply transition-transform duration-200;
   }
 
@@ -674,15 +874,19 @@
   /* ============ 代码块 ============ */
   .code {
     @apply font-mono text-sm;
-    @apply bg-gray-100 dark:bg-dark-800;
-    @apply rounded px-1.5 py-0.5;
-    @apply text-primary-600 dark:text-primary-400;
+    @apply px-1.5 py-0.5;
+    border-radius: 0;
+    background: var(--youc-ink);
+    color: var(--youc-accent-2);
   }
 
   .code-block {
     @apply font-mono text-sm;
-    @apply bg-gray-900 text-gray-100;
-    @apply overflow-x-auto rounded-xl p-4;
+    @apply overflow-x-auto p-4;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: #111111;
+    color: #d6d3cb;
   }
 
   /* ============ Tour Description ============ */
@@ -730,19 +934,22 @@
 
   /* 表头固定时添加底部阴影，增强视觉层次 */
   .table-wrapper thead.sticky {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    box-shadow: 0 2.5px 0 var(--youc-line);
   }
 }
 
 @layer utilities {
   /* 文字渐变 */
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
+    background: none;
+    color: var(--youc-ink);
+    -webkit-text-fill-color: currentColor;
+    font-weight: 850;
   }
 
   /* 玻璃效果 */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl dark:bg-dark-800/80;
+    background: var(--youc-paper);
   }
 
   /* 隐藏滚动条 */
@@ -762,4 +969,531 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  .youc-hard {
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: var(--youc-shadow);
+  }
+
+  .youc-hard-lg {
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: var(--youc-shadow-lg);
+  }
+
+  .youc-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--youc-ink);
+    font-size: 0.8125rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .youc-section-title::before {
+    content: '';
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2.5px solid var(--youc-line);
+    background: var(--youc-accent-2);
+  }
+}
+
+/* YOUC prototype compatibility layer. Most screens use Tailwind utilities
+   directly, so these selectors restyle repeated UI primitives without
+   touching data flow or event handlers. */
+  .bg-gradient-to-br,
+  .bg-gradient-to-r,
+  .bg-gradient-to-l,
+  .bg-gradient-to-t,
+  .bg-gradient-to-b {
+    background-image: none;
+  }
+
+  .bg-white,
+  .bg-white\/40,
+  .bg-white\/50,
+  .bg-white\/60,
+  .bg-white\/70,
+  .bg-white\/80,
+  .bg-gray-50,
+  .bg-gray-50\/50,
+  .bg-gray-50\/60,
+  .bg-gray-50\/80,
+  .dark .dark\:bg-dark-700,
+  .dark .dark\:bg-dark-800,
+  .dark .dark\:bg-dark-800\/50,
+  .dark .dark\:bg-dark-800\/60,
+  .dark .dark\:bg-dark-800\/70,
+  .dark .dark\:bg-dark-800\/80,
+  .dark .dark\:bg-dark-900,
+  .dark .dark\:bg-dark-950 {
+    background-color: var(--youc-paper);
+  }
+
+  .bg-gray-100,
+  .bg-gray-100\/50,
+  .bg-gray-100\/80,
+  .bg-primary-50,
+  .bg-primary-50\/30,
+  .bg-primary-100,
+  .bg-primary-400\/10,
+  .bg-primary-400\/20,
+  .bg-primary-500\/10,
+  .bg-primary-500\/15,
+  .dark .dark\:bg-dark-700\/50,
+  .dark .dark\:bg-dark-900\/40 {
+    background-color: var(--youc-soft);
+  }
+
+  .bg-primary-300\/10,
+  .bg-primary-400,
+  .bg-primary-500,
+  .bg-primary-600,
+  .hover\:bg-primary-600:hover,
+  .dark .dark\:bg-primary-500\/10 {
+    background-color: var(--youc-accent);
+  }
+
+  .text-gray-900,
+  .text-gray-800,
+  .text-gray-700,
+  .dark .dark\:text-white,
+  .dark .dark\:text-gray-100,
+  .dark .dark\:text-gray-200,
+  .dark .dark\:text-gray-300,
+  .dark .dark\:text-dark-100,
+  .dark .dark\:text-dark-200,
+  .dark .dark\:text-dark-300 {
+    color: var(--youc-ink);
+  }
+
+  .text-gray-600,
+  .text-gray-500,
+  .text-gray-400,
+  .dark .dark\:text-gray-400,
+  .dark .dark\:text-dark-400,
+  .dark .dark\:text-dark-500 {
+    color: var(--youc-muted);
+  }
+
+  .text-primary-600,
+  .text-primary-700,
+  .text-primary-500,
+  .text-primary-400,
+  .dark .dark\:text-primary-400,
+  .dark .dark\:text-primary-300 {
+    color: var(--youc-accent);
+  }
+
+  .border,
+  .border-t,
+  .border-b,
+  .border-l,
+  .border-r,
+  .divide-y > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--youc-line);
+  }
+
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl,
+  .shadow-card,
+  .shadow-glass {
+    box-shadow: var(--youc-shadow);
+  }
+
+  .rounded,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-full {
+    border-radius: 0;
+  }
+
+  .blur-3xl,
+  .blur-2xl,
+  .blur-xl {
+    filter: none;
+  }
+
+  .backdrop-blur-sm,
+  .backdrop-blur,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl {
+    backdrop-filter: none;
+  }
+
+  .ring-1,
+  .ring-2,
+  .ring {
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-ring-shadow: 0 0 #0000;
+    box-shadow: none;
+    outline: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+    outline-offset: 0;
+  }
+
+  .ring-2 {
+    outline-width: 2px;
+  }
+
+  .ring-inset {
+    outline-offset: -1px;
+  }
+
+  .focus\:ring-1:focus,
+  .focus\:ring-2:focus,
+  .focus\:ring-4:focus,
+  .focus\:ring-blue-500:focus,
+  .focus\:ring-green-500:focus,
+  .focus\:ring-primary-500:focus,
+  .focus\:ring-primary-500\/20:focus,
+  .focus\:ring-primary-500\/30:focus,
+  .focus\:ring-red-500:focus {
+    outline: 3px solid var(--youc-accent-2);
+    outline-offset: 2px;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-ring-offset-shadow: 0 0 #0000;
+    box-shadow: none;
+  }
+
+  input[type='checkbox'] {
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background-color: var(--youc-paper);
+    color: var(--youc-accent);
+  }
+
+  input[type='checkbox']:checked {
+    background-color: var(--youc-accent);
+  }
+
+  input[type='date'],
+  input[type='email'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  input[type='text'],
+  textarea,
+  select {
+    border-color: var(--youc-line);
+    border-radius: 0;
+    background-color: var(--youc-paper);
+    color: var(--youc-ink);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 var(--youc-accent-2);
+  }
+
+  .select-trigger,
+  .date-picker-trigger {
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: none;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+  }
+
+  th {
+    border-bottom: 2.5px solid var(--youc-line);
+    color: inherit;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom-color: var(--youc-line);
+  }
+
+  .app-main > .mx-auto[class*='max-w-'],
+  .app-main > div > .mx-auto[class*='max-w-'],
+  .app-main > .max-w-7xl,
+  .app-main > .max-w-6xl,
+  .app-main > .max-w-5xl,
+  .app-main > .max-w-4xl {
+    max-width: none !important;
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .app-main > * {
+    min-width: 0;
+  }
+
+  .app-main table,
+  .table-container table,
+  .table-wrapper table {
+    max-width: 100%;
+  }
+
+/* Scoped component styles for Select and DateRangePicker need an explicit
+   post-layer override to match the shared YOUC controls. */
+.select-trigger,
+.date-picker-trigger,
+button.select-trigger,
+button.date-picker-trigger {
+  border: 2.5px solid var(--youc-line) !important;
+  border-radius: 0 !important;
+  background: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+  box-shadow: none !important;
+}
+
+.select-trigger-open,
+.date-picker-trigger-open {
+  border-color: var(--youc-line) !important;
+  box-shadow: 4px 4px 0 var(--youc-accent-2) !important;
+}
+
+.select-dropdown-portal,
+.date-picker-dropdown {
+  border: 2.5px solid var(--youc-line) !important;
+  border-radius: 0 !important;
+  background: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+  box-shadow: 4px 4px 0 var(--youc-line) !important;
+}
+
+.select-option,
+.date-picker-preset {
+  color: var(--youc-ink) !important;
+}
+
+.select-option-focused,
+.select-option:hover,
+.date-picker-preset:hover {
+  background: var(--youc-soft) !important;
+}
+
+.select-option-selected,
+.date-picker-preset-active {
+  background: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
+}
+
+.date-picker-apply {
+  border: 2.5px solid var(--youc-line) !important;
+  border-radius: 0 !important;
+  background: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
+  font-weight: 800 !important;
+}
+
+/* Table refinements for scoped DataTable styles. */
+.table-scroll-container .table-wrapper,
+.table-wrapper {
+  background: var(--youc-paper) !important;
+}
+
+.table-scroll-container table,
+.table-wrapper table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-scroll-container thead,
+.table-wrapper thead,
+.table-wrapper .table-header {
+  background: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
+}
+
+.table-scroll-container thead th,
+.table-wrapper thead th,
+.table-wrapper .sticky-header-cell {
+  border-bottom: 2.5px solid var(--youc-line) !important;
+  background-color: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
+  opacity: 1 !important;
+}
+
+.table-scroll-container thead th *,
+.table-wrapper thead th * {
+  color: inherit !important;
+  opacity: 0.96 !important;
+}
+
+.table-scroll-container thead th:hover,
+.table-wrapper thead th:hover {
+  background-color: color-mix(in srgb, var(--youc-ink) 88%, var(--youc-accent-2)) !important;
+}
+
+.table-scroll-container thead input[type='checkbox'],
+.table-wrapper thead input[type='checkbox'] {
+  background-color: var(--youc-bg) !important;
+  color: var(--youc-accent) !important;
+}
+
+.table-scroll-container tbody,
+.table-wrapper tbody,
+.table-wrapper .table-body {
+  background: var(--youc-paper) !important;
+}
+
+.table-scroll-container tbody tr,
+.table-wrapper tbody tr {
+  background: var(--youc-paper) !important;
+}
+
+.table-scroll-container tbody tr:not([aria-hidden='true']) > td,
+.table-wrapper tbody tr:not([aria-hidden='true']) > td {
+  border-bottom: 2px solid var(--youc-line) !important;
+  background-color: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+}
+
+.table-scroll-container tbody tr:hover,
+.table-wrapper tbody tr:hover,
+.table-scroll-container tbody tr:hover > td,
+.table-wrapper tbody tr:hover > td {
+  background-color: var(--youc-soft) !important;
+}
+
+.table-scroll-container tbody .sticky-col,
+.table-wrapper tbody .sticky-col {
+  background-color: inherit !important;
+}
+
+.table-scroll-container tbody tr:hover .sticky-col,
+.table-wrapper tbody tr:hover .sticky-col {
+  background-color: var(--youc-soft) !important;
+}
+
+.table-wrapper.is-scrollable .sticky-col-left::after,
+.table-wrapper.is-scrollable .sticky-col-left-second::after {
+  display: none !important;
+}
+
+.table-wrapper.is-scrollable .sticky-col-right::before {
+  display: none !important;
+}
+
+.table-wrapper .sticky-col-left,
+.table-wrapper .sticky-col-left-second {
+  border-right: 2px solid var(--youc-line) !important;
+}
+
+.table-wrapper .sticky-col-right {
+  border-left: 2px solid var(--youc-line) !important;
+}
+
+.table-wrapper tbody tr:not([aria-hidden='true']) td button.flex.flex-col {
+  min-width: 3rem;
+  border: 2px solid var(--youc-line) !important;
+  border-radius: 0 !important;
+  background: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+  box-shadow: none !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.table-wrapper tbody tr:not([aria-hidden='true']) td button.flex.flex-col:hover {
+  transform: translate(-1px, -1px);
+  background: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
+  box-shadow: 2px 2px 0 var(--youc-line) !important;
+}
+
+.table-wrapper tbody tr:not([aria-hidden='true']) td button.flex.flex-col svg,
+.table-wrapper tbody tr:not([aria-hidden='true']) td button.flex.flex-col span {
+  color: inherit !important;
+}
+
+/* Compact dropdowns and pagination controls. */
+.select-dropdown-portal .select-search {
+  border-bottom: 2px solid var(--youc-line) !important;
+  background: var(--youc-paper) !important;
+}
+
+.select-dropdown-portal .select-search-input {
+  color: var(--youc-ink) !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+}
+
+.select-dropdown-portal .select-options {
+  padding-block: 0.25rem !important;
+}
+
+.select-dropdown-portal .select-option,
+.date-picker-preset {
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 750 !important;
+  line-height: 1.25 !important;
+}
+
+.select-dropdown-portal .select-option-label,
+.select-dropdown-portal .select-option svg {
+  color: inherit !important;
+}
+
+.select-dropdown-portal .select-option-group {
+  border-bottom: 2px solid var(--youc-line) !important;
+  background: var(--youc-soft) !important;
+  color: var(--youc-muted) !important;
+  font-size: 0.6875rem !important;
+}
+
+.page-size-select .select-trigger {
+  min-height: 2.25rem;
+  padding: 0.375rem 0.5rem !important;
+}
+
+nav[aria-label='Pagination'] {
+  box-shadow: none !important;
+}
+
+nav[aria-label='Pagination'] button {
+  margin-left: -2px;
+  border: 2px solid var(--youc-line) !important;
+  border-radius: 0 !important;
+  background: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+  box-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+nav[aria-label='Pagination'] button:first-child {
+  margin-left: 0;
+}
+
+nav[aria-label='Pagination'] button[aria-current='page'] {
+  background: var(--youc-ink) !important;
+  color: var(--youc-bg) !important;
 }

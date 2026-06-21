@@ -244,6 +244,57 @@ export interface OpsOpenAITokenStatsParams {
   top_n?: number
 }
 
+export type OpsAnalyticsDimension = 'account' | 'group'
+export type OpsAnalyticsSort = 'request_count_desc' | 'error_rate_desc' | 'avg_duration_desc' | 'avg_ttft_desc'
+
+export interface OpsAnalyticsLatencySummary {
+  min_ms?: number | null
+  max_ms?: number | null
+  avg_ms?: number | null
+  p95_ms?: number | null
+  p99_ms?: number | null
+  samples: number
+}
+
+export interface OpsAnalyticsRow {
+  dimension: OpsAnalyticsDimension
+  id?: number | null
+  name: string
+  platform: string
+  request_count: number
+  success_count: number
+  error_count: number
+  business_limited_count: number
+  token_consumed: number
+  error_rate: number
+  duration: OpsAnalyticsLatencySummary
+  ttft: OpsAnalyticsLatencySummary
+}
+
+export interface OpsAnalyticsParams {
+  dimension?: OpsAnalyticsDimension
+  time_range?: '5m' | '30m' | '1h' | '6h' | '24h' | '7d' | '30d'
+  start_time?: string
+  end_time?: string
+  platform?: string
+  group_id?: number | null
+  account_id?: number | null
+  model?: string
+  sort?: OpsAnalyticsSort
+  limit?: number
+}
+
+export interface OpsAnalyticsResponse {
+  start_time: string
+  end_time: string
+  dimension: OpsAnalyticsDimension
+  platform: string
+  group_id?: number | null
+  account_id?: number | null
+  model: string
+  rows: OpsAnalyticsRow[]
+}
+
 export interface OpsSystemMetricsSnapshot {
   id: number
   created_at: string
@@ -1077,6 +1128,17 @@ export async function getOpenAITokenStats(
   return data
 }
 
+export async function getAnalytics(
+  params: OpsAnalyticsParams,
+  options: OpsRequestOptions = {}
+): Promise<OpsAnalyticsResponse> {
+  const { data } = await apiClient.get<OpsAnalyticsResponse>('/admin/ops/analytics', {
+    params,
+    signal: options.signal
+  })
+  return data
+}
+
 export type OpsErrorListView = 'errors' | 'excluded' | 'all'
 
 export type OpsErrorListQueryParams = {
@@ -1305,6 +1367,7 @@ export const opsAPI = {
   getErrorTrend,
   getErrorDistribution,
   getOpenAITokenStats,
+  getAnalytics,
   getConcurrencyStats,
   getUserConcurrencyStats,
   getAccountAvailabilityStats,

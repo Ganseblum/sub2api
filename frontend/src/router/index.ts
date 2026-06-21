@@ -416,6 +416,18 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/data-analysis',
+    name: 'AdminDataAnalysis',
+    component: () => import('@/views/admin/DataAnalysisView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Data Analysis',
+      titleKey: 'admin.dataAnalysis.title',
+      descriptionKey: 'admin.dataAnalysis.description'
+    }
+  },
+  {
     path: '/admin/users',
     name: 'AdminUsers',
     component: () => import('@/views/admin/UsersView.vue'),

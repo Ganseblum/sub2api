@@ -10,7 +10,7 @@
     </div>
 
     <header class="relative z-20 border-b border-gray-200/70 bg-white/80 backdrop-blur-xl dark:border-dark-700/60 dark:bg-dark-900/80">
-      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div class="flex w-full items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <RouterLink to="/home" class="flex min-w-0 items-center gap-3">
           <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-dark-800 dark:ring-dark-700">
             <img :src="siteLogo || '/logo.png'" alt="Logo" class="h-full w-full object-contain" />
@@ -28,7 +28,7 @@
       </div>
     </header>
 
-    <main class="relative z-10 mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-10">
+    <main class="relative z-10 w-full px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <div v-if="loading" class="flex min-h-[320px] items-center justify-center">
         <div class="h-8 w-8 animate-spin rounded-full border-b-2 border-primary-600"></div>
       </div>

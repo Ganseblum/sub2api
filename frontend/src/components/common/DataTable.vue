@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!isDesktopViewport" class="space-y-3">
-    <template v-if="loading">
+  <div v-if="!isDesktopViewport" class="space-y-3" :class="{ 'is-refreshing': isRefreshingRows }">
+    <template v-if="showLoadingSkeleton">
       <div v-for="i in 5" :key="i" class="rounded-lg border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-900">
         <div class="space-y-3">
           <div v-for="column in dataColumns" :key="column.key" class="flex justify-between">
@@ -66,7 +66,8 @@
     class="table-wrapper"
     :class="{
       'actions-expanded': actionsExpanded,
-      'is-scrollable': isScrollable
+      'is-scrollable': isScrollable,
+      'is-refreshing': isRefreshingRows
     }"
   >
     <table class="w-full min-w-max divide-y divide-gray-200 dark:divide-dark-700">
@@ -120,7 +121,7 @@
       </thead>
       <tbody class="table-body divide-y divide-gray-200 bg-white dark:divide-dark-700 dark:bg-dark-900">
         <!-- Loading skeleton -->
-        <tr v-if="loading" v-for="i in 5" :key="i">
+        <tr v-if="showLoadingSkeleton" v-for="i in 5" :key="i">
           <td v-for="column in columns" :key="column.key" :class="['whitespace-nowrap py-4', getAdaptivePaddingClass()]">
             <div class="animate-pulse">
               <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-dark-700"></div>
@@ -630,6 +631,10 @@ const hasActionsColumn = computed(() => {
   return props.columns.some(column => column.key === 'actions')
 })
 
+const hasDataRows = computed(() => Array.isArray(props.data) && props.data.length > 0)
+const showLoadingSkeleton = computed(() => props.loading && !hasDataRows.value)
+const isRefreshingRows = computed(() => props.loading && hasDataRows.value)
+
 const hasSelectColumn = computed(() => {
   return props.columns.length > 0 && props.columns[0].key === 'select'
 })
@@ -741,6 +746,11 @@ defineExpose({
   flex: 1;
   min-height: 0;
   isolation: isolate;
+}
+
+.table-wrapper.is-refreshing,
+.is-refreshing {
+  cursor: progress;
 }
 
 /* 表头容器，确保在滚动时覆盖表体内容 */

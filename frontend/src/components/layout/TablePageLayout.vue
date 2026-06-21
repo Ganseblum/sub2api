@@ -47,20 +47,29 @@ onUnmounted(() => {
 /* 桌面端：Flexbox 布局 */
 .table-page-layout {
   @apply flex flex-col gap-6;
+  width: 100%;
+  min-width: 0;
   height: calc(100vh - 64px - 4rem); /* 减去 header + lg:p-8 的上下padding */
 }
 
 .layout-section-fixed {
   @apply flex-shrink-0;
+  width: 100%;
+  min-width: 0;
 }
 
 .layout-section-scrollable {
   @apply flex-1 min-h-0 flex flex-col;
+  width: 100%;
 }
 
 /* 表格滚动容器 - 增强版表体滚动方案 */
 .table-scroll-container {
-  @apply flex flex-col overflow-hidden h-full bg-white dark:bg-dark-800 rounded-2xl border border-gray-200 dark:border-dark-700 shadow-sm;
+  @apply flex h-full flex-col overflow-hidden;
+  border: 2.5px solid var(--youc-line);
+  border-radius: 0;
+  background: var(--youc-paper);
+  box-shadow: var(--youc-shadow);
 }
 
 .table-scroll-container :deep(.table-wrapper) {
@@ -76,7 +85,8 @@ onUnmounted(() => {
 }
 
 .table-scroll-container :deep(thead) {
-  @apply bg-gray-50/80 dark:bg-dark-800/80 backdrop-blur-sm;
+  background: var(--youc-ink);
+  color: var(--youc-bg);
 }
 
 .table-scroll-container :deep(tbody) {
@@ -84,16 +94,23 @@ onUnmounted(() => {
 }
 
 .table-scroll-container :deep(th) {
-  @apply px-5 py-4 text-left text-sm font-medium text-gray-600 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700;
+  @apply px-5 py-4 text-left text-sm;
+  border-bottom: 2.5px solid var(--youc-line);
+  color: inherit;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .table-scroll-container :deep(td) {
-  @apply px-5 py-4 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-dark-800;
+  @apply px-5 py-4 text-sm;
+  border-bottom: 2px solid var(--youc-line);
+  color: var(--youc-ink);
 }
 
 /* 移动端：恢复正常滚动 */
 .table-page-layout.mobile-mode .table-scroll-container {
-  @apply h-auto overflow-visible border-none shadow-none bg-transparent;
+  @apply h-auto overflow-visible;
 }
 
 .table-page-layout.mobile-mode .layout-section-scrollable {

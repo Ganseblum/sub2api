@@ -519,6 +519,71 @@ func (h *OpsHandler) ResolveUpstreamError(c *gin.Context) {
 
 // ==================== Existing endpoints ====================
 
+// GetAnalytics returns account/group latency and error-rate analytics.
+// GET /api/v1/admin/ops/analytics
+func (h *OpsHandler) GetAnalytics(c *gin.Context) {
+	if h.opsService == nil {
+		response.Error(c, http.StatusServiceUnavailable, "Ops service not available")
+		return
+	}
+	if err := h.opsService.RequireMonitoringEnabled(c.Request.Context()); err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+
+	startTime, endTime, err := parseOpsTimeRange(c, "1h")
+	if err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+
+	filter := &service.OpsAnalyticsFilter{
+		StartTime: startTime,
+		EndTime:   endTime,
+		Dimension: strings.TrimSpace(c.Query("dimension")),
+		Platform:  strings.TrimSpace(c.Query("platform")),
+		Model:     strings.TrimSpace(c.Query("model")),
+		Sort:      strings.TrimSpace(c.Query("sort")),
+	}
+
+	if v := strings.TrimSpace(c.Query("limit")); v != "" {
+		limit, err := strconv.Atoi(v)
+		if err != nil || limit <= 0 {
+			response.BadRequest(c, "Invalid limit")
+			return
+		}
+		filter.Limit = limit
+	}
+	if v := strings.TrimSpace(c.Query("account_id")); v != "" {
+		id, err := strconv.ParseInt(v, 10, 64)
+		if err != nil || id <= 0 {
+			response.BadRequest(c, "Invalid account_id")
+			return
+		}
+		filter.AccountID = &id
+	}
+	if v := strings.TrimSpace(c.Query("group_id")); v != "" {
+		id, err := strconv.ParseInt(v, 10, 64)
+		if err != nil || id <= 0 {
+			response.BadRequest(c, "Invalid group_id")
+			return
+		}
+		filter.GroupID = &id
+	}
+
+	out, err := h.opsService.GetAnalytics(c.Request.Context(), filter)
+	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "invalid") {
+			response.BadRequest(c, err.Error())
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "Failed to load analytics")
+		return
+	}
+
+	response.Success(c, out)
+}
+
 // ListRequestDetails returns a request-level list (success + error) for drill-down.
 // GET /api/v1/admin/ops/requests
 func (h *OpsHandler) ListRequestDetails(c *gin.Context) {

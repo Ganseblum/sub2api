@@ -163,7 +163,7 @@
                   <div class="code-line line-1">
                     <span class="code-prompt">$</span>
                     <span class="code-cmd">curl</span>
-                    <span class="code-url">api.youc.io/v1/messages</span>
+                    <span class="code-url">ai.youc.online/messages</span>
                     <span class="code-flag">\</span>
                   </div>
                   <div class="code-line line-2">
@@ -189,7 +189,12 @@
         <!-- Feature Tags - Centered -->
         <div class="feature-strip mb-14">
           <div class="strip-track">
-            <span v-for="(tag, index) in homeCopy.stripTags" :key="`${tag}-${index}`">{{ tag }}</span>
+            <div class="strip-group" aria-hidden="false">
+              <span v-for="(tag, index) in homeCopy.stripTags" :key="`strip-a-${index}`">{{ tag }}</span>
+            </div>
+            <div class="strip-group" aria-hidden="true">
+              <span v-for="(tag, index) in homeCopy.stripTags" :key="`strip-b-${index}`">{{ tag }}</span>
+            </div>
           </div>
         </div>
 
@@ -544,10 +549,6 @@ const homeCopy = computed(() => {
         '账号池',
         '额度控制',
         '全部模型',
-        '订阅转 API',
-        '会话保持',
-        '实时计费',
-        '统一网关',
       ],
       sectionIndexes: {
         how: '/ 01 - 使用流程',
@@ -575,7 +576,7 @@ const homeCopy = computed(() => {
           no: '03',
           title: '替换 BaseURL',
           description: '把请求地址指向网关即可，兼容官方 SDK，无需改动业务代码。',
-          code: 'api.youc.io/v1',
+          code: 'ai.youc.online',
         },
       ],
       featuresTitle: '核心能力',
@@ -747,10 +748,6 @@ const homeCopy = computed(() => {
       'Account Pool',
       'Quota Control',
       'All Models',
-      'Subscription To API',
-      'Sticky Session',
-      'Realtime Billing',
-      'Unified Gateway',
     ],
     sectionIndexes: {
       how: '/ 01 - HOW IT WORKS',
@@ -778,7 +775,7 @@ const homeCopy = computed(() => {
         no: '03',
         title: 'Replace BaseURL',
         description: 'Point requests to the gateway. Official SDKs stay compatible with no business-code rewrite.',
-        code: 'api.youc.io/v1',
+        code: 'ai.youc.online',
       },
     ],
     featuresTitle: 'Core Features',
@@ -1228,11 +1225,19 @@ onMounted(() => {
 }
 
 .strip-track {
-  display: inline-block;
+  display: flex;
+  width: max-content;
   animation: home-scroll 28s linear infinite;
+  will-change: transform;
 }
 
-.strip-track span {
+.strip-group {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.strip-group span {
   display: inline-block;
   padding: 0 26px;
   font-size: 14px;

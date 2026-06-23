@@ -359,8 +359,7 @@
         @submit.prevent="handleCreateGroup"
         class="space-y-5"
       >
-        <div>
-          <label class="input-label">{{ t("admin.groups.form.name") }}</label>
+        <FormField :label="t('admin.groups.form.name')" :required="true">
           <input
             v-model="createForm.name"
             type="text"
@@ -369,58 +368,33 @@
             :placeholder="t('admin.groups.enterGroupName')"
             data-tour="group-form-name"
           />
-        </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.description")
-          }}</label>
+        </FormField>
+        <FormField :label="t('admin.groups.form.description')">
           <textarea
             v-model="createForm.description"
             rows="3"
             class="input"
             :placeholder="t('admin.groups.optionalDescription')"
           ></textarea>
-        </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.platform")
-          }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.groups.form.platform')"
+          :hint="t('admin.groups.platformHint')"
+        >
           <Select
             v-model="createForm.platform"
             :options="platformOptions"
             data-tour="group-form-platform"
             @change="createForm.copy_accounts_from_group_ids = []"
           />
-          <p class="input-hint">{{ t("admin.groups.platformHint") }}</p>
-        </div>
+        </FormField>
         <!-- 从分组复制账号 -->
         <div v-if="copyAccountsGroupOptions.length > 0">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t("admin.groups.copyAccounts.title") }}
             </label>
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.copyAccounts.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.copyAccounts.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <!-- 已选分组标签 -->
           <div
@@ -482,10 +456,11 @@
           </select>
           <p class="input-hint">{{ t("admin.groups.copyAccounts.hint") }}</p>
         </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.rateMultiplier")
-          }}</label>
+        <FormField
+          :label="t('admin.groups.form.rateMultiplier')"
+          :hint="t('admin.groups.rateMultiplierHint')"
+          :required="true"
+        >
           <input
             v-model.number="createForm.rate_multiplier"
             type="number"
@@ -495,10 +470,11 @@
             class="input"
             data-tour="group-form-multiplier"
           />
-          <p class="input-hint">{{ t("admin.groups.rateMultiplierHint") }}</p>
-        </div>
-        <div>
-          <label class="input-label">{{ t("admin.groups.form.rpmLimit") }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.groups.form.rpmLimit')"
+          :hint="t('admin.groups.form.rpmLimitHint')"
+        >
           <input
             v-model.number="createForm.rpm_limit"
             type="number"
@@ -507,107 +483,62 @@
             class="input"
             :placeholder="t('admin.groups.form.rpmLimitPlaceholder')"
           />
-          <p class="input-hint">{{ t("admin.groups.form.rpmLimitHint") }}</p>
-        </div>
+        </FormField>
         <div
           v-if="createForm.subscription_type !== 'subscription'"
           data-tour="group-form-exclusive"
         >
-          <div class="mb-1.5 flex items-center gap-1">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t("admin.groups.form.exclusive") }}
-            </label>
-            <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <!-- Tooltip Popover -->
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="mb-2 text-xs font-medium">
-                    {{ t("admin.groups.exclusiveTooltip.title") }}
+          <SettingToggleRow
+            v-model="createForm.is_exclusive"
+            :label="t('admin.groups.form.exclusive')"
+          >
+            <template #help>
+              <HelpTooltip variant="youc" width-class="w-72">
+                <p class="mb-2 text-xs font-medium">
+                  {{ t("admin.groups.exclusiveTooltip.title") }}
+                </p>
+                <p class="mb-2 text-xs leading-relaxed text-gray-300">
+                  {{ t("admin.groups.exclusiveTooltip.description") }}
+                </p>
+                <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
+                  <p class="text-xs leading-relaxed text-gray-300">
+                    <span class="inline-flex items-center gap-1 text-primary-400">
+                      <Icon name="lightbulb" size="xs" />
+                      {{ t("admin.groups.exclusiveTooltip.example") }}
+                    </span>
+                    {{ t("admin.groups.exclusiveTooltip.exampleContent") }}
                   </p>
-                  <p class="mb-2 text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.exclusiveTooltip.description") }}
-                  </p>
-                  <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
-                    <p class="text-xs leading-relaxed text-gray-300">
-                      <span
-                        class="inline-flex items-center gap-1 text-primary-400"
-                        ><Icon name="lightbulb" size="xs" />
-                        {{ t("admin.groups.exclusiveTooltip.example") }}</span
-                      >
-                      {{ t("admin.groups.exclusiveTooltip.exampleContent") }}
-                    </p>
-                  </div>
-                  <!-- Arrow -->
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              @click="createForm.is_exclusive = !createForm.is_exclusive"
-              :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                createForm.is_exclusive
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
-              ]"
-            >
-              <span
-                :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
-                  createForm.is_exclusive ? 'translate-x-6' : 'translate-x-1',
-                ]"
-              />
-            </button>
-            <span class="text-sm text-gray-500 dark:text-gray-400">
+              </HelpTooltip>
+            </template>
+            <template #hint>
               {{
                 createForm.is_exclusive
                   ? t("admin.groups.exclusive")
                   : t("admin.groups.public")
               }}
-            </span>
-          </div>
+            </template>
+          </SettingToggleRow>
         </div>
 
         <!-- Subscription Configuration -->
         <div class="mt-4 border-t pt-4">
-          <div>
-            <label class="input-label">{{
-              t("admin.groups.subscription.type")
-            }}</label>
+          <FormField
+            :label="t('admin.groups.subscription.type')"
+            :hint="t('admin.groups.subscription.typeHint')"
+          >
             <Select
               v-model="createForm.subscription_type"
               :options="subscriptionTypeOptions"
             />
-            <p class="input-hint">
-              {{ t("admin.groups.subscription.typeHint") }}
-            </p>
-          </div>
+          </FormField>
 
           <!-- Subscription limits (only show when subscription type is selected) -->
           <div
             v-if="createForm.subscription_type === 'subscription'"
             class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
           >
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.dailyLimit")
-              }}</label>
+            <FormField :label="t('admin.groups.subscription.dailyLimit')">
               <input
                 v-model.number="createForm.daily_limit_usd"
                 type="number"
@@ -616,11 +547,8 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.weeklyLimit")
-              }}</label>
+            </FormField>
+            <FormField :label="t('admin.groups.subscription.weeklyLimit')">
               <input
                 v-model.number="createForm.weekly_limit_usd"
                 type="number"
@@ -629,11 +557,8 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.monthlyLimit")
-              }}</label>
+            </FormField>
+            <FormField :label="t('admin.groups.subscription.monthlyLimit')">
               <input
                 v-model.number="createForm.monthly_limit_usd"
                 type="number"
@@ -642,38 +567,16 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
+            </FormField>
           </div>
         </div>
 
         <div class="border-t pt-4">
-          <div class="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t("admin.groups.modelsList.title") }}
-              </label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t("admin.groups.modelsList.hint") }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="createModelsListState.enabled = !createModelsListState.enabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors',
-                createModelsListState.enabled
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
-              ]"
-            >
-              <span
-                :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
-                  createModelsListState.enabled ? 'translate-x-6' : 'translate-x-1',
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="createModelsListState.enabled"
+            :label="t('admin.groups.modelsList.title')"
+            :hint="t('admin.groups.modelsList.hint')"
+          />
           <div
             v-if="createModelsListState.enabled"
             class="overflow-hidden rounded-lg border border-gray-200 bg-gray-50/50 dark:border-dark-600 dark:bg-dark-800/40"
@@ -860,28 +763,7 @@
               {{ t("admin.groups.supportedScopes.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.supportedScopes.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.supportedScopes.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="space-y-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -933,28 +815,7 @@
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t("admin.groups.mcpXml.title") }}
             </label>
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.mcpXml.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.mcpXml.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="flex items-center gap-3">
             <button
@@ -991,28 +852,7 @@
               {{ t("admin.groups.claudeCode.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.claudeCode.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.claudeCode.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="flex items-center gap-3">
             <button
@@ -1070,36 +910,11 @@
           </h4>
 
           <!-- 允许 Messages 调度开关 -->
-          <div class="flex items-center justify-between">
-            <label class="text-sm text-gray-600 dark:text-gray-400">{{
-              t("admin.groups.openaiMessages.allowDispatch")
-            }}</label>
-            <button
-              type="button"
-              @click="
-                createForm.allow_messages_dispatch =
-                  !createForm.allow_messages_dispatch
-              "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              :class="
-                createForm.allow_messages_dispatch
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
-              "
-            >
-              <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                :class="
-                  createForm.allow_messages_dispatch
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                "
-              />
-            </button>
-          </div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {{ t("admin.groups.openaiMessages.allowDispatchHint") }}
-          </p>
+          <SettingToggleRow
+            v-model="createForm.allow_messages_dispatch"
+            :label="t('admin.groups.openaiMessages.allowDispatch')"
+            :hint="t('admin.groups.openaiMessages.allowDispatchHint')"
+          />
 
           <div v-if="createForm.allow_messages_dispatch" class="mt-3">
             <div
@@ -1403,28 +1218,7 @@
               {{ t("admin.groups.modelRouting.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.modelRouting.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.modelRouting.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <!-- 启用开关 -->
           <div class="flex items-center gap-3 mb-3">
@@ -1592,44 +1386,14 @@
       </form>
 
       <template #footer>
-        <div class="flex justify-end gap-3 pt-4">
-          <button
-            @click="closeCreateModal"
-            type="button"
-            class="btn btn-secondary"
-          >
-            {{ t("common.cancel") }}
-          </button>
-          <button
-            type="submit"
-            form="create-group-form"
-            :disabled="submitting"
-            class="btn btn-primary"
-            data-tour="group-form-submit"
-          >
-            <svg
-              v-if="submitting"
-              class="-ml-1 mr-2 h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ submitting ? t("admin.groups.creating") : t("common.create") }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="submitting"
+          :loading-text="t('admin.groups.creating')"
+          :confirm-text="t('common.create')"
+          confirm-form="create-group-form"
+          confirm-data-tour="group-form-submit"
+          @cancel="closeCreateModal"
+        />
       </template>
     </BaseDialog>
 
@@ -1646,8 +1410,7 @@
         @submit.prevent="handleUpdateGroup"
         class="space-y-5"
       >
-        <div>
-          <label class="input-label">{{ t("admin.groups.form.name") }}</label>
+        <FormField :label="t('admin.groups.form.name')" :required="true">
           <input
             v-model="editForm.name"
             type="text"
@@ -1655,57 +1418,32 @@
             class="input"
             data-tour="edit-group-form-name"
           />
-        </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.description")
-          }}</label>
+        </FormField>
+        <FormField :label="t('admin.groups.form.description')">
           <textarea
             v-model="editForm.description"
             rows="3"
             class="input"
           ></textarea>
-        </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.platform")
-          }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.groups.form.platform')"
+          :hint="t('admin.groups.platformNotEditable')"
+        >
           <Select
             v-model="editForm.platform"
             :options="platformOptions"
             :disabled="true"
             data-tour="group-form-platform"
           />
-          <p class="input-hint">{{ t("admin.groups.platformNotEditable") }}</p>
-        </div>
+        </FormField>
         <!-- 从分组复制账号（编辑时） -->
         <div v-if="copyAccountsGroupOptionsForEdit.length > 0">
           <div class="mb-1.5 flex items-center gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t("admin.groups.copyAccounts.title") }}
             </label>
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.copyAccounts.tooltipEdit") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.copyAccounts.tooltipEdit')" variant="youc" width-class="w-72" />
           </div>
           <!-- 已选分组标签 -->
           <div
@@ -1769,10 +1507,7 @@
             {{ t("admin.groups.copyAccounts.hintEdit") }}
           </p>
         </div>
-        <div>
-          <label class="input-label">{{
-            t("admin.groups.form.rateMultiplier")
-          }}</label>
+        <FormField :label="t('admin.groups.form.rateMultiplier')" :required="true">
           <input
             v-model.number="editForm.rate_multiplier"
             type="number"
@@ -1782,9 +1517,11 @@
             class="input"
             data-tour="group-form-multiplier"
           />
-        </div>
-        <div>
-          <label class="input-label">{{ t("admin.groups.form.rpmLimit") }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.groups.form.rpmLimit')"
+          :hint="t('admin.groups.form.rpmLimitHint')"
+        >
           <input
             v-model.number="editForm.rpm_limit"
             type="number"
@@ -1793,109 +1530,63 @@
             class="input"
             :placeholder="t('admin.groups.form.rpmLimitPlaceholder')"
           />
-          <p class="input-hint">{{ t("admin.groups.form.rpmLimitHint") }}</p>
-        </div>
+        </FormField>
         <div v-if="editForm.subscription_type !== 'subscription'">
-          <div class="mb-1.5 flex items-center gap-1">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t("admin.groups.form.exclusive") }}
-            </label>
-            <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <!-- Tooltip Popover -->
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="mb-2 text-xs font-medium">
-                    {{ t("admin.groups.exclusiveTooltip.title") }}
+          <SettingToggleRow
+            v-model="editForm.is_exclusive"
+            :label="t('admin.groups.form.exclusive')"
+          >
+            <template #help>
+              <HelpTooltip variant="youc" width-class="w-72">
+                <p class="mb-2 text-xs font-medium">
+                  {{ t("admin.groups.exclusiveTooltip.title") }}
+                </p>
+                <p class="mb-2 text-xs leading-relaxed text-gray-300">
+                  {{ t("admin.groups.exclusiveTooltip.description") }}
+                </p>
+                <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
+                  <p class="text-xs leading-relaxed text-gray-300">
+                    <span class="inline-flex items-center gap-1 text-primary-400">
+                      <Icon name="lightbulb" size="xs" />
+                      {{ t("admin.groups.exclusiveTooltip.example") }}
+                    </span>
+                    {{ t("admin.groups.exclusiveTooltip.exampleContent") }}
                   </p>
-                  <p class="mb-2 text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.exclusiveTooltip.description") }}
-                  </p>
-                  <div class="rounded bg-gray-800 p-2 dark:bg-gray-700">
-                    <p class="text-xs leading-relaxed text-gray-300">
-                      <span
-                        class="inline-flex items-center gap-1 text-primary-400"
-                        ><Icon name="lightbulb" size="xs" />
-                        {{ t("admin.groups.exclusiveTooltip.example") }}</span
-                      >
-                      {{ t("admin.groups.exclusiveTooltip.exampleContent") }}
-                    </p>
-                  </div>
-                  <!-- Arrow -->
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              @click="editForm.is_exclusive = !editForm.is_exclusive"
-              :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                editForm.is_exclusive
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
-              ]"
-            >
-              <span
-                :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
-                  editForm.is_exclusive ? 'translate-x-6' : 'translate-x-1',
-                ]"
-              />
-            </button>
-            <span class="text-sm text-gray-500 dark:text-gray-400">
+              </HelpTooltip>
+            </template>
+            <template #hint>
               {{
                 editForm.is_exclusive
                   ? t("admin.groups.exclusive")
                   : t("admin.groups.public")
               }}
-            </span>
-          </div>
+            </template>
+          </SettingToggleRow>
         </div>
-        <div>
-          <label class="input-label">{{ t("admin.groups.form.status") }}</label>
+        <FormField :label="t('admin.groups.form.status')">
           <Select v-model="editForm.status" :options="editStatusOptions" />
-        </div>
+        </FormField>
 
         <!-- Subscription Configuration -->
         <div class="mt-4 border-t pt-4">
-          <div>
-            <label class="input-label">{{
-              t("admin.groups.subscription.type")
-            }}</label>
+          <FormField
+            :label="t('admin.groups.subscription.type')"
+            :hint="t('admin.groups.subscription.typeNotEditable')"
+          >
             <Select
               v-model="editForm.subscription_type"
               :options="subscriptionTypeOptions"
               :disabled="true"
             />
-            <p class="input-hint">
-              {{ t("admin.groups.subscription.typeNotEditable") }}
-            </p>
-          </div>
+          </FormField>
 
           <!-- Subscription limits (only show when subscription type is selected) -->
           <div
             v-if="editForm.subscription_type === 'subscription'"
             class="space-y-4 border-l-2 border-primary-200 pl-4 dark:border-primary-800"
           >
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.dailyLimit")
-              }}</label>
+            <FormField :label="t('admin.groups.subscription.dailyLimit')">
               <input
                 v-model.number="editForm.daily_limit_usd"
                 type="number"
@@ -1904,11 +1595,8 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.weeklyLimit")
-              }}</label>
+            </FormField>
+            <FormField :label="t('admin.groups.subscription.weeklyLimit')">
               <input
                 v-model.number="editForm.weekly_limit_usd"
                 type="number"
@@ -1917,11 +1605,8 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
-            <div>
-              <label class="input-label">{{
-                t("admin.groups.subscription.monthlyLimit")
-              }}</label>
+            </FormField>
+            <FormField :label="t('admin.groups.subscription.monthlyLimit')">
               <input
                 v-model.number="editForm.monthly_limit_usd"
                 type="number"
@@ -1930,38 +1615,16 @@
                 class="input"
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
-            </div>
+            </FormField>
           </div>
         </div>
 
         <div class="border-t pt-4">
-          <div class="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ t("admin.groups.modelsList.title") }}
-              </label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t("admin.groups.modelsList.hint") }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="editModelsListState.enabled = !editModelsListState.enabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors',
-                editModelsListState.enabled
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600',
-              ]"
-            >
-              <span
-                :class="[
-                  'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
-                  editModelsListState.enabled ? 'translate-x-6' : 'translate-x-1',
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="editModelsListState.enabled"
+            :label="t('admin.groups.modelsList.title')"
+            :hint="t('admin.groups.modelsList.hint')"
+          />
           <div
             v-if="editModelsListState.enabled"
             class="overflow-hidden rounded-lg border border-gray-200 bg-gray-50/50 dark:border-dark-600 dark:bg-dark-800/40"
@@ -2148,28 +1811,7 @@
               {{ t("admin.groups.supportedScopes.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.supportedScopes.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.supportedScopes.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="space-y-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -2221,28 +1863,7 @@
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ t("admin.groups.mcpXml.title") }}
             </label>
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.mcpXml.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.mcpXml.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="flex items-center gap-3">
             <button
@@ -2279,28 +1900,7 @@
               {{ t("admin.groups.claudeCode.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-72 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.claudeCode.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.claudeCode.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <div class="flex items-center gap-3">
             <button
@@ -2354,36 +1954,11 @@
           </h4>
 
           <!-- 允许 Messages 调度开关 -->
-          <div class="flex items-center justify-between">
-            <label class="text-sm text-gray-600 dark:text-gray-400">{{
-              t("admin.groups.openaiMessages.allowDispatch")
-            }}</label>
-            <button
-              type="button"
-              @click="
-                editForm.allow_messages_dispatch =
-                  !editForm.allow_messages_dispatch
-              "
-              class="relative inline-flex h-6 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              :class="
-                editForm.allow_messages_dispatch
-                  ? 'bg-primary-500'
-                  : 'bg-gray-300 dark:bg-dark-600'
-              "
-            >
-              <span
-                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                :class="
-                  editForm.allow_messages_dispatch
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                "
-              />
-            </button>
-          </div>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {{ t("admin.groups.openaiMessages.allowDispatchHint") }}
-          </p>
+          <SettingToggleRow
+            v-model="editForm.allow_messages_dispatch"
+            :label="t('admin.groups.openaiMessages.allowDispatch')"
+            :hint="t('admin.groups.openaiMessages.allowDispatchHint')"
+          />
 
           <div v-if="editForm.allow_messages_dispatch" class="mt-3">
             <div
@@ -2687,28 +2262,7 @@
               {{ t("admin.groups.modelRouting.title") }}
             </label>
             <!-- Help Tooltip -->
-            <div class="group relative inline-flex">
-              <Icon
-                name="questionCircle"
-                size="sm"
-                :stroke-width="2"
-                class="cursor-help text-gray-400 transition-colors hover:text-primary-500 dark:text-gray-500 dark:hover:text-primary-400"
-              />
-              <div
-                class="pointer-events-none absolute bottom-full left-0 z-50 mb-2 w-80 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100"
-              >
-                <div
-                  class="rounded-lg bg-gray-900 p-3 text-white shadow-lg dark:bg-gray-800"
-                >
-                  <p class="text-xs leading-relaxed text-gray-300">
-                    {{ t("admin.groups.modelRouting.tooltip") }}
-                  </p>
-                  <div
-                    class="absolute -bottom-1.5 left-3 h-3 w-3 rotate-45 bg-gray-900 dark:bg-gray-800"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <HelpTooltip :content="t('admin.groups.modelRouting.tooltip')" variant="youc" width-class="w-72" />
           </div>
           <!-- 启用开关 -->
           <div class="flex items-center gap-3 mb-3">
@@ -2875,44 +2429,14 @@
       </form>
 
       <template #footer>
-        <div class="flex justify-end gap-3 pt-4">
-          <button
-            @click="closeEditModal"
-            type="button"
-            class="btn btn-secondary"
-          >
-            {{ t("common.cancel") }}
-          </button>
-          <button
-            type="submit"
-            form="edit-group-form"
-            :disabled="submitting"
-            class="btn btn-primary"
-            data-tour="group-form-submit"
-          >
-            <svg
-              v-if="submitting"
-              class="-ml-1 mr-2 h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ submitting ? t("admin.groups.updating") : t("common.update") }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="submitting"
+          :loading-text="t('admin.groups.updating')"
+          :confirm-text="t('common.update')"
+          confirm-form="edit-group-form"
+          confirm-data-tour="group-form-submit"
+          @cancel="closeEditModal"
+        />
       </template>
     </BaseDialog>
 
@@ -2979,42 +2503,12 @@
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-3 pt-4">
-          <button
-            @click="closeSortModal"
-            type="button"
-            class="btn btn-secondary"
-          >
-            {{ t("common.cancel") }}
-          </button>
-          <button
-            @click="saveSortOrder"
-            :disabled="sortSubmitting"
-            class="btn btn-primary"
-          >
-            <svg
-              v-if="sortSubmitting"
-              class="-ml-1 mr-2 h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ sortSubmitting ? t("common.saving") : t("common.save") }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="sortSubmitting"
+          :loading-text="t('common.saving')"
+          @cancel="closeSortModal"
+          @confirm="saveSortOrder"
+        />
       </template>
     </BaseDialog>
 
@@ -3050,9 +2544,13 @@ import DataTable from "@/components/common/DataTable.vue";
 import Pagination from "@/components/common/Pagination.vue";
 import BaseDialog from "@/components/common/BaseDialog.vue";
 import ConfirmDialog from "@/components/common/ConfirmDialog.vue";
+import FormField from "@/components/common/FormField.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import Select from "@/components/common/Select.vue";
 import PlatformIcon from "@/components/common/PlatformIcon.vue";
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
+import HelpTooltip from "@/components/common/HelpTooltip.vue"
 import Icon from "@/components/icons/Icon.vue";
 import GroupRateMultipliersModal from "@/components/admin/group/GroupRateMultipliersModal.vue";
 import GroupRPMOverridesModal from "@/components/admin/group/GroupRPMOverridesModal.vue";

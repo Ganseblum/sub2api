@@ -21,13 +21,13 @@
         <h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           {{ t('admin.groups.addUserRate') }}
         </h4>
-        <div class="flex items-end gap-2">
+        <div class="inline-field-row">
           <div class="relative flex-1">
             <input
               v-model="searchQuery"
               type="text"
               autocomplete="off"
-              class="input w-full"
+              class="input control-h w-full"
               :placeholder="t('admin.groups.searchUserPlaceholder')"
               @input="handleSearchUsers"
               @focus="showDropdown = true"
@@ -56,13 +56,13 @@
               step="0.001"
               min="0"
               autocomplete="off"
-              class="hide-spinner input w-full"
+              class="hide-spinner input control-h w-full"
               placeholder="1.0"
             />
           </div>
           <button
             type="button"
-            class="btn btn-primary shrink-0"
+            class="btn btn-primary control-h shrink-0"
             :disabled="!selectedUser || !newRate"
             @click="handleAddLocal"
           >

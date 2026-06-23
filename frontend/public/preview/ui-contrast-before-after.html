@@ -1,0 +1,2211 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YOUC UI 对比预览 · 清晰度 / 对比度</title>
+    <style>
+      :root {
+        --youc-bg: #f4f3ee;
+        --youc-paper: #ffffff;
+        --youc-ink: #111111;
+        --youc-line: #111111;
+        --youc-muted: #555555;
+        --youc-soft: #ecebe4;
+        --youc-accent: #0f766e;
+        --youc-accent-2: #14b8a6;
+        --youc-danger: #b91c1c;
+        --youc-shadow: 4px 4px 0 var(--youc-line);
+        --youc-shadow-lg: 8px 8px 0 var(--youc-line);
+        --youc-dropdown-hover-bg: color-mix(in srgb, var(--youc-ink) 68%, var(--youc-paper));
+        --youc-dropdown-hover-fg: var(--youc-bg);
+        --youc-dropdown-selected-bg: var(--youc-ink);
+        --youc-dropdown-selected-fg: var(--youc-bg);
+        /* proposed semantic tokens */
+        --text-primary: #111111;
+        --text-secondary: #444444;
+        --text-tertiary: #666666;
+        --text-success: #0b6b4d;
+        --text-cost: #b45309;
+        --surface-tooltip: #ffffff;
+        --youc-info: #2563eb;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'PingFang SC', monospace;
+        background: #1c1c1a;
+        color: #f4f3ee;
+        line-height: 1.5;
+      }
+
+      .page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .intro {
+        margin: 0 0 28px;
+        max-width: 900px;
+        color: #b8b4ab;
+        font-size: 14px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+      }
+
+      .section-title {
+        margin: 0 0 6px;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #5eead4;
+      }
+
+      .section-desc {
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: #8f8b82;
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 960px) {
+        .compare { grid-template-columns: 1fr; }
+      }
+
+      .col-label {
+        margin-bottom: 8px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .col-label.before { color: #fca5a5; }
+      .col-label.after { color: #5eead4; }
+
+      .stage {
+        background: var(--youc-bg);
+        border: 2px solid #444;
+        padding: 20px;
+        min-height: 200px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stage-inner {
+        background: var(--youc-paper);
+        border: 2.5px solid var(--youc-line);
+        padding: 16px;
+      }
+
+      /* ===== shared mock table ===== */
+      .mock-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .mock-table th,
+      .mock-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 2px solid var(--youc-line);
+      }
+
+      /* ===== BEFORE styles ===== */
+      .before thead th {
+        background: #111;
+        color: #fff;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 11px;
+      }
+
+      .before .seg {
+        display: inline-flex;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        padding: 2px;
+        gap: 2px;
+      }
+
+      .before .seg button {
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font: inherit;
+        font-size: 11px;
+        padding: 4px 10px;
+        cursor: default;
+      }
+
+      .before .seg button.on {
+        background: #fff;
+        color: #111827;
+        box-shadow: 0 1px 2px rgba(0,0,0,.08);
+      }
+
+      .before .tooltip-dark {
+        display: inline-block;
+        background: #111827;
+        border: 1px solid #374151;
+        color: #fff;
+        padding: 10px 12px;
+        font-size: 11px;
+        min-width: 200px;
+      }
+
+      .before .tooltip-dark .tt-title {
+        color: #d1d5db;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .before .tooltip-dark .tt-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 3px 0;
+      }
+
+      .before .tooltip-dark .tt-label { color: #9ca3af; }
+      .before .tooltip-dark .tt-val { color: #fff; font-weight: 600; }
+      .before .tooltip-dark .tt-total { color: #22d3ee; font-weight: 700; }
+
+      .before .token-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .before .token-stack { display: flex; flex-direction: column; gap: 4px; }
+      .before .token-line { display: flex; gap: 10px; align-items: center; }
+      .before .c-in { color: #10b981; }
+      .before .c-out { color: #8b5cf6; }
+      .before .c-cache { color: #0ea5e9; }
+      .before .cost { color: #16a34a; font-weight: 600; }
+      .before .info-btn {
+        width: 16px; height: 16px; border-radius: 999px;
+        background: #f3f4f6; color: #9ca3af;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 700;
+      }
+
+      .before .code-key {
+        font-family: inherit;
+        font-size: 11px;
+        background: #111;
+        color: #14b8a6;
+        padding: 3px 8px;
+      }
+
+      .before .copy-btn { color: #9ca3af; font-size: 14px; }
+
+      /* ===== AFTER styles ===== */
+      .after thead th {
+        background: var(--youc-soft);
+        color: var(--youc-ink);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 11px;
+        border-bottom: 2.5px solid var(--youc-line);
+      }
+
+      .after .seg {
+        display: inline-flex;
+        border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper);
+        padding: 0;
+        gap: 0;
+      }
+
+      .after .seg button {
+        border: none;
+        border-right: 2px solid var(--youc-line);
+        background: var(--youc-paper);
+        color: var(--text-secondary);
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 12px;
+        cursor: default;
+        letter-spacing: 0.04em;
+      }
+
+      .after .seg button:last-child { border-right: none; }
+
+      .after .seg button.on {
+        background: var(--youc-ink);
+        color: var(--youc-bg);
+      }
+
+      .after .tooltip-light {
+        display: inline-block;
+        background: var(--surface-tooltip);
+        border: 2.5px solid var(--youc-line);
+        box-shadow: var(--youc-shadow);
+        color: var(--text-primary);
+        padding: 12px 14px;
+        font-size: 11px;
+        min-width: 220px;
+      }
+
+      .after .tooltip-light .tt-title {
+        color: var(--text-primary);
+        font-weight: 800;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--youc-line);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 10px;
+      }
+
+      .after .tooltip-light .tt-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 4px 0;
+      }
+
+      .after .tooltip-light .tt-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      .after .tooltip-light .tt-val {
+        color: var(--text-primary);
+        font-weight: 800;
+      }
+
+      .after .tooltip-light .tt-total {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 2px solid var(--youc-line);
+        color: var(--youc-accent);
+        font-weight: 800;
+      }
+
+      .after .token-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+      }
+
+      .after .token-stack { display: flex; flex-direction: column; gap: 3px; }
+      .after .token-line { display: flex; gap: 12px; align-items: center; }
+      .after .token-num { color: var(--text-primary); font-weight: 800; }
+      .after .token-icon { font-weight: 800; font-size: 10px; }
+      .after .token-icon.in { color: var(--text-success); }
+      .after .token-icon.out { color: #6d28d9; }
+      .after .token-icon.cache { color: var(--youc-accent); }
+      .after .cost { color: var(--text-cost); font-weight: 800; }
+      .after .info-btn {
+        width: 18px; height: 18px;
+        border: 2px solid var(--youc-line);
+        background: var(--youc-paper);
+        color: var(--text-secondary);
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 800;
+      }
+
+      .after .code-key {
+        font-family: inherit;
+        font-size: 11px;
+        background: var(--youc-soft);
+        color: var(--youc-ink);
+        border: 2px solid var(--youc-line);
+        padding: 4px 10px;
+        font-weight: 700;
+      }
+
+      .after .copy-btn {
+        color: var(--youc-ink);
+        border: 2px solid var(--youc-line);
+        background: var(--youc-paper);
+        width: 24px; height: 24px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .card-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--youc-ink);
+      }
+
+      .mini-chart {
+        height: 56px;
+        margin-top: 10px;
+        border: 2px solid var(--youc-line);
+        background: repeating-linear-gradient(
+          90deg,
+          var(--youc-soft) 0,
+          var(--youc-soft) 8px,
+          transparent 8px,
+          transparent 16px
+        );
+        opacity: 0.7;
+      }
+
+      .legend {
+        margin-top: 8px;
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        border: 2px solid var(--youc-line);
+        background: #fff7ed;
+        color: #c2410c;
+      }
+
+      .after .pill {
+        background: var(--youc-soft);
+        color: var(--text-cost);
+      }
+
+      /* ===== buttons & dropdowns ===== */
+      .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+      .before .btn-y {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 8px 16px; font: inherit; font-size: 12px; font-weight: 600;
+        border: 1px solid #e5e7eb; background: #fff; color: #374151;
+        border-radius: 8px;
+      }
+      .before .btn-y.primary {
+        background: #111; color: #fff; border-color: #111;
+      }
+      .before .btn-y.ghost {
+        background: transparent; color: #6b7280; border-color: transparent;
+      }
+      .before .btn-y.icon {
+        padding: 6px; color: #9ca3af; border: none; background: transparent;
+      }
+
+      .after .btn-y {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 8px 16px; font: inherit; font-size: 12px; font-weight: 800;
+        border: 2.5px solid var(--youc-line); background: var(--youc-paper);
+        color: var(--youc-ink); letter-spacing: 0.04em; text-transform: uppercase;
+      }
+      .after .btn-y.primary {
+        background: var(--youc-ink); color: var(--youc-bg);
+      }
+      .after .btn-y.ghost {
+        background: var(--youc-paper); color: var(--youc-ink);
+      }
+      .after .btn-y.icon {
+        width: 32px; height: 32px; padding: 0;
+        border: 2px solid var(--youc-line); color: var(--youc-ink);
+      }
+
+      .mock-select, .mock-select-after { width: 220px; font-size: 12px; }
+      .mock-select .trigger {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb;
+        background: #fff; color: #6b7280; border-radius: 12px; font: inherit;
+      }
+      .mock-select .trigger .chev { color: #9ca3af; }
+      .mock-select .panel {
+        margin-top: 6px; border: 1px solid #e5e7eb; border-radius: 12px;
+        background: #fff; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,.08);
+      }
+      .mock-select .opt {
+        padding: 8px 12px; color: #374151; border-bottom: 1px solid #f3f4f6;
+      }
+      .mock-select .opt.sel {
+        background: #eff6ff; color: #1d4ed8;
+      }
+      .mock-select .opt:hover { background: #f9fafb; }
+
+      .mock-select-after .trigger {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; padding: 8px 12px; border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper); color: var(--youc-ink); font: inherit; font-weight: 700;
+      }
+      .mock-select-after .trigger.open {
+        box-shadow: none;
+        position: relative;
+        z-index: 2;
+      }
+      .mock-select-after .trigger .placeholder { color: var(--text-secondary); }
+      .mock-select-after .trigger .chev { color: var(--text-secondary); font-weight: 800; }
+      .mock-select-after .panel {
+        margin-top: 6px; border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper); box-shadow: 5px 5px 0 var(--youc-line);
+      }
+      .mock-select-after .search {
+        padding: 8px 10px; border-bottom: 2px solid var(--youc-line);
+        color: var(--text-tertiary); font-size: 11px;
+      }
+      .mock-select-after .opt {
+        padding: 8px 12px; color: var(--youc-ink); font-weight: 650;
+        border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 35%, transparent);
+      }
+      .mock-select-after .opt.sel {
+        background: var(--youc-dropdown-selected-bg); color: var(--youc-dropdown-selected-fg); font-weight: 800;
+      }
+      .mock-select-after .opt:hover:not(.sel) {
+        background: var(--youc-dropdown-hover-bg); color: var(--youc-dropdown-hover-fg);
+      }
+
+      .mock-date .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px; }
+      .mock-date .preset {
+        padding: 6px 8px; font-size: 11px; border-radius: 6px;
+        border: none; background: transparent; color: #6b7280; font: inherit;
+      }
+      .mock-date .preset.on { background: #dbeafe; color: #1d4ed8; }
+      .mock-date .apply {
+        margin: 8px; width: calc(100% - 16px); padding: 8px;
+        border: none; border-radius: 8px; background: #111; color: #fff; font: inherit;
+      }
+
+      .mock-date-after .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; border-bottom: 2px solid var(--youc-line); }
+      .mock-date-after .preset {
+        padding: 8px 10px; font-size: 11px; border: none; border-right: 2px solid var(--youc-line);
+        background: var(--youc-paper); color: var(--text-secondary); font: inherit; font-weight: 700;
+      }
+      .mock-date-after .preset.on {
+        background: var(--youc-ink); color: var(--youc-bg);
+      }
+      .mock-date-after .apply {
+        margin: 10px; width: calc(100% - 20px); padding: 8px 12px;
+        border: 2.5px solid var(--youc-line); background: var(--youc-ink);
+        color: var(--youc-bg); font: inherit; font-weight: 800; text-transform: uppercase;
+      }
+
+      .mock-page { display: flex; gap: 4px; align-items: center; }
+      .mock-page button {
+        min-width: 32px; height: 32px; border: 1px solid #d1d5db;
+        background: #fff; color: #6b7280; font: inherit; font-size: 12px;
+      }
+      .mock-page button.on {
+        background: #eff6ff; color: #2563eb; border-color: #93c5fd;
+      }
+      .mock-page-after { display: flex; gap: 0; align-items: center; }
+      .mock-page-after button {
+        min-width: 34px; height: 34px; border: 2px solid var(--youc-line);
+        margin-left: -2px; background: var(--youc-paper); color: var(--youc-ink);
+        font: inherit; font-size: 12px; font-weight: 800;
+      }
+      .mock-page-after button:first-child { margin-left: 0; }
+      .mock-page-after button.on {
+        background: var(--youc-ink); color: var(--youc-bg);
+      }
+
+      .filter-drop { margin-top: 6px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; font-size: 12px; }
+      .filter-drop button { display: block; width: 100%; padding: 8px 12px; border: none; background: #fff; text-align: left; color: #374151; font: inherit; }
+      .filter-drop button:hover { background: #f3f4f6; }
+      .filter-drop-after { margin-top: 6px; border: 2.5px solid var(--youc-line); background: var(--youc-paper); font-size: 12px; box-shadow: var(--youc-shadow); }
+      .filter-drop-after button { display: block; width: 100%; padding: 8px 12px; border: none; border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 30%, transparent); background: var(--youc-paper); text-align: left; color: var(--youc-ink); font: inherit; font-weight: 650; }
+      .filter-drop-after button:hover {
+        background: var(--youc-dropdown-hover-bg);
+        color: var(--youc-dropdown-hover-fg);
+      }
+
+      .issue-list {
+        margin: 10px 0 0; padding-left: 18px; font-size: 11px; color: #8f8b82; line-height: 1.6;
+      }
+      .issue-list li { margin: 2px 0; }
+
+      .toc {
+        margin: 0 0 28px; padding: 14px 16px; border: 2px solid #444; background: #24241f;
+        font-size: 12px; color: #d6d3cb; columns: 2; column-gap: 24px;
+      }
+      .toc a { color: #5eead4; text-decoration: none; }
+      .toc a:hover { text-decoration: underline; }
+      .toc li { margin: 3px 0; break-inside: avoid; }
+
+      .audit-table {
+        width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 28px;
+      }
+      .audit-table th, .audit-table td {
+        border: 1px solid #444; padding: 8px 10px; text-align: left; vertical-align: top;
+      }
+      .audit-table th { background: #111; color: #f4f3ee; }
+      .audit-table td { background: #24241f; color: #d6d3cb; }
+      .status-ok { color: #5eead4; font-weight: 700; }
+      .status-warn { color: #fbbf24; font-weight: 700; }
+      .status-bad { color: #fca5a5; font-weight: 700; }
+
+      /* extra component mocks */
+      .mock-input-before input, .mock-input-after input {
+        width: 100%; padding: 8px 12px; font: inherit; font-size: 12px;
+      }
+      .mock-input-before input {
+        border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #111;
+      }
+      .mock-input-before input:focus { outline: 2px solid #93c5fd; border-color: #3b82f6; }
+      .mock-input-before .hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+      .mock-input-before .label { font-size: 11px; color: #6b7280; margin-bottom: 4px; }
+
+      .mock-input-after .label {
+        font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--youc-ink); margin-bottom: 6px;
+      }
+      .mock-input-after input {
+        border: 2.5px solid var(--youc-line); background: var(--youc-paper); color: var(--youc-ink); font-weight: 600;
+      }
+      .mock-input-after input:focus { outline: none; box-shadow: 4px 4px 0 var(--youc-accent-2); }
+      .mock-input-after .hint { font-size: 11px; color: var(--text-secondary); margin-top: 6px; font-weight: 600; }
+      .mock-input-after input.err { border-color: var(--youc-danger); }
+
+      .sw-before, .sw-after { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+      .sw-before .track {
+        width: 44px; height: 24px; border-radius: 999px; background: #e5e7eb; position: relative;
+      }
+      .sw-before .track.on { background: #2563eb; }
+      .sw-before .thumb {
+        position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+        border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.15);
+      }
+      .sw-before .track.on .thumb { transform: translateX(20px); }
+
+      .sw-after .track {
+        width: 44px; height: 24px; border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper); position: relative;
+      }
+      .sw-after .track.on { background: var(--youc-accent-2); }
+      .sw-after .thumb {
+        position: absolute; top: 1px; left: 1px; width: 16px; height: 16px;
+        background: var(--youc-ink);
+      }
+      .sw-after .track.on .thumb { transform: translateX(20px); }
+
+      .modal-before, .modal-after { max-width: 300px; font-size: 12px; }
+      .modal-before .shell {
+        border-radius: 16px; overflow: hidden; background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,.15); border: 1px solid #f3f4f6;
+      }
+      .modal-before .head { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #111; }
+      .modal-before .body { padding: 16px; color: #6b7280; }
+      .modal-before .foot {
+        padding: 12px 16px; display: flex; justify-content: flex-end; gap: 8px;
+        border-top: 1px solid #f3f4f6;
+      }
+      .modal-before .foot button {
+        padding: 6px 14px; border-radius: 8px; font: inherit; font-size: 12px; border: 1px solid #d1d5db; background: #fff;
+      }
+      .modal-before .foot button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+      .modal-after .shell {
+        border: 2.5px solid var(--youc-line); background: var(--youc-paper);
+        box-shadow: 10px 10px 0 var(--youc-line);
+      }
+      .modal-after .head {
+        padding: 14px 16px; border-bottom: 2.5px solid var(--youc-line);
+        font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--youc-ink);
+      }
+      .modal-after .body { padding: 16px; color: var(--text-secondary); font-weight: 600; }
+      .modal-after .foot {
+        padding: 12px 16px; display: flex; justify-content: flex-end; gap: 10px;
+        border-top: 2.5px solid var(--youc-line); background: var(--youc-soft);
+      }
+      .modal-after .foot button {
+        padding: 8px 14px; border: 2.5px solid var(--youc-line); font: inherit; font-size: 11px;
+        font-weight: 800; text-transform: uppercase; background: var(--youc-paper); color: var(--youc-ink);
+      }
+      .modal-after .foot button.primary { background: var(--youc-ink); color: var(--youc-bg); }
+
+      .toast-before, .toast-after { max-width: 280px; font-size: 12px; }
+      .toast-before .item {
+        border-radius: 10px; background: #fff; border-left: 4px solid #22c55e;
+        box-shadow: 0 8px 20px rgba(0,0,0,.1); padding: 12px; color: #374151;
+      }
+      .toast-before .title { font-weight: 600; color: #111; }
+      .toast-after .item {
+        border: 2.5px solid var(--youc-line); border-left-width: 8px; border-left-color: var(--youc-accent);
+        background: var(--youc-paper); box-shadow: var(--youc-shadow); padding: 12px; color: var(--youc-ink);
+      }
+      .toast-after .title { font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; }
+
+      .tabs-before, .tabs-after { display: flex; font-size: 12px; width: fit-content; }
+      .tabs-before button {
+        padding: 8px 14px; border: none; background: transparent; color: #6b7280; font: inherit;
+        border-bottom: 2px solid transparent;
+      }
+      .tabs-before button.on { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+      .tabs-after { border: 2.5px solid var(--youc-line); }
+      .tabs-after button {
+        padding: 8px 14px; border: none; border-right: 2.5px solid var(--youc-line);
+        background: var(--youc-paper); color: var(--youc-ink); font: inherit; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.04em;
+      }
+      .tabs-after button:last-child { border-right: none; }
+      .tabs-after button.on { background: var(--youc-ink); color: var(--youc-bg); }
+
+      .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+      .badge-before span {
+        display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600;
+      }
+      .badge-before .g { background: #dcfce7; color: #15803d; }
+      .badge-before .o { background: #ffedd5; color: #c2410c; }
+      .badge-before .p { background: #f3e8ff; color: #7e22ce; }
+      .badge-after span {
+        display: inline-block; padding: 3px 10px; border: 2px solid var(--youc-line);
+        font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      }
+      .badge-after .g { background: var(--youc-accent-2); color: #04231f; }
+      .badge-after .o { background: #fde68a; color: #111; }
+      .badge-after .p { background: #f0abfc; color: #111; }
+
+      .cb-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+      .cb-before input { width: 16px; height: 16px; accent-color: #2563eb; }
+      .cb-after input {
+        width: 18px; height: 18px; border: 2.5px solid var(--youc-line); appearance: none;
+        background: var(--youc-paper); display: inline-grid; place-content: center;
+      }
+      .cb-after input:checked { background: var(--youc-accent); }
+      .cb-after input:checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 800; }
+
+      .alert-before, .alert-after { font-size: 11px; padding: 10px 12px; max-width: 320px; }
+      .alert-before { border-left: 4px solid #3b82f6; background: #eff6ff; color: #1e3a8a; border-radius: 6px; }
+      .alert-after {
+        border: 2.5px solid var(--youc-line); border-left-width: 8px; border-left-color: var(--youc-info);
+        background: var(--youc-paper); color: var(--youc-ink); font-weight: 650;
+      }
+
+      .empty-before, .empty-after { text-align: center; padding: 24px 16px; font-size: 12px; max-width: 280px; }
+      .empty-before { color: #6b7280; }
+      .empty-before .icon {
+        width: 64px; height: 64px; border-radius: 16px; background: #f3f4f6; margin: 0 auto 12px;
+        display: grid; place-items: center; color: #9ca3af; font-size: 24px;
+      }
+      .empty-after {
+        border: 2.5px dashed var(--youc-line); background: var(--youc-paper); color: var(--text-secondary);
+      }
+      .empty-after .icon {
+        width: 64px; height: 64px; border: 2.5px solid var(--youc-line); background: var(--youc-soft);
+        margin: 0 auto 12px; display: grid; place-items: center; color: var(--youc-muted); font-size: 24px;
+      }
+      .empty-after .title { color: var(--youc-ink); font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+
+      .skel-before, .skel-after { width: 100%; max-width: 260px; }
+      .skel-before .bar { height: 12px; border-radius: 6px; background: #e5e7eb; margin-bottom: 8px; }
+      .skel-after .bar { height: 12px; background: var(--youc-soft); margin-bottom: 8px; border: 1px solid color-mix(in srgb, var(--youc-line) 20%, transparent); }
+
+      .spin-demo { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 20px 0; }
+      .spin-broken {
+        width: 32px; height: 32px; border-radius: 0;
+        border: none; border-bottom: 2.5px solid var(--youc-accent);
+        animation: spin-demo 0.75s linear infinite;
+      }
+      .spin-fixed {
+        width: 32px; height: 32px; border-radius: 50%; box-sizing: border-box;
+        border: 2.5px solid color-mix(in srgb, var(--youc-line) 28%, transparent);
+        border-top-color: var(--youc-accent);
+        animation: spin-demo 0.75s linear infinite;
+      }
+      @keyframes spin-demo { to { transform: rotate(360deg); } }
+      .spin-caption { font-size: 11px; color: #6b7280; text-align: center; max-width: 220px; line-height: 1.5; }
+      .spin-caption-after { font-size: 11px; color: var(--text-secondary); text-align: center; max-width: 220px; line-height: 1.5; font-weight: 600; }
+
+      .grad-kill { background-image: none !important; }
+
+      /* Section 21: simulate YOUC global layer from style.css */
+      .youc-sim .sim-grad-icon,
+      .youc-sim .sim-grad-btn {
+        background-image: linear-gradient(135deg, #3b82f6, #4f46e5);
+        color: #ffffff;
+      }
+      .youc-sim .sim-grad-icon,
+      .youc-sim .sim-grad-btn {
+        background-image: none !important;
+        background-color: #ffffff;
+        color: #ffffff;
+      }
+
+      .bell-card {
+        border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden;
+        max-width: 340px; background: #fff; font-size: 12px;
+      }
+      .bell-card-hdr {
+        display: flex; align-items: center; gap: 10px; justify-content: space-between;
+        padding: 12px 14px; border-bottom: 1px solid #f3f4f6;
+        background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      }
+      .youc-sim .bell-card-hdr {
+        background-image: none;
+        background-color: #fff;
+      }
+      .bell-icon-slot {
+        width: 32px; height: 32px; border-radius: 8px;
+        display: grid; place-items: center; font-size: 14px; flex-shrink: 0;
+      }
+      .bell-title-vis { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+      .bell-btn-solid {
+        padding: 6px 12px; border-radius: 8px; font: inherit; font-size: 11px; font-weight: 600;
+        background: #2563eb; color: #fff; border: none; flex-shrink: 0;
+      }
+      .bell-row {
+        display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      .bell-row-title { font-weight: 600; color: #111827; font-size: 13px; }
+      .bell-row-meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+      .bell-foot {
+        padding: 12px 14px; display: flex; justify-content: flex-end; gap: 8px;
+        background: #f9fafb; border-top: 1px solid #f3f4f6;
+      }
+      .bell-foot .sim-grad-btn {
+        padding: 8px 14px; border-radius: 10px; font: inherit; font-size: 12px; font-weight: 600; border: none;
+      }
+      .bell-ghost {
+        position: relative; display: inline-block;
+        outline: 2px dashed #dc2626; outline-offset: 3px;
+      }
+      .bell-ghost-tag {
+        position: absolute; top: -9px; left: -2px; z-index: 2;
+        background: #dc2626; color: #fff; font-size: 9px; font-weight: 800;
+        padding: 1px 5px; letter-spacing: 0.04em; white-space: nowrap;
+      }
+      .bell-callout {
+        margin-top: 12px; max-width: 340px; padding: 10px 12px;
+        background: #1c1917; border: 2px solid #dc2626; color: #fecaca;
+        font-size: 11px; font-weight: 650; line-height: 1.55;
+      }
+      .bell-callout strong { color: #fff; }
+
+      .bell-after-card {
+        border: 2.5px solid var(--youc-line); max-width: 340px;
+        background: var(--youc-paper); box-shadow: var(--youc-shadow); font-size: 12px;
+      }
+      .bell-after-hdr {
+        display: flex; align-items: center; gap: 10px; justify-content: space-between;
+        padding: 12px 14px; border-bottom: 2.5px solid var(--youc-line); background: var(--youc-soft);
+      }
+      .bell-after-icon {
+        width: 32px; height: 32px; border: 2.5px solid var(--youc-line);
+        background: var(--youc-ink); color: var(--youc-bg);
+        display: grid; place-items: center; font-size: 14px; flex-shrink: 0;
+      }
+      .bell-after-title { font-size: 13px; font-weight: 800; color: var(--youc-ink); text-transform: uppercase; letter-spacing: 0.05em; flex: 1; }
+      .bell-after-btn {
+        padding: 8px 12px; border: 2.5px solid var(--youc-line); font: inherit; font-size: 10px;
+        font-weight: 800; text-transform: uppercase; background: var(--youc-ink); color: var(--youc-bg); flex-shrink: 0;
+      }
+      .bell-after-row {
+        display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+        border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 25%, transparent);
+      }
+      .bell-after-row-icon {
+        width: 36px; height: 36px; border: 2.5px solid var(--youc-line);
+        background: var(--youc-accent); color: #04231f;
+        display: grid; place-items: center; font-weight: 800; flex-shrink: 0;
+      }
+      .bell-after-row-title { font-weight: 700; color: var(--youc-ink); }
+      .bell-after-row-meta { font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-weight: 600; }
+      .bell-after-foot {
+        padding: 12px 14px; display: flex; justify-content: flex-end;
+        border-top: 2.5px solid var(--youc-line); background: var(--youc-soft);
+      }
+
+      .locale-before button {
+        padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff;
+        font: inherit; font-size: 12px; color: #374151;
+      }
+      .locale-before .menu {
+        margin-top: 4px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff;
+        font-size: 12px; overflow: hidden; max-width: 140px;
+      }
+      .locale-before .menu div { padding: 8px 10px; color: #374151; }
+      .locale-before .menu div:hover { background: #f3f4f6; }
+      .locale-after button {
+        padding: 8px 12px; border: 2.5px solid var(--youc-line); background: var(--youc-paper);
+        font: inherit; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--youc-ink);
+      }
+      .locale-after .menu {
+        margin-top: 6px; border: 2.5px solid var(--youc-line); background: var(--youc-paper);
+        font-size: 12px; max-width: 150px; box-shadow: var(--youc-shadow);
+      }
+      .locale-after .menu div {
+        padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 25%, transparent);
+        font-weight: 650; color: var(--youc-ink);
+      }
+      .locale-after .menu div:hover {
+        background: var(--youc-dropdown-hover-bg);
+        color: var(--youc-dropdown-hover-fg);
+      }
+
+      /* §23 Select 开/关不一致 */
+      .select-pair { display: flex; gap: 16px; flex-wrap: wrap; }
+      .select-mock { width: 168px; font-size: 12px; }
+      .select-mock .trigger {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 10px; font: inherit; font-weight: 600; width: 100%;
+      }
+      .select-mock .panel { margin-top: 4px; font-size: 11px; }
+      .select-mock .opt { padding: 8px 10px; text-align: left; width: 100%; font: inherit; }
+      .select-open-thick .trigger { border: 2.5px solid var(--youc-line); background: #fff; }
+      .select-open-thick .panel { border: 2.5px solid var(--youc-line); box-shadow: 6px 6px 0 #111; background: #fff; }
+      .select-open-thick .opt.sel { background: #111; color: #f4f3ee; }
+      .select-closed-thin .trigger { border: 1px solid #d1d5db; background: #fff; }
+      .select-closed-thin .panel { border: 1px solid #e5e7eb; background: #fff; }
+      .select-unified .trigger { border: 2.5px solid var(--youc-line); background: var(--youc-paper); box-shadow: none; }
+      .select-unified.open .trigger { box-shadow: none; position: relative; z-index: 2; }
+      .select-unified .panel {
+        margin-top: 6px; border: 2.5px solid var(--youc-line);
+        box-shadow: 5px 5px 0 var(--youc-line); background: var(--youc-paper);
+      }
+      .select-unified .opt:hover:not(.sel) {
+        background: var(--youc-dropdown-hover-bg); color: var(--youc-dropdown-hover-fg);
+      }
+      .select-unified .opt.sel { background: var(--youc-dropdown-selected-bg); color: var(--youc-dropdown-selected-fg); font-weight: 700; }
+
+      /* §24 弹窗内表头 — 模拟 YOUC 全局 thead 与 gray 字色冲突 */
+      .youc-global-sim thead { background: #111; color: #f4f3ee; }
+      .youc-global-sim thead th {
+        background: #111; font-weight: 800; text-transform: uppercase;
+        font-size: 10px; letter-spacing: .06em; padding: 8px 8px;
+        border-bottom: 2.5px solid #111;
+      }
+      /* 真实 bug：th 上 text-gray-700 被映射成墨色，叠在黑底上 ≈ 看不见 */
+      .youc-global-sim .th-bug { color: #111 !important; }
+      .youc-global-sim .sub-bug { color: #9ca3af; font-size: 11px; margin-bottom: 8px; }
+      .youc-global-sim .hint-bug { color: #d1d5db; font-size: 10px; margin-top: 8px; }
+      .youc-global-sim .usage-bug { color: #d1d5db; font-size: 10px; }
+      .youc-global-sim .reset-bug { color: #e5e7eb; font-size: 10px; border: none; background: none; }
+      .youc-global-sim td { padding: 8px; font-size: 11px; color: #374151; border-bottom: 1px solid #f3f4f6; }
+      .youc-global-sim .platform { font-family: inherit; font-weight: 600; color: #111; }
+      .youc-global-sim .input-bug {
+        width: 64px; padding: 3px 6px; font: inherit; font-size: 11px;
+        border: 1px solid #e5e7eb; background: #fff; color: #9ca3af;
+      }
+
+      .modal-mock {
+        width: 100%;
+        max-width: 56rem;
+        border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper);
+        box-shadow: var(--youc-shadow-lg);
+        font-size: 11px;
+        overflow: hidden;
+      }
+      .modal-mock-h { padding: 10px 14px; border-bottom: 2.5px solid var(--youc-line); font-weight: 800; text-transform: uppercase; color: var(--youc-ink); background: var(--youc-soft); }
+      .modal-mock-body { padding: 12px 14px; overflow: hidden; min-width: 0; }
+      .modal-mock table { width: 100%; border-collapse: collapse; }
+      .modal-mock-foot {
+        padding: 10px 14px;
+        border-top: 2.5px solid var(--youc-line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        background: var(--youc-soft);
+        flex-wrap: wrap;
+      }
+      .modal-mock-foot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+      /* 表格局部横向滚动，不撑破弹窗外框 */
+      .modal-table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border: 2px solid color-mix(in srgb, var(--youc-line) 35%, transparent);
+        background: var(--youc-paper);
+      }
+      .modal-table-scroll::-webkit-scrollbar { height: 6px; }
+      .modal-table-scroll::-webkit-scrollbar-thumb { background: var(--youc-muted); }
+
+      .modal-inner-table {
+        width: 100%;
+        min-width: 52rem;
+        table-layout: fixed;
+        border-collapse: collapse;
+      }
+      .modal-inner-table col.col-platform { width: 8.5rem; }
+      .modal-inner-table col.col-limit { width: 9.75rem; }
+      .modal-inner-table col.col-usage { width: 13.5rem; }
+      .modal-inner-table thead th {
+        background: var(--youc-soft);
+        color: var(--youc-ink);
+        padding: 6px 4px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        border-bottom: 2.5px solid var(--youc-line);
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .modal-inner-table td {
+        padding: 6px 4px;
+        border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 18%, transparent);
+        color: var(--youc-ink);
+        font-weight: 600;
+        vertical-align: middle;
+        overflow: hidden;
+      }
+      .modal-inner-table .platform {
+        font-family: inherit;
+        font-weight: 800;
+        font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .modal-cell-input { display: flex; align-items: center; gap: 2px; min-width: 0; }
+      .modal-sub { font-size: 11px; color: var(--text-secondary); font-weight: 650; margin-bottom: 10px; line-height: 1.5; word-break: break-word; }
+      .modal-hint { font-size: 10px; color: var(--youc-muted); font-weight: 650; margin-top: 10px; line-height: 1.5; }
+      .modal-usage {
+        font-size: 9px;
+        color: var(--text-secondary);
+        font-weight: 700;
+        line-height: 1.35;
+        white-space: normal;
+        word-break: break-all;
+      }
+      .modal-input {
+        width: 100%;
+        min-width: 0;
+        max-width: 48px;
+        padding: 3px 4px;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        border: 2px solid var(--youc-line);
+        background: var(--youc-paper);
+        color: var(--youc-ink);
+        box-sizing: border-box;
+      }
+      .modal-input::placeholder { color: var(--youc-muted); font-weight: 600; }
+      .modal-reset { font-size: 11px; color: var(--youc-muted); border: none; background: none; font-weight: 800; cursor: default; }
+      .modal-reset:hover { color: var(--youc-accent); }
+      .modal-ghost-label {
+        display: inline-block; margin-top: 8px; padding: 4px 8px;
+        border: 2px dashed #dc2626; color: #b91c1c; font-size: 10px; font-weight: 800;
+        background: #fef2f2;
+      }
+
+      /* §25 系统设置 Tab + 开关 */
+      .settings-tabs-old { display: flex; gap: 4px; padding: 6px; border-radius: 16px; border: 1px solid #e5e7eb; background: rgba(255,255,255,.9); font-size: 11px; flex-wrap: wrap; }
+      .settings-tabs-old button { position: relative; padding: 8px 12px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: #6b7280; font: inherit; }
+      .settings-tabs-old button.on { background: #fff; color: #0f766e; border-color: #99f6e4; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+      .settings-tabs-old button.on::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px; border-radius: 99px; background: linear-gradient(90deg,#14b8a6,#0ea5e9); }
+      .settings-tabs-new { display: flex; gap: 0; border: 2.5px solid var(--youc-line); flex-wrap: wrap; }
+      .settings-tabs-new button { padding: 8px 12px; border: none; border-right: 2px solid var(--youc-line); background: var(--youc-paper); color: var(--youc-muted); font: inherit; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+      .settings-tabs-new button:last-child { border-right: none; }
+      .settings-tabs-new button.on { background: var(--youc-ink); color: var(--youc-bg); }
+      .backend-box { margin-top: 12px; padding: 10px 12px; border: 2px solid #fde68a; background: #fffbeb; font-size: 11px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .backend-box.new { border: 2.5px solid var(--youc-line); background: var(--youc-soft); }
+      .ios-switch { width: 44px; height: 24px; border-radius: 99px; background: #e5e7eb; position: relative; flex-shrink: 0; }
+      .ios-switch .dot { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 99px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+      /* §26 图表分段：下划线 vs 黑底 */
+      .chart-seg-underline { display: inline-flex; border: 2.5px solid var(--youc-line); background: var(--youc-paper); }
+      .chart-seg-underline button { padding: 6px 12px; border: none; border-right: 2px solid var(--youc-line); background: transparent; font: inherit; font-size: 11px; font-weight: 700; color: var(--youc-muted); position: relative; }
+      .chart-seg-underline button:last-child { border-right: none; }
+      .chart-seg-underline button.on { color: var(--youc-ink); }
+      .chart-seg-underline button.on::after { content: ''; position: absolute; left: 6px; right: 6px; bottom: 2px; height: 4px; background: var(--youc-ink); }
+      .chart-seg-fill { display: inline-flex; border: 2.5px solid var(--youc-line); }
+      .chart-seg-fill button { padding: 6px 12px; border: none; border-right: 2px solid var(--youc-line); background: var(--youc-paper); font: inherit; font-size: 11px; font-weight: 700; color: var(--youc-muted); }
+      .chart-seg-fill button:last-child { border-right: none; }
+      .chart-seg-fill button.on { background: var(--youc-ink); color: var(--youc-bg); }
+
+      .status-pill { display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; margin-left: 8px; }
+      .status-pill.done { background: #04231f; color: #5eead4; }
+      .status-pill.partial { background: #422006; color: #fbbf24; }
+      .status-pill.todo { background: #450a0a; color: #fca5a5; }
+
+      .note-bar {
+        margin-top: 48px;
+        padding: 16px 18px;
+        border: 2px solid #444;
+        background: #24241f;
+        font-size: 13px;
+        color: #d6d3cb;
+        line-height: 1.7;
+      }
+
+      .note-bar strong { color: #5eead4; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>YOUC UI 前后对比预览</h1>
+      <p class="intro">
+        全项目组件审计 + 静态前后对比。<strong>§01–§26 + P3 扫尾已与生产对齐</strong>。
+        打开：<code>http://localhost:3000/preview/ui-contrast-before-after.html</code>
+      </p>
+
+      <div class="note-bar" style="margin-bottom:24px;border-color:#5eead4">
+        <strong>针对你刚提的 5 点 · 当前状态（代码 vs 预览）</strong><br>
+        ① Select / YoucDropdown — <span class="status-pill done">已同步</span> → <a href="#s23" style="color:#5eead4">§23</a><br>
+        ② 平台限额弹窗 — <span class="status-pill done">已同步</span> → <a href="#s24" style="color:#5eead4">§24</a><br>
+        ③ 系统设置 Tab + 开关 — <span class="status-pill done">已同步</span> → <a href="#s25" style="color:#5eead4">§25</a><br>
+        ④ 图表分段 — <span class="status-pill done">已确认黑底选中</span> → <a href="#s26" style="color:#5eead4">§26</a><br>
+        ⑤ Loading 圆形 — <span class="status-pill done">已同步</span> → <a href="#s20" style="color:#5eead4">§20</a>
+      </div>
+
+      <nav class="toc">
+        <strong style="display:block;margin-bottom:8px;color:#f4f3ee">目录</strong>
+        <ul style="margin:0;padding-left:18px">
+          <li><a href="#s01">01 仪表盘切换</a> · <a href="#s02">02 表头</a> · <a href="#s03">03 Token Tooltip</a></li>
+          <li><a href="#s04">04 成本 Tooltip</a> · <a href="#s05">05 Token 列</a> · <a href="#s06">06 API Key</a></li>
+          <li><a href="#s07">07 按钮</a> · <a href="#s08">08 Select</a> · <a href="#s09">09 日期</a> · <a href="#s10">10 分页/筛选</a></li>
+          <li><a href="#s11">11 输入框</a> · <a href="#s12">12 开关</a> · <a href="#s13">13 弹窗</a> · <a href="#s14">14 Toast</a></li>
+          <li><a href="#s15">15 Tabs</a> · <a href="#s16">16 徽章</a> · <a href="#s17">17 复选框</a> · <a href="#s18">18 空状态</a></li>
+          <li><a href="#s19">19 提示条</a> · <a href="#s20">20 Loading</a> · <a href="#s21">21 公告</a> · <a href="#s22">22 语言</a></li>
+          <li><a href="#s23">23 Select 开/关统一</a> · <a href="#s24">24 弹窗表头</a> · <a href="#s25">25 设置 Tab/开关</a> · <a href="#s26">26 图表分段</a></li>
+        </ul>
+      </nav>
+
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>组件</th><th>文件</th><th>现状</th><th>优先级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Input / SearchInput</td><td>style.css · SearchInput.vue</td><td>YOUC 输入框 + 搜索图标对比度已对齐</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Toggle / ToggleSwitch</td><td>Toggle.vue · style.css <code>.switch</code></td><td>方形 YOUC 开关，生产已接入</td><td class="status-ok">已同步</td></tr>
+          <tr><td>BaseDialog / ConfirmDialog</td><td>BaseDialog.vue · ConfirmDialog.vue</td><td>YOUC modal + <code>.btn-*</code> + 关闭钮</td><td class="status-ok">已同步</td></tr>
+          <tr><td>AnnouncementPopup / Bell</td><td>AnnouncementPopup.vue · AnnouncementBell.vue</td><td>YOUC token + 渐变按钮修复</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Toast</td><td>Toast.vue · style.css <code>.toast</code></td><td>已接入全局 <code>.toast</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Select / DateRangePicker</td><td>YoucDropdown.vue · Select · DateRangePicker</td><td>统一 YoucDropdown，选中黑底</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Pagination / UsageFilters</td><td>Pagination.vue · UsageFilters.vue</td><td>分页 YOUC；筛选项 <code>.usage-filter-menu</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Usage Token / Cost 列</td><td>UsageTable.vue · UsageView.vue</td><td><code>.usage-token-*</code> · <code>.usage-info-btn</code> · <code>.usage-cost-value</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>API Key 展示</td><td>KeysView.vue</td><td><code>.code-key</code> + <code>.copy-btn</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Tabs</td><td>style.css · SettingsView.vue</td><td>YOUC 黑底选中 <code>.tabs</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Badge / StatusBadge</td><td>style.css · UsageTable · billingMode</td><td>用量表徽章改用 <code>.badge-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Checkbox</td><td>style.css 原生</td><td>方形 YOUC；全局 <code>input[type=checkbox]</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>EmptyState</td><td>EmptyState.vue</td><td><code>.empty-state-icon-box</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Tooltip</td><td>UsageTable · UsageView</td><td>纸白底 <code>.usage-tooltip</code> + 语义色覆盖</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Loading / Spinner</td><td>LoadingSpinner.vue</td><td>圆形旋转环（§20）</td><td class="status-ok">已同步</td></tr>
+          <tr><td>LocaleSwitcher</td><td>YoucDropdown · LocaleSwitcher.vue</td><td>§22 基准样式，勿改阴影逻辑</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Charts 分段控件</td><td>ModelDistributionChart 等</td><td><code>.seg-control</code> 黑底选中</td><td class="status-ok">已同步</td></tr>
+          <tr><td>Tour 提示条</td><td>style.css <code>.tour-*-box</code></td><td>硬边框 + 左侧色条 YOUC</td><td class="status-ok">已同步</td></tr>
+          <tr><td>ProxySelector</td><td>ProxySelector.vue</td><td>移除圆角 scoped，走全局 <code>.select-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>OrderStatusBadge</td><td>OrderStatusBadge.vue</td><td>订单状态改用 <code>.badge-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>分页移动端</td><td>Pagination.vue</td><td>上一页/下一页改用 <code>.btn-secondary</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Peer 圆角开关</td><td>SettingsView · AccountsView · ProfileBalanceNotifyCard</td><td>已换 <code>Toggle</code>（<code>.switch</code>）</td><td class="status-ok">已同步</td></tr>
+          <tr><td>UsageFilterSearch</td><td>UsageFilters.vue</td><td>用户/Key/账号搜索 → YoucDropdown 面板样式</td><td class="status-ok">已同步</td></tr>
+          <tr><td>PlatformTypeBadge</td><td>PlatformTypeBadge.vue</td><td>硬边 <code>.platform-type-badge-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>AccountUsageCell 徽章</td><td>AccountUsageCell.vue</td><td>Gemini/Antigravity → <code>.badge-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Tooltip 语义类</td><td>UsageTable · UsageView</td><td><code>.usage-tooltip-row/label/val/total</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>Dashboard 统计卡</td><td>DashboardView.vue</td><td><code>.stat-card-*</code></td><td class="status-ok">已同步</td></tr>
+          <tr><td>进度条</td><td>style.css · UsageProgressBar 等</td><td><code>.progress-track</code> + 全局方角覆盖</td><td class="status-ok">已同步</td></tr>
+          <tr><td>帮助 (i) 按钮</td><td>Create/EditAccountModal · ScheduledTestsPanel</td><td><code>.usage-info-btn</code></td><td class="status-ok">已同步</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 1. Dashboard segmented control -->
+      <section class="section">
+        <h2 class="section-title" id="s01">01 · 仪表盘切换按钮</h2>
+        <p class="section-desc">问题：选中态对比弱，全局去圆角后更像「灰底灰字」。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="stage-inner">
+                <div class="card-head">
+                  <span class="card-title">模型使用分布</span>
+                  <div class="seg">
+                    <button class="on">请求</button>
+                    <button>上游</button>
+                    <button>映射</button>
+                  </div>
+                </div>
+                <div class="seg" style="margin-bottom:8px">
+                  <button class="on">按 Token</button>
+                  <button>按实际消费</button>
+                </div>
+                <div class="mini-chart"></div>
+                <div class="legend">选中按钮：白底 + 浅阴影，和未选中差异小</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="stage-inner">
+                <div class="card-head">
+                  <span class="card-title">模型使用分布</span>
+                  <div class="seg">
+                    <button class="on">请求</button>
+                    <button>上游</button>
+                    <button>映射</button>
+                  </div>
+                </div>
+                <div class="seg" style="margin-bottom:8px">
+                  <button class="on">按 Token</button>
+                  <button>按实际消费</button>
+                </div>
+                <div class="mini-chart"></div>
+                <div class="legend">选中：黑底白字 · 未选中：纸白黑字 · 硬边框</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Table header -->
+      <section class="section">
+        <h2 class="section-title" id="s02">02 · 内嵌数据表表头</h2>
+        <p class="section-desc">问题：所有表统一黑表头，在图表卡片里过重。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <table class="mock-table">
+                <thead>
+                  <tr>
+                    <th>模型</th><th>请求</th><th>实际</th><th>成本</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>gpt-5.5</td><td>12</td>
+                    <td class="cost">$0.42</td>
+                    <td style="color:#ea580c">$0.38</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <table class="mock-table">
+                <thead>
+                  <tr>
+                    <th>模型</th><th>请求</th><th>实际</th><th>成本</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>gpt-5.5</td><td>12</td>
+                    <td class="cost">$0.42</td>
+                    <td class="cost">$0.38</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Token tooltip -->
+      <section class="section">
+        <h2 class="section-title" id="s03">03 · Token 明细 Tooltip</h2>
+        <p class="section-desc">问题：深色底 + 灰色标签，层次发糊。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="tooltip-dark">
+                <div class="tt-title">Token 明细</div>
+                <div class="tt-row"><span class="tt-label">输入 Token</span><span class="tt-val">790</span></div>
+                <div class="tt-row"><span class="tt-label">输出 Token</span><span class="tt-val">88</span></div>
+                <div class="tt-row"><span class="tt-label">缓存读取 Token</span><span class="tt-val">19,968</span></div>
+                <div class="tt-row tt-total"><span class="tt-label">总 Token</span><span>20,846</span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="tooltip-light">
+                <div class="tt-title">Token 明细</div>
+                <div class="tt-row"><span class="tt-label">输入 Token</span><span class="tt-val">790</span></div>
+                <div class="tt-row"><span class="tt-label">输出 Token</span><span class="tt-val">88</span></div>
+                <div class="tt-row"><span class="tt-label">缓存读取 Token</span><span class="tt-val">19,968</span></div>
+                <div class="tt-row tt-total"><span class="tt-label">总 Token</span><span>20,846</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Cost tooltip -->
+      <section class="section">
+        <h2 class="section-title" id="s04">04 · 成本明细 Tooltip</h2>
+        <p class="section-desc">问题：标签灰、数值青，信息层级不统一。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="tooltip-dark">
+                <div class="tt-title">成本明细</div>
+                <div class="tt-row"><span class="tt-label">输入成本</span><span class="tt-val">$0.001570</span></div>
+                <div class="tt-row"><span class="tt-label">输出成本</span><span class="tt-val">$0.000087</span></div>
+                <div class="tt-row"><span class="tt-label">计费</span><span class="tt-val">$0.001657</span></div>
+                <div class="tt-row"><span class="tt-label">Standard</span><span style="color:#22d3ee">0.10x</span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="tooltip-light">
+                <div class="tt-title">成本明细</div>
+                <div class="tt-row"><span class="tt-label">输入成本</span><span class="tt-val">$0.001570</span></div>
+                <div class="tt-row"><span class="tt-label">输出成本</span><span class="tt-val">$0.000087</span></div>
+                <div class="tt-row"><span class="tt-label">计费</span><span class="tt-val">$0.001657</span></div>
+                <div class="tt-row"><span class="tt-label">Standard</span><span class="tt-val">0.10x</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Token column + info icon -->
+      <section class="section">
+        <h2 class="section-title" id="s05">05 · 用量表 Token 列 + (i) 按钮</h2>
+        <p class="section-desc">问题：颜色过多、数字小、info 图标太淡。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <table class="mock-table">
+                <thead><tr><th>Token</th><th>费用</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="token-cell">
+                        <div class="token-stack">
+                          <div class="token-line">
+                            <span class="c-in">↓ 790</span>
+                            <span class="c-out">↑ 88</span>
+                          </div>
+                          <div class="token-line">
+                            <span class="c-cache">▣ 20.0K</span>
+                          </div>
+                        </div>
+                        <span class="info-btn">i</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="cost">$0.001570</span>
+                      <span class="info-btn" style="margin-left:6px">i</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <table class="mock-table">
+                <thead><tr><th>Token</th><th>费用</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="token-cell">
+                        <div class="token-stack">
+                          <div class="token-line">
+                            <span><span class="token-icon in">IN</span> <span class="token-num">790</span></span>
+                            <span><span class="token-icon out">OUT</span> <span class="token-num">88</span></span>
+                          </div>
+                          <div class="token-line">
+                            <span><span class="token-icon cache">CACHE</span> <span class="token-num">20.0K</span></span>
+                          </div>
+                        </div>
+                        <span class="info-btn">i</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="cost">$0.001570</span>
+                      <span class="info-btn" style="margin-left:6px">i</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. API Key -->
+      <section class="section">
+        <h2 class="section-title" id="s06">06 · API 密钥展示</h2>
+        <p class="section-desc">问题：黑底青字偏终端风，复制按钮不明显。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <table class="mock-table">
+                <thead><tr><th>名称</th><th>API 密钥</th><th>分组</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>claude-test</td>
+                    <td>
+                      <code class="code-key">sk-f4e...a816</code>
+                      <span class="copy-btn">⎘</span>
+                    </td>
+                    <td><span class="pill">claude-高…</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <table class="mock-table">
+                <thead><tr><th>名称</th><th>API 密钥</th><th>分组</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>claude-test</td>
+                    <td style="display:flex;align-items:center;gap:8px">
+                      <code class="code-key">sk-f4e...a816</code>
+                      <span class="copy-btn">⎘</span>
+                    </td>
+                    <td><span class="pill">claude-高…</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Button system -->
+      <section class="section">
+        <h2 class="section-title" id="s07">07 · 主/次按钮 + 图标按钮</h2>
+        <p class="section-desc">问题：`.btn` 体系已 YOUC 化，但大量页面仍用 Tailwind 圆角按钮，同一工具栏两种风格。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前（混用）</div>
+            <div class="stage before">
+              <div class="btn-row">
+                <button class="btn-y primary">保存</button>
+                <button class="btn-y">取消</button>
+                <button class="btn-y ghost">⎘</button>
+                <button class="btn-y icon">⋮</button>
+              </div>
+              <ul class="issue-list">
+                <li>主按钮黑底 OK，但次按钮灰边灰字对比弱</li>
+                <li>图标按钮无边框，默认几乎看不见</li>
+                <li>与 `.btn-primary/.btn-secondary` 并存时不统一</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后（统一）</div>
+            <div class="stage after">
+              <div class="btn-row">
+                <button class="btn-y primary">保存</button>
+                <button class="btn-y">取消</button>
+                <button class="btn-y ghost">复制</button>
+                <button class="btn-y icon">⋮</button>
+              </div>
+              <ul class="issue-list" style="color:#6b9e96">
+                <li>全部走 `.btn` 体系：硬边框 + 大写 + 800 字重</li>
+                <li>图标按钮默认有边框，不依赖 hover</li>
+                <li>禁止页面内再写 `rounded-lg bg-white` 按钮</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Select dropdown -->
+      <section class="section">
+        <h2 class="section-title" id="s08">08 · Select 下拉（触发器 + 选项）</h2>
+        <p class="section-desc">问题：组件内仍是圆角/浅灰/primary 蓝，全局层压成 YOUC 后选中态发灰，和 hover 难区分。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="mock-select">
+                <button class="trigger">选择分组 <span class="chev">▾</span></button>
+                <div class="panel">
+                  <div class="opt">gpt-特惠</div>
+                  <div class="opt sel">claude-高倍 ✓</div>
+                  <div class="opt">全部模型</div>
+                </div>
+              </div>
+              <ul class="issue-list">
+                <li>选中项：浅蓝底 + 蓝字，对比偏弱</li>
+                <li>箭头 `text-gray-400` 太淡</li>
+                <li>placeholder 与已选值颜色几乎一样</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="mock-select-after">
+                <button class="trigger open">claude-高倍 <span class="chev">▾</span></button>
+                <div class="panel">
+                  <div class="search">搜索…</div>
+                  <div class="opt">gpt-特惠</div>
+                  <div class="opt sel">claude-高倍 ✓</div>
+                  <div class="opt">全部模型</div>
+                </div>
+              </div>
+              <ul class="issue-list" style="color:#6b9e96">
+                <li>打开：面板与触发器间隔 6px，独立硬阴影浮动</li>
+                <li>选中：纯黑底反色；hover 深灰反色（略浅一档）</li>
+                <li>与语言切换 / 筛选下拉 / Select 组件同一套 token</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. DateRangePicker -->
+      <section class="section">
+        <h2 class="section-title" id="s09">09 · 日期范围选择器</h2>
+        <p class="section-desc">问题：快捷预设选中是浅蓝，Apply 按钮和主按钮体系不一致。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="mock-date" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;max-width:280px">
+                <div class="presets">
+                  <button class="preset on">今天</button>
+                  <button class="preset">近 7 天</button>
+                  <button class="preset">近 30 天</button>
+                  <button class="preset">本月</button>
+                </div>
+                <button class="apply">应用</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="mock-date-after" style="border:2.5px solid var(--youc-line);max-width:280px;box-shadow:var(--youc-shadow)">
+                <div class="presets">
+                  <button class="preset on">今天</button>
+                  <button class="preset">近 7 天</button>
+                  <button class="preset">近 30 天</button>
+                  <button class="preset">本月</button>
+                </div>
+                <button class="apply">应用</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Pagination + filter autocomplete -->
+      <section class="section">
+        <h2 class="section-title" id="s10">10 · 分页 + 筛选自动完成下拉</h2>
+        <p class="section-desc">问题：分页当前页浅蓝高亮弱；UsageFilters 自建下拉仍是圆角+浅灰 hover。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="mock-page">
+                <button>‹</button><button>1</button><button class="on">2</button><button>3</button><button>›</button>
+              </div>
+              <div style="margin-top:14px;font-size:11px;color:#6b7280">用户筛选</div>
+              <input style="width:100%;margin-top:4px;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font:inherit" value="admin@" />
+              <div class="filter-drop">
+                <button>admin@sub2api.local <span style="color:#9ca3af">#1</span></button>
+                <button>admin-test@… <span style="color:#9ca3af">#8</span></button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="mock-page-after">
+                <button>‹</button><button>1</button><button class="on">2</button><button>3</button><button>›</button>
+              </div>
+              <div style="margin-top:14px;font-size:11px;color:var(--text-secondary);font-weight:700">用户筛选</div>
+              <input style="width:100%;margin-top:4px;padding:8px;border:2.5px solid var(--youc-line);font:inherit;font-weight:600" value="admin@" />
+              <div class="filter-drop-after">
+                <button>admin@sub2api.local <span style="color:var(--text-tertiary)">#1</span></button>
+                <button>admin-test@… <span style="color:var(--text-tertiary)">#8</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. Input -->
+      <section class="section">
+        <h2 class="section-title" id="s11">11 · 输入框 / 搜索框</h2>
+        <p class="section-desc">问题：hint/图标 <code>text-gray-400</code> 过淡；错误态仅靠红色细边框。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="mock-input-before">
+                <div class="label">API 名称</div>
+                <input value="my-production-key" />
+                <div class="hint">用于区分不同环境的密钥</div>
+              </div>
+              <div class="mock-input-before" style="margin-top:14px">
+                <div class="label">邮箱</div>
+                <input class="err" value="not-an-email" style="border-color:#fca5a5" />
+                <div class="hint" style="color:#ef4444">格式不正确</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="mock-input-after">
+                <div class="label">API 名称</div>
+                <input value="my-production-key" />
+                <div class="hint">用于区分不同环境的密钥</div>
+              </div>
+              <div class="mock-input-after" style="margin-top:14px">
+                <div class="label">邮箱</div>
+                <input class="err" value="not-an-email" />
+                <div class="hint" style="color:var(--youc-danger)">格式不正确</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Switch -->
+      <section class="section">
+        <h2 class="section-title" id="s12">12 · 开关 Toggle / ToggleSwitch</h2>
+        <p class="section-desc">问题：<code>Toggle.vue</code> 圆角蓝轨；<code>style.css</code> 已定义方形 <code>.switch</code> 但组件未接入。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="sw-before"><div class="track on"><div class="thumb"></div></div><span>启用流式输出</span></div>
+              <div class="sw-before" style="margin-top:10px"><div class="track"><div class="thumb"></div></div><span>余额不足通知</span></div>
+              <ul class="issue-list"><li>三处实现：Toggle / ToggleSwitch / peer checkbox</li></ul>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="sw-after"><div class="track on"><div class="thumb"></div></div><span>启用流式输出</span></div>
+              <div class="sw-after" style="margin-top:10px"><div class="track"><div class="thumb"></div></div><span>余额不足通知</span></div>
+              <ul class="issue-list" style="color:#6b9e96"><li>统一改用 <code>.switch</code>，开=accent 底+黑滑块</li></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. Modal -->
+      <section class="section">
+        <h2 class="section-title" id="s13">13 · 弹窗 BaseDialog / ConfirmDialog</h2>
+        <p class="section-desc">问题：外壳已是 YOUC；<code>ConfirmDialog</code> 底部仍用 <code>rounded-md bg-primary-600</code>。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="modal-before">
+                <div class="shell">
+                  <div class="head">确认删除 API Key？</div>
+                  <div class="body">此操作不可撤销，关联请求将立即失效。</div>
+                  <div class="foot">
+                    <button>取消</button>
+                    <button class="primary">删除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="modal-after">
+                <div class="shell">
+                  <div class="head">确认删除 API Key？</div>
+                  <div class="body">此操作不可撤销，关联请求将立即失效。</div>
+                  <div class="foot">
+                    <button>取消</button>
+                    <button class="primary">删除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. Toast -->
+      <section class="section">
+        <h2 class="section-title" id="s14">14 · Toast 通知</h2>
+        <p class="section-desc">问题：<code>Toast.vue</code> 圆角+阴影；<code>style.css</code> 的 <code>.toast</code> 未使用。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="toast-before">
+                <div class="item"><div class="title">保存成功</div><div>API Key 已更新</div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="toast-after">
+                <div class="item"><div class="title">保存成功</div><div>API Key 已更新</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15. Tabs -->
+      <section class="section">
+        <h2 class="section-title" id="s15">15 · Tabs 标签页</h2>
+        <p class="section-desc"><code>UsageView</code> 等已用 YOUC <code>.tabs</code>；对比旧式下划线蓝选中。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="tabs-before">
+                <button class="on">用量明细</button>
+                <button>按模型</button>
+                <button>按用户</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="tabs-after">
+                <button class="on">用量明细</button>
+                <button>按模型</button>
+                <button>按用户</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 16. Badge -->
+      <section class="section">
+        <h2 class="section-title" id="s16">16 · 徽章 / StatusBadge</h2>
+        <p class="section-desc">问题：页面散落 Tailwind 彩色圆角 pill；<code>StatusBadge</code> 灰字+圆点。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="badge-row badge-before">
+                <span class="g">Active</span><span class="o">Warning</span><span class="p">Pro</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="badge-row badge-after">
+                <span class="g">Active</span><span class="o">Warning</span><span class="p">Pro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 17. Checkbox -->
+      <section class="section">
+        <h2 class="section-title" id="s17">17 · 复选框</h2>
+        <p class="section-desc">全局 <code>input[type=checkbox]</code> 已是方形 YOUC；部分设置页用 peer 圆角开关替代。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="cb-row cb-before"><input type="checkbox" checked /><span>记住我</span></div>
+              <div class="cb-row cb-before" style="margin-top:8px"><input type="checkbox" /><span>同意服务条款</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="cb-row cb-after"><input type="checkbox" checked /><span>记住我</span></div>
+              <div class="cb-row cb-after" style="margin-top:8px"><input type="checkbox" /><span>同意服务条款</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 18. Empty state -->
+      <section class="section">
+        <h2 class="section-title" id="s18">18 · 空状态 EmptyState</h2>
+        <p class="section-desc">问题：图标容器大圆角灰底，与 YOUC 硬边风格不一致。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="empty-before">
+                <div class="icon">∅</div>
+                <div style="font-weight:600;color:#374151">暂无用量记录</div>
+                <div style="font-size:11px;margin-top:4px">调整筛选条件后重试</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="empty-after">
+                <div class="icon">∅</div>
+                <div class="title">暂无用量记录</div>
+                <div style="font-size:11px;margin-top:4px">调整筛选条件后重试</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 19. Alert -->
+      <section class="section">
+        <h2 class="section-title" id="s19">19 · 提示条 / Tour 引导框</h2>
+        <p class="section-desc">问题：浅蓝圆角 alert；Tour 盒彩色底+圆角，与主界面割裂。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="alert-before">本地开发模式：部分计费功能已禁用。</div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="alert-after">本地开发模式：部分计费功能已禁用。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 20. Skeleton -->
+      <section class="section">
+        <h2 class="section-title" id="s20">20 · 骨架屏 / Loading Spinner</h2>
+        <p class="section-desc">
+          问题：YOUC 去掉 <code>rounded-full</code> 后内联 <code>border-b-2</code> 旋转器变细线。
+          <strong>改后方案：圆形</strong>（<code>border-radius:50%</code>），在兼容层对 <code>.loading-spinner</code> 豁免圆角。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前（系统设置同款）</div>
+            <div class="stage before">
+              <div class="spin-demo">
+                <div class="spin-broken"></div>
+                <div class="spin-caption">仅 <code>border-bottom</code> + 方形容器旋转 ≈ 细线/光点，不像加载中</div>
+              </div>
+              <div class="skel-before" style="margin-top:8px">
+                <div class="bar" style="width:70%"></div>
+                <div class="bar" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="spin-demo">
+                <div class="spin-fixed"></div>
+                <div class="spin-caption-after">圆形 + 四边描边 + 顶边 accent 色旋转（保留 border-radius）</div>
+              </div>
+              <div class="skel-after" style="margin-top:8px">
+                <div class="bar" style="width:70%"></div>
+                <div class="bar" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 21. Announcement bell -->
+      <section class="section">
+        <h2 class="section-title" id="s21">21 · 公告铃铛弹窗 AnnouncementBell</h2>
+        <p class="section-desc">
+          问题：组件里多处 <code>bg-gradient-*</code> + <code>text-white</code>。YOUC 全局把渐变清掉后背景变白、字仍白 → 图标和「标记已读」等按钮文字消失。标题等深色字仍可见。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前（YOUC 全局生效后）</div>
+            <div class="stage before">
+              <div class="youc-sim">
+                <div class="bell-card">
+                  <div class="bell-card-hdr">
+                    <div class="bell-ghost">
+                      <span class="bell-ghost-tag">图标白字消失</span>
+                      <div class="sim-grad-icon bell-icon-slot">🔔</div>
+                    </div>
+                    <span class="bell-title-vis">公告通知</span>
+                    <button type="button" class="bell-btn-solid">全部已读</button>
+                  </div>
+                  <div class="bell-row">
+                    <div class="bell-ghost">
+                      <span class="bell-ghost-tag">列表图标</span>
+                      <div class="sim-grad-icon bell-icon-slot">!</div>
+                    </div>
+                    <div>
+                      <div class="bell-row-title">系统维护通知</div>
+                      <div class="bell-row-meta">2 小时前 · 未读</div>
+                    </div>
+                  </div>
+                  <div class="bell-foot">
+                    <div class="bell-ghost">
+                      <span class="bell-ghost-tag">标记已读 · 看不见</span>
+                      <button type="button" class="sim-grad-btn">标记已读</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bell-callout">
+                <strong>红框 = 内容仍在 DOM 里，但肉眼不可见。</strong><br>
+                「公告通知」「系统维护通知」等墨色标题仍正常；渐变槽位上的白字/白图标会消失。<br>
+                「全部已读」用实心 <code>bg-blue-600</code> 通常仍可见；详情页「标记已读」用 gradient 必挂。
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后（YOUC token）</div>
+            <div class="stage after">
+              <div class="bell-after-card">
+                <div class="bell-after-hdr">
+                  <div class="bell-after-icon">🔔</div>
+                  <span class="bell-after-title">公告通知</span>
+                  <button type="button" class="bell-after-btn">全部已读</button>
+                </div>
+                <div class="bell-after-row">
+                  <div class="bell-after-row-icon">!</div>
+                  <div>
+                    <div class="bell-after-row-title">系统维护通知</div>
+                    <div class="bell-after-row-meta">2 小时前 · 未读</div>
+                  </div>
+                </div>
+                <div class="bell-after-foot">
+                  <button type="button" class="bell-after-btn">标记已读</button>
+                </div>
+              </div>
+              <div class="bell-callout" style="border-color:var(--youc-accent);color:var(--youc-bg);background:var(--youc-ink)">
+                <strong style="color:var(--youc-accent-2)">与 AnnouncementPopup 同一套：</strong>
+                图标黑底浅字、按钮 <code>--youc-ink</code> 底，不依赖 gradient。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 22. Locale -->
+      <section class="section">
+        <h2 class="section-title" id="s22">22 · 语言切换 LocaleSwitcher</h2>
+        <p class="section-desc">参照实现：<code>YoucDropdown panel-width="sm"</code>。2.5px 墨线 + 硬阴影下拉，选中黑底白字。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div class="locale-before">
+                <button>中文 ▾</button>
+                <div class="menu">
+                  <div>中文</div>
+                  <div>English</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后</div>
+            <div class="stage after">
+              <div class="locale-after">
+                <button>中文 ▾</button>
+                <div class="menu">
+                  <div>中文</div>
+                  <div>English</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 23. Select open/closed inconsistency -->
+      <section class="section">
+        <h2 class="section-title" id="s23">23 · Select 下拉开/关不统一（图一图二）</h2>
+        <p class="section-desc">
+          统一为 <code>YoucDropdown</code> / <code>Select</code> 共用体系：触发器与面板同宽 2.5px 墨线、无偏移硬阴影；面板与触发器底边重叠衔接；选中项黑底白字，hover 仅作用于未选中项。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">现状（截图）</div>
+            <div class="stage before">
+              <div class="select-pair">
+                <div class="select-mock select-open-thick">
+                  <button type="button" class="trigger">全部计费类型 ▴</button>
+                  <div class="panel">
+                    <button type="button" class="opt sel">全部计费类型 ✓</button>
+                    <button type="button" class="opt">钱包余额</button>
+                    <button type="button" class="opt">订阅套餐</button>
+                  </div>
+                </div>
+                <div class="select-mock select-closed-thin">
+                  <button type="button" class="trigger">请选择 ▾</button>
+                </div>
+              </div>
+              <div class="bell-callout" style="margin-top:12px;max-width:100%">
+                左粗右细、阴影不一致 — 同一行筛选器视觉分裂。
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">建议改法</div>
+            <div class="stage after">
+              <div class="select-pair">
+                <div class="select-mock select-unified open">
+                  <button type="button" class="trigger">全部计费类型 ▴</button>
+                  <div class="panel">
+                    <button type="button" class="opt sel">全部计费类型 ✓</button>
+                    <button type="button" class="opt">钱包余额</button>
+                  </div>
+                </div>
+                <div class="select-mock select-unified">
+                  <button type="button" class="trigger">请选择 ▾</button>
+                </div>
+              </div>
+              <div class="bell-callout" style="margin-top:12px;max-width:100%;border-color:var(--youc-accent);background:var(--youc-ink);color:var(--youc-bg)">
+                打开：触发器无阴影；面板与触发器<strong>共用边框衔接</strong>，选项无分割线，选中黑底白字。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 24. Modal table header -->
+      <section class="section">
+        <h2 class="section-title" id="s24">24 · 弹窗内表头（图三 · 平台限额）</h2>
+        <p class="section-desc">
+          根因①：YOUC 全局 <code>thead</code> 黑底 + gray 字色冲突；根因②：5 列表格在 ~900px 弹窗内被百分比列宽挤扁。
+          改后：弹窗保持 <code>wide</code>（大屏约 896px）+ 表格 <code>min-width:52rem</code> 列宽用 rem 固定，在 <code>.modal-table-scroll</code> 内横向滚动，不撑破外框。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前（真实问题）</div>
+            <div class="stage before">
+              <div class="modal-mock youc-global-sim">
+                <div class="modal-mock-h" style="color:#111;background:#fff;border-bottom:1px solid #e5e7eb">平台限额</div>
+                <div class="modal-mock-body">
+                  <p class="sub-bug">为 admin@sub2api.local 设置各平台日/周/月消费限额（USD）</p>
+                  <div class="modal-table-scroll" style="border-color:#f3f4f6">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th class="th-bug">平台</th>
+                        <th class="th-bug">日限额</th>
+                        <th class="th-bug">周限额</th>
+                        <th class="th-bug">月限额</th>
+                        <th class="th-bug">用量</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="platform">anthropic</td>
+                        <td><input class="input-bug" placeholder="不限制" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td><input class="input-bug" placeholder="不限制" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td><input class="input-bug" placeholder="不限制" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td class="usage-bug">0.00 / 0.00 / 0.00</td>
+                      </tr>
+                      <tr>
+                        <td class="platform">openai</td>
+                        <td><input class="input-bug" value="100" style="color:#6b7280" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td><input class="input-bug" placeholder="不限制" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td><input class="input-bug" placeholder="不限制" /> <button type="button" class="reset-bug">↻</button></td>
+                        <td class="usage-bug">12.50 / 45.00 / 120.00</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  </div>
+                  <p class="hint-bug">留空或 0 表示不限制；保存后立即生效。</p>
+                  <span class="modal-ghost-label">↑ 列名/用量看不清；表格右侧还会撑出弹窗外框</span>
+                </div>
+                <div class="modal-mock-foot">
+                  <button type="button" style="font:inherit;font-size:11px;color:#d1d5db;border:1px solid #e5e7eb;padding:6px 10px;background:#fff">全部清空</button>
+                  <div style="display:flex;gap:8px">
+                    <button type="button" style="font:inherit;font-size:11px;padding:6px 12px;border:1px solid #d1d5db;background:#fff;color:#6b7280">取消</button>
+                    <button type="button" style="font:inherit;font-size:11px;padding:6px 12px;border:none;background:#111;color:#fff">保存</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后（加宽 + 可内滚）</div>
+            <div class="stage after">
+              <div class="modal-mock">
+                <div class="modal-mock-h">平台限额</div>
+                <div class="modal-mock-body">
+                  <p class="modal-sub">为 <strong style="color:var(--youc-ink)">admin@sub2api.local</strong> 设置各平台日/周/月消费限额（USD）</p>
+                  <div class="modal-table-scroll">
+                  <table class="modal-inner-table">
+                    <colgroup>
+                      <col class="col-platform" />
+                      <col class="col-limit" /><col class="col-limit" /><col class="col-limit" />
+                      <col class="col-usage" />
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th>平台</th>
+                        <th>日</th>
+                        <th>周</th>
+                        <th>月</th>
+                        <th>用量</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="platform">anthropic</td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td class="modal-usage">0.00 / 0.00 / 0.00</td>
+                      </tr>
+                      <tr>
+                        <td class="platform">openai</td>
+                        <td><div class="modal-cell-input"><input class="modal-input" value="100" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td class="modal-usage">12.50 / 45.00 / 120.00</td>
+                      </tr>
+                      <tr>
+                        <td class="platform">gemini</td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td><div class="modal-cell-input"><input class="modal-input" placeholder="不限" /><button type="button" class="modal-reset">↻</button></div></td>
+                        <td class="modal-usage">3.20 / 8.10 / 22.40</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  </div>
+                  <p class="modal-hint">弹窗 <code>wide</code>（≈896px）；表格最小 52rem，列宽固定，底部横向滚动条在弹窗内部，不整页加宽。</p>
+                </div>
+                <div class="modal-mock-foot">
+                  <button type="button" class="bell-after-btn" style="background:var(--youc-paper);color:var(--youc-ink);font-size:10px">全部清空</button>
+                  <div class="modal-mock-foot-actions">
+                    <button type="button" class="bell-after-btn" style="background:var(--youc-paper);color:var(--youc-ink)">取消</button>
+                    <button type="button" class="bell-after-btn">保存</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 25. Settings tabs + toggle -->
+      <section class="section">
+        <h2 class="section-title" id="s25">25 · 系统设置 Tab + Backend 开关（图四）</h2>
+        <p class="section-desc">
+        设置页 Tab 对齐全局 <code>.tabs</code> 黑底选中；Backend 等开关已用 <code>Toggle</code>（<code>.switch</code>）。<span class="status-pill done">已同步</span>
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前（截图）</div>
+            <div class="stage before">
+              <div class="settings-tabs-old">
+                <button type="button" class="on">通用设置</button>
+                <button type="button">登录参数</button>
+                <button type="button">功能开关</button>
+                <button type="button">安全与认证</button>
+              </div>
+              <div class="backend-box">
+                <span>Backend 模式 — 启用后…</span>
+                <div class="ios-switch"><div class="dot"></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">建议改法</div>
+            <div class="stage after">
+              <div class="settings-tabs-new">
+                <button type="button" class="on">通用设置</button>
+                <button type="button">登录参数</button>
+                <button type="button">功能开关</button>
+                <button type="button">安全与认证</button>
+              </div>
+              <div class="backend-box new">
+                <span style="font-weight:700;color:var(--youc-ink)">Backend 模式</span>
+                <div class="sw-after"><div class="track on"><div class="thumb"></div></div></div>
+              </div>
+              <p style="font-size:11px;color:var(--text-secondary);margin-top:10px;font-weight:600">Tab 对齐 <code>.tabs</code>；开关用 <code>.switch</code>（与 Toggle 组件一致）。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 26. Chart seg controls -->
+      <section class="section">
+        <h2 class="section-title" id="s26">26 · 图表分段按钮（图五）<span class="status-pill done">已确认：黑底选中</span></h2>
+        <p class="section-desc">弱对比白底选中 → 统一 <code>.seg-control</code> 黑底白字。代码里已按此实现，预览与生产对齐。</p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">改前</div>
+            <div class="stage before">
+              <div style="display:flex;flex-wrap:wrap;gap:10px">
+                <div class="seg" style="display:inline-flex;border:1px solid #e5e7eb;background:#f9fafb;padding:2px">
+                  <button style="border:none;background:#fff;padding:6px 12px;font:inherit;font-size:11px;box-shadow:0 1px 2px rgba(0,0,0,.08)">请求</button>
+                  <button style="border:none;background:transparent;padding:6px 12px;font:inherit;font-size:11px;color:#9ca3af">上游</button>
+                  <button style="border:none;background:transparent;padding:6px 12px;font:inherit;font-size:11px;color:#9ca3af">映射</button>
+                </div>
+                <div class="seg" style="display:inline-flex;border:1px solid #e5e7eb;background:#f9fafb;padding:2px">
+                  <button style="border:none;background:#fff;padding:6px 12px;font:inherit;font-size:11px;box-shadow:0 1px 2px rgba(0,0,0,.08)">按 Token</button>
+                  <button style="border:none;background:transparent;padding:6px 12px;font:inherit;font-size:11px;color:#9ca3af">按实际消费</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">改后（黑底选中）</div>
+            <div class="stage after">
+              <div style="display:flex;flex-wrap:wrap;gap:10px">
+                <div class="chart-seg-fill">
+                  <button type="button" class="on">请求</button>
+                  <button type="button">上游</button>
+                  <button type="button">映射</button>
+                </div>
+                <div class="chart-seg-fill">
+                  <button type="button" class="on">按 Token</button>
+                  <button type="button">按实际消费</button>
+                </div>
+              </div>
+              <p style="font-size:11px;color:var(--text-secondary);margin-top:12px;font-weight:650">
+                选中：<code>background: var(--youc-ink)</code> + <code>color: var(--youc-bg)</code>；未选中：纸白底 + 墨色字。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="note-bar">
+        <strong>§01–§26 + P3 扫尾已全部与生产对齐。</strong>
+        含 UsageFilterSearch、PlatformTypeBadge、AccountUsageCell 徽章、Tooltip 语义类、Dashboard 统计卡、进度条方角、帮助 (i) 按钮等。
+      </div>
+    </div>
+  </body>
+</html>

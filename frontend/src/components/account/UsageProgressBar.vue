@@ -29,17 +29,17 @@
     <div class="flex items-center gap-1">
       <!-- Label badge (fixed width for alignment) -->
       <span
-        :class="['w-[32px] shrink-0 rounded px-1 text-center text-[10px] font-medium', labelClass]"
+        :class="['w-[32px] shrink-0 text-center', labelClass]"
       >
         {{ label }}
       </span>
 
       <!-- Progress bar container -->
-      <div class="h-1.5 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+      <div class="progress-track progress-track-sm w-8 shrink-0">
         <div
-          :class="['h-full transition-all duration-300', barClass]"
+          :class="['progress-track-fill', barFillClass]"
           :style="{ width: barWidth }"
-        ></div>
+        />
       </div>
 
       <!-- Percentage -->
@@ -99,23 +99,22 @@ watch(
 // Label background colors
 const labelClass = computed(() => {
   const colors = {
-    indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
-    emerald: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
-    purple: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
-    amber: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+    indigo: 'badge badge-primary text-[10px] px-1',
+    emerald: 'badge badge-success text-[10px] px-1',
+    purple: 'badge badge-purple text-[10px] px-1',
+    amber: 'badge badge-warning text-[10px] px-1'
   }
   return colors[props.color]
 })
 
 // Progress bar color based on utilization
-const barClass = computed(() => {
+const barFillClass = computed(() => {
   if (props.utilization >= 100) {
-    return 'bg-red-500'
+    return 'progress-track-fill-danger'
   } else if (props.utilization >= 80) {
-    return 'bg-amber-500'
-  } else {
-    return 'bg-green-500'
+    return 'progress-track-fill-warn'
   }
+  return 'progress-track-fill-ok'
 })
 
 // Text color based on utilization

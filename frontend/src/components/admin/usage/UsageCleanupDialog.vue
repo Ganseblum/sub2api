@@ -83,14 +83,14 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button type="button" class="btn btn-secondary" @click="handleClose">
-          {{ t('common.cancel') }}
-        </button>
-        <button type="button" class="btn btn-danger" :disabled="submitting" @click="openConfirm">
-          {{ submitting ? t('admin.usage.cleanup.submitting') : t('admin.usage.cleanup.submit') }}
-        </button>
-      </div>
+      <DialogFooter
+        variant="danger"
+        :confirm-text="t('admin.usage.cleanup.submit')"
+        :loading="submitting"
+        :loading-text="t('admin.usage.cleanup.submitting')"
+        @cancel="handleClose"
+        @confirm="openConfirm"
+      />
     </template>
   </BaseDialog>
 
@@ -120,6 +120,7 @@ import { ref, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import UsageFilters from '@/components/admin/usage/UsageFilters.vue'

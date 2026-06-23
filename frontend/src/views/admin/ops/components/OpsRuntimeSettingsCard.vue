@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { opsAPI } from '@/api/admin/ops'
 import type { OpsAlertRuntimeSettings } from '../types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 
 const { t } = useI18n()
 const appStore = useAppStore()
@@ -524,12 +525,13 @@ onMounted(() => {
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <button class="btn btn-secondary" @click="showAlertEditor = false">{{ t('common.cancel') }}</button>
-        <button class="btn btn-primary" :disabled="saving || !alertValidation.valid" @click="saveAlertSettings">
-          {{ saving ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="saving"
+        :loading-text="t('common.saving')"
+        :confirm-disabled="!alertValidation.valid"
+        @cancel="showAlertEditor = false"
+        @confirm="saveAlertSettings"
+      />
     </template>
   </BaseDialog>
 </template>

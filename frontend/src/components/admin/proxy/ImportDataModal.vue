@@ -67,19 +67,13 @@
     </form>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button class="btn btn-secondary" type="button" :disabled="importing" @click="handleClose">
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          class="btn btn-primary"
-          type="submit"
-          form="import-proxy-data-form"
-          :disabled="importing"
-        >
-          {{ importing ? t('admin.proxies.dataImporting') : t('admin.proxies.dataImportButton') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="importing"
+        :loading-text="t('admin.proxies.dataImporting')"
+        :confirm-text="t('admin.proxies.dataImportButton')"
+        confirm-form="import-proxy-data-form"
+        @cancel="handleClose"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -88,6 +82,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import { adminAPI } from '@/api/admin'
 import { useAppStore } from '@/stores/app'
 import type { AdminDataImportResult } from '@/types'

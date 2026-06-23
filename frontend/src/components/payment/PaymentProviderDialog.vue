@@ -251,12 +251,12 @@
     </form>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button type="button" @click="emit('close')" class="btn btn-secondary">{{ t('common.cancel') }}</button>
-        <button type="submit" form="provider-form" :disabled="saving" class="btn btn-primary">
-          {{ saving ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="saving"
+        :loading-text="t('common.saving')"
+        confirm-form="provider-form"
+        @cancel="emit('close')"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -265,6 +265,7 @@
 import { reactive, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import HelpTooltip from '@/components/common/HelpTooltip.vue'
 import Select from '@/components/common/Select.vue'
 import type { SelectOption } from '@/components/common/Select.vue'

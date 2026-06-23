@@ -47,18 +47,11 @@
         <!-- Tab: Security — Admin API Key -->
         <div v-show="activeTab === 'security'" class="space-y-6">
           <!-- Admin API Key Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.adminApiKey.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.adminApiKey.description") }}
-              </p>
-            </div>
-            <div class="space-y-4 p-6">
+          <SectionCard
+            :title="t('admin.settings.adminApiKey.title')"
+            :description="t('admin.settings.adminApiKey.description')"
+            body-class="space-y-4 p-6"
+          >
               <!-- Security Warning -->
               <div
                 class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
@@ -196,26 +189,18 @@
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
         </div>
         <!-- /Tab: Security — Admin API Key -->
 
         <!-- Tab: Gateway -->
         <div v-show="activeTab === 'gateway'" class="space-y-6">
           <!-- Overload Cooldown (529) Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.overloadCooldown.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.overloadCooldown.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.overloadCooldown.title')"
+            :description="t('admin.settings.overloadCooldown.description')"
+            body-class="space-y-5 p-6"
+          >
               <div
                 v-if="overloadCooldownLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -227,17 +212,11 @@
               </div>
 
               <template v-else>
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
-                      t("admin.settings.overloadCooldown.enabled")
-                    }}</label>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ t("admin.settings.overloadCooldown.enabledHint") }}
-                    </p>
-                  </div>
-                  <Toggle v-model="overloadCooldownForm.enabled" />
-                </div>
+                <SettingToggleRow
+                v-model="overloadCooldownForm.enabled"
+                :label="t('admin.settings.overloadCooldown.enabled')"
+                :hint="t('admin.settings.overloadCooldown.enabledHint')"
+              />
 
                 <div
                   v-if="overloadCooldownForm.enabled"
@@ -301,22 +280,14 @@
                   </button>
                 </div>
               </template>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Rate Limit Cooldown (429) Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.rateLimit429Cooldown.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.rateLimit429Cooldown.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.rateLimit429Cooldown.title')"
+            :description="t('admin.settings.rateLimit429Cooldown.description')"
+            body-class="space-y-5 p-6"
+          >
               <div
                 v-if="rateLimit429CooldownLoading"
                 class="flex items-center gap-2 text-gray-500"
@@ -328,17 +299,11 @@
               </div>
 
               <template v-else>
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
-                      t("admin.settings.rateLimit429Cooldown.enabled")
-                    }}</label>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ t("admin.settings.rateLimit429Cooldown.enabledHint") }}
-                    </p>
-                  </div>
-                  <Toggle v-model="rateLimit429CooldownForm.enabled" />
-                </div>
+                <SettingToggleRow
+                v-model="rateLimit429CooldownForm.enabled"
+                :label="t('admin.settings.rateLimit429Cooldown.enabled')"
+                :hint="t('admin.settings.rateLimit429Cooldown.enabledHint')"
+              />
 
                 <div
                   v-if="rateLimit429CooldownForm.enabled"
@@ -408,22 +373,14 @@
                   </button>
                 </div>
               </template>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Stream Timeout Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.streamTimeout.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.streamTimeout.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.streamTimeout.title')"
+            :description="t('admin.settings.streamTimeout.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Loading State -->
               <div
                 v-if="streamTimeoutLoading"
@@ -437,17 +394,11 @@
 
               <template v-else>
                 <!-- Enable Stream Timeout -->
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
-                      t("admin.settings.streamTimeout.enabled")
-                    }}</label>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ t("admin.settings.streamTimeout.enabledHint") }}
-                    </p>
-                  </div>
-                  <Toggle v-model="streamTimeoutForm.enabled" />
-                </div>
+                <SettingToggleRow
+                v-model="streamTimeoutForm.enabled"
+                :label="t('admin.settings.streamTimeout.enabled')"
+                :hint="t('admin.settings.streamTimeout.enabledHint')"
+              />
 
                 <!-- Settings - Only show when enabled -->
                 <div
@@ -588,22 +539,14 @@
                   </button>
                 </div>
               </template>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Request Rectifier Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.rectifier.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.rectifier.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.rectifier.title')"
+            :description="t('admin.settings.rectifier.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Loading State -->
               <div
                 v-if="rectifierLoading"
@@ -617,17 +560,11 @@
 
               <template v-else>
                 <!-- Master Toggle -->
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label class="font-medium text-gray-900 dark:text-white">{{
-                      t("admin.settings.rectifier.enabled")
-                    }}</label>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ t("admin.settings.rectifier.enabledHint") }}
-                    </p>
-                  </div>
-                  <Toggle v-model="rectifierForm.enabled" />
-                </div>
+                <SettingToggleRow
+                v-model="rectifierForm.enabled"
+                :label="t('admin.settings.rectifier.enabled')"
+                :hint="t('admin.settings.rectifier.enabledHint')"
+              />
 
                 <!-- Sub-toggles (only show when master is enabled) -->
                 <div
@@ -655,36 +592,10 @@
                   </div>
 
                   <!-- Thinking Budget Rectifier -->
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <label
-                        class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >{{
-                          t("admin.settings.rectifier.thinkingBudget")
-                        }}</label
-                      >
-                      <p class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ t("admin.settings.rectifier.thinkingBudgetHint") }}
-                      </p>
-                    </div>
-                    <Toggle v-model="rectifierForm.thinking_budget_enabled" />
-                  </div>
+                  <SettingToggleRow v-model="rectifierForm.thinking_budget_enabled" :label="t('admin.settings.rectifier.thinkingBudget')" :hint="t('admin.settings.rectifier.thinkingBudgetHint')" />
 
                   <!-- API Key Signature Rectifier -->
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <label
-                        class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >{{
-                          t("admin.settings.rectifier.apikeySignature")
-                        }}</label
-                      >
-                      <p class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ t("admin.settings.rectifier.apikeySignatureHint") }}
-                      </p>
-                    </div>
-                    <Toggle v-model="rectifierForm.apikey_signature_enabled" />
-                  </div>
+                  <SettingToggleRow v-model="rectifierForm.apikey_signature_enabled" :label="t('admin.settings.rectifier.apikeySignature')" :hint="t('admin.settings.rectifier.apikeySignatureHint')" />
 
                   <!-- Custom Patterns (only when apikey_signature_enabled) -->
                   <div
@@ -788,21 +699,13 @@
                   </button>
                 </div>
               </template>
-            </div>
-          </div>
+            </SectionCard>
           <!-- Beta Policy Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.betaPolicy.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.betaPolicy.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.betaPolicy.title')"
+            :description="t('admin.settings.betaPolicy.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Loading State -->
               <div
                 v-if="betaPolicyLoading"
@@ -1067,21 +970,13 @@
                   </button>
                 </div>
               </template>
-            </div>
-          </div>
+            </SectionCard>
           <!-- OpenAI Fast/Flex Policy Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.openaiFastPolicy.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.openaiFastPolicy.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.openaiFastPolicy.title')"
+            :description="t('admin.settings.openaiFastPolicy.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Empty state -->
               <div
                 v-if="openaiFastPolicyForm.rules.length === 0"
@@ -1346,55 +1241,32 @@
                   {{ t("admin.settings.openaiFastPolicy.saveHint") }}
                 </p>
               </div>
-            </div>
-          </div>
+            </SectionCard>
         </div>
         <!-- /Tab: Gateway -->
 
         <!-- Tab: Security — Registration, Turnstile, LinuxDo -->
         <div v-show="activeTab === 'security'" class="space-y-6">
           <!-- Registration Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.registration.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.registration.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.registration.title')"
+            :description="t('admin.settings.registration.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Enable Registration -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.registration.enableRegistration")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{
-                      t("admin.settings.registration.enableRegistrationHint")
-                    }}
-                  </p>
-                </div>
-                <Toggle v-model="form.registration_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.registration_enabled"
+                :label="t('admin.settings.registration.enableRegistration')"
+                :hint="t('admin.settings.registration.enableRegistrationHint')"
+              />
 
               <!-- Email Verification -->
-              <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.registration.emailVerification")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.registration.emailVerificationHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.email_verify_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.email_verify_enabled"
+                :label="t('admin.settings.registration.emailVerification')"
+                :hint="t('admin.settings.registration.emailVerificationHint')"
+                bordered
+              />
 
               <!-- Email Suffix Whitelist -->
               <div class="border-t border-gray-100 pt-4 dark:border-dark-700">
@@ -1466,49 +1338,28 @@
               </div>
 
               <!-- Promo Code -->
-              <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.registration.promoCode")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.registration.promoCodeHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.promo_code_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.promo_code_enabled"
+                :label="t('admin.settings.registration.promoCode')"
+                :hint="t('admin.settings.registration.promoCodeHint')"
+                bordered
+              />
 
               <!-- Invitation Code -->
-              <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.registration.invitationCode")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.registration.invitationCodeHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.invitation_code_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.invitation_code_enabled"
+                :label="t('admin.settings.registration.invitationCode')"
+                :hint="t('admin.settings.registration.invitationCodeHint')"
+                bordered
+              />
               <!-- Password Reset - Only show when email verification is enabled -->
-              <div
+              <SettingToggleRow
                 v-if="form.email_verify_enabled"
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.registration.passwordReset")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.registration.passwordResetHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.password_reset_enabled" />
-              </div>
+                v-model="form.password_reset_enabled"
+                :label="t('admin.settings.registration.passwordReset')"
+                :hint="t('admin.settings.registration.passwordResetHint')"
+                bordered
+              />
               <!-- Frontend URL - Only show when password reset is enabled -->
               <div
                 v-if="form.email_verify_enabled && form.password_reset_enabled"
@@ -1556,61 +1407,33 @@
                   :disabled="!form.totp_encryption_key_configured"
                 />
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- API Key IP ACL Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.apiKeyAcl.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.apiKeyAcl.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">
-                    {{ t("admin.settings.apiKeyAcl.trustForwardedIp") }}
-                  </label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.apiKeyAcl.trustForwardedIpHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.api_key_acl_trust_forwarded_ip" />
-              </div>
-            </div>
-          </div>
+          <SectionCard
+            :title="t('admin.settings.apiKeyAcl.title')"
+            :description="t('admin.settings.apiKeyAcl.description')"
+            body-class="space-y-5 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.api_key_acl_trust_forwarded_ip"
+                :label="t('admin.settings.apiKeyAcl.trustForwardedIp')"
+                :hint="t('admin.settings.apiKeyAcl.trustForwardedIpHint')"
+              />
+            </SectionCard>
 
           <!-- Cloudflare Turnstile Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.turnstile.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.turnstile.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.turnstile.title')"
+            :description="t('admin.settings.turnstile.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Enable Turnstile -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.turnstile.enableTurnstile")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.turnstile.enableTurnstileHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.turnstile_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.turnstile_enabled"
+                :label="t('admin.settings.turnstile.enableTurnstile')"
+                :hint="t('admin.settings.turnstile.enableTurnstileHint')"
+              />
 
               <!-- Turnstile Keys - Only show when enabled -->
               <div
@@ -1666,33 +1489,19 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- LinuxDo Connect OAuth 登录 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.linuxdo.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.linuxdo.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.linuxdo.enable")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.linuxdo.enableHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.linuxdo_connect_enabled" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.linuxdo.title')"
+            :description="t('admin.settings.linuxdo.description')"
+            body-class="space-y-5 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.linuxdo_connect_enabled"
+                :label="t('admin.settings.linuxdo.enable')"
+                :hint="t('admin.settings.linuxdo.enableHint')"
+              />
 
               <div
                 v-if="form.linuxdo_connect_enabled"
@@ -1784,45 +1593,30 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- GitHub / Google 邮箱快捷登录 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ localText("邮箱快捷登录", "Email OAuth Sign-in") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{
-                  localText(
-                    "开启 GitHub 或 Google 邮箱授权登录后，系统会读取已验证邮箱，存在则直接登录，不存在则自动注册。",
-                    "After GitHub or Google email OAuth is enabled, the system reads a verified email, signs in matching users, and auto-registers missing users.",
-                  )
-                }}
-              </p>
-            </div>
-            <div class="space-y-6 p-6">
+          <SectionCard body-class="space-y-6 p-6">
+            <template #header>
+              <h3 class="card-title">{{ localText("邮箱快捷登录", "Email OAuth Sign-in") }}</h3>
+              <p class="card-desc">{{
+                localText(
+                  "开启 GitHub 或 Google 邮箱授权登录后，系统会读取已验证邮箱，存在则直接登录，不存在则自动注册。",
+                  "After GitHub or Google email OAuth is enabled, the system reads a verified email, signs in matching users, and auto-registers missing users.",
+                )
+              }}</p>
+            </template>
               <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-700">
-                  <div class="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 class="font-medium text-gray-900 dark:text-white">
-                        GitHub
-                      </h3>
-                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{
-                          localText(
-                            "GitHub OAuth App 需要 read:user user:email 权限，回调地址填写下方后端地址。",
-                            "GitHub OAuth App needs read:user user:email scopes. Use the backend callback URL below.",
-                          )
-                        }}
-                      </p>
-                    </div>
-                    <Toggle v-model="form.github_oauth_enabled" />
-                  </div>
+                  <SettingToggleRow v-model="form.github_oauth_enabled">
+                    <template #label>GitHub</template>
+                    <template #hint>{{
+                      localText(
+                        "GitHub OAuth App 需要 read:user user:email 权限，回调地址填写下方后端地址。",
+                        "GitHub OAuth App needs read:user user:email scopes. Use the backend callback URL below.",
+                      )
+                    }}</template>
+                  </SettingToggleRow>
 
                   <div v-if="form.github_oauth_enabled" class="mt-4 space-y-4">
                     <div class="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:bg-dark-800 dark:text-gray-300">
@@ -1921,22 +1715,15 @@
                 </div>
 
                 <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-700">
-                  <div class="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 class="font-medium text-gray-900 dark:text-white">
-                        Google
-                      </h3>
-                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{
-                          localText(
-                            "Google OAuth 客户端需要 openid email profile 范围，并在凭据里登记后端回调地址。",
-                            "Google OAuth client needs openid email profile scopes and the backend callback URL registered in credentials.",
-                          )
-                        }}
-                      </p>
-                    </div>
-                    <Toggle v-model="form.google_oauth_enabled" />
-                  </div>
+                  <SettingToggleRow v-model="form.google_oauth_enabled">
+                    <template #label>Google</template>
+                    <template #hint>{{
+                      localText(
+                        "Google OAuth 客户端需要 openid email profile 范围，并在凭据里登记后端回调地址。",
+                        "Google OAuth client needs openid email profile scopes and the backend callback URL registered in credentials.",
+                      )
+                    }}</template>
+                  </SettingToggleRow>
 
                   <div v-if="form.google_oauth_enabled" class="mt-4 space-y-4">
                     <div class="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:bg-dark-800 dark:text-gray-300">
@@ -2018,22 +1805,14 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+          </SectionCard>
 
           <!-- WeChat Connect OAuth 登录 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.wechatConnect.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.wechatConnect.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.wechatConnect.title')"
+            :description="t('admin.settings.wechatConnect.description')"
+            body-class="space-y-5 p-6"
+          >
               <div class="flex items-center justify-between">
                 <div>
                   <label class="font-medium text-gray-900 dark:text-white">{{
@@ -2360,33 +2139,19 @@
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- DingTalk Connect OAuth 登录 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.dingtalk.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.dingtalk.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.dingtalk.enable")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.dingtalk.enableHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.dingtalk_connect_enabled" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.dingtalk.title')"
+            :description="t('admin.settings.dingtalk.description')"
+            body-class="space-y-5 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.dingtalk_connect_enabled"
+                :label="t('admin.settings.dingtalk.enable')"
+                :hint="t('admin.settings.dingtalk.enableHint')"
+              />
 
               <div
                 v-if="form.dingtalk_connect_enabled"
@@ -2495,37 +2260,23 @@
                   </div>
 
                   <!-- bypass_registration toggle（仅 internal_only 模式下可见可用） -->
-                  <div
-                    v-if="form.dingtalk_connect_corp_restriction_policy === 'internal_only'"
-                    class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-dark-700"
-                  >
-                    <div>
-                      <label class="font-medium text-gray-900 dark:text-white">{{
-                        t("admin.settings.dingtalk.bypassRegistration")
-                      }}</label>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ t("admin.settings.dingtalk.bypassRegistrationHint") }}
-                      </p>
-                    </div>
-                    <Toggle v-model="form.dingtalk_connect_bypass_registration" />
-                  </div>
+                  <SettingToggleRow
+                    v-model="form.dingtalk_connect_bypass_registration"
+                    :label="t('admin.settings.dingtalk.bypassRegistration')"
+                    :hint="t('admin.settings.dingtalk.bypassRegistrationHint')"
+                    bordered
+                  />
 
                   <!-- 身份同步开关（仅 internal_only 模式下可见） -->
                   <div
                     v-if="form.dingtalk_connect_corp_restriction_policy === 'internal_only'"
                     class="pt-4 border-t border-gray-100 dark:border-dark-700 space-y-2"
                   >
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <label class="font-medium text-gray-900 dark:text-white">{{
-                          t("admin.settings.dingtalk.syncDisplayName")
-                        }}</label>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                          {{ t("admin.settings.dingtalk.syncDisplayNameHint") }}
-                        </p>
-                      </div>
-                      <Toggle v-model="form.dingtalk_connect_sync_display_name" />
-                    </div>
+                    <SettingToggleRow
+                v-model="form.dingtalk_connect_sync_display_name"
+                :label="t('admin.settings.dingtalk.syncDisplayName')"
+                :hint="t('admin.settings.dingtalk.syncDisplayNameHint')"
+              />
                     <div v-if="form.dingtalk_connect_sync_display_name" class="space-y-2">
                       <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap min-w-[5rem]">
@@ -2558,20 +2309,13 @@
                     v-if="form.dingtalk_connect_corp_restriction_policy === 'internal_only'"
                     class="pt-4 border-t border-gray-100 dark:border-dark-700 space-y-2"
                   >
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <label class="font-medium text-gray-900 dark:text-white">{{
-                          t("admin.settings.dingtalk.syncCorpEmail")
-                        }}</label>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                          {{ t("admin.settings.dingtalk.syncCorpEmailHint") }}
-                        </p>
-                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                          {{ t("admin.settings.dingtalk.syncCorpEmailPermissionHint") }}
-                        </p>
-                      </div>
-                      <Toggle v-model="form.dingtalk_connect_sync_corp_email" />
-                    </div>
+                    <SettingToggleRow v-model="form.dingtalk_connect_sync_corp_email">
+                      <template #label>{{ t("admin.settings.dingtalk.syncCorpEmail") }}</template>
+                      <template #hint>
+                        <span>{{ t("admin.settings.dingtalk.syncCorpEmailHint") }}</span>
+                        <span class="mt-1 block text-xs text-amber-600 dark:text-amber-400">{{ t("admin.settings.dingtalk.syncCorpEmailPermissionHint") }}</span>
+                      </template>
+                    </SettingToggleRow>
                     <div v-if="form.dingtalk_connect_sync_corp_email" class="space-y-2">
                       <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap min-w-[5rem]">
@@ -2604,20 +2348,13 @@
                     v-if="form.dingtalk_connect_corp_restriction_policy === 'internal_only'"
                     class="pt-4 border-t border-gray-100 dark:border-dark-700 space-y-2"
                   >
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <label class="font-medium text-gray-900 dark:text-white">{{
-                          t("admin.settings.dingtalk.syncDept")
-                        }}</label>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                          {{ t("admin.settings.dingtalk.syncDeptHint") }}
-                        </p>
-                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                          {{ t("admin.settings.dingtalk.syncDeptPermissionHint") }}
-                        </p>
-                      </div>
-                      <Toggle v-model="form.dingtalk_connect_sync_dept" />
-                    </div>
+                    <SettingToggleRow v-model="form.dingtalk_connect_sync_dept">
+                      <template #label>{{ t("admin.settings.dingtalk.syncDept") }}</template>
+                      <template #hint>
+                        <span>{{ t("admin.settings.dingtalk.syncDeptHint") }}</span>
+                        <span class="mt-1 block text-xs text-amber-600 dark:text-amber-400">{{ t("admin.settings.dingtalk.syncDeptPermissionHint") }}</span>
+                      </template>
+                    </SettingToggleRow>
                     <div v-if="form.dingtalk_connect_sync_dept" class="space-y-2">
                       <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap min-w-[5rem]">
@@ -2648,33 +2385,19 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Generic OIDC OAuth 登录 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.oidc.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.oidc.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.oidc.enable")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.oidc.enableHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.oidc_connect_enabled" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.oidc.title')"
+            :description="t('admin.settings.oidc.description')"
+            body-class="space-y-5 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.oidc_connect_enabled"
+                :label="t('admin.settings.oidc.enable')"
+                :hint="t('admin.settings.oidc.enableHint')"
+              />
 
               <div
                 v-if="form.oidc_connect_enabled"
@@ -3057,26 +2780,18 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
         </div>
         <!-- /Tab: Security — Registration, Turnstile, LinuxDo, OIDC -->
 
         <!-- Tab: Users -->
         <div v-show="activeTab === 'users'" class="space-y-6">
           <!-- Default Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.defaults.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.defaults.description") }}
-              </p>
-            </div>
-            <div class="space-y-6 p-6">
+          <SectionCard
+            :title="t('admin.settings.defaults.title')"
+            :description="t('admin.settings.defaults.description')"
+            body-class="space-y-6 p-6"
+          >
               <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <label
@@ -3335,34 +3050,18 @@
                 </div>
               </div>
               <!-- /全局平台限额矩阵 -->
-            </div>
-          </div>
+            </SectionCard>
 
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.authSourceDefaults.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.authSourceDefaults.description") }}
-              </p>
-            </div>
-            <div class="space-y-6 p-6">
-              <div
-                class="flex items-center justify-between rounded border border-gray-200 px-4 py-3 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">
-                    {{ t("admin.settings.authSourceDefaults.requireEmailLabel") }}
-                  </label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.authSourceDefaults.requireEmailHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.force_email_on_third_party_signup" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.authSourceDefaults.title')"
+            :description="t('admin.settings.authSourceDefaults.description')"
+            body-class="space-y-6 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.force_email_on_third_party_signup"
+                :label="t('admin.settings.authSourceDefaults.requireEmailLabel')"
+                :hint="t('admin.settings.authSourceDefaults.requireEmailHint')"
+              />
 
               <div class="space-y-4">
                 <div
@@ -3673,26 +3372,18 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </SectionCard>
         </div>
         <!-- /Tab: Users -->
 
         <!-- Tab: Gateway — Claude Code, Scheduling -->
         <div v-show="activeTab === 'gateway'" class="space-y-6">
           <!-- Claude Code Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.claudeCode.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.claudeCode.description") }}
-              </p>
-            </div>
-            <div class="p-6">
+          <SectionCard
+            :title="t('admin.settings.claudeCode.title')"
+            :description="t('admin.settings.claudeCode.description')"
+            body-class="p-6"
+          >
               <div>
                 <label
                   class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -3729,125 +3420,49 @@
                   {{ t("admin.settings.claudeCode.maxVersionHint") }}
                 </p>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Gateway Scheduling Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.scheduling.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.scheduling.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ t("admin.settings.scheduling.allowUngroupedKey") }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.scheduling.allowUngroupedKeyHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.allow_ungrouped_key_scheduling" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.scheduling.title')"
+            :description="t('admin.settings.scheduling.description')"
+            body-class="space-y-5 p-6"
+          >
+              <SettingToggleRow
+                v-model="form.allow_ungrouped_key_scheduling"
+                :label="t('admin.settings.scheduling.allowUngroupedKey')"
+                :hint="t('admin.settings.scheduling.allowUngroupedKeyHint')"
+              />
 
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ t("admin.settings.openaiExperimentalScheduler.title") }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{
-                      t("admin.settings.openaiExperimentalScheduler.description")
-                    }}
-                  </p>
-                </div>
-                <Toggle v-model="form.openai_advanced_scheduler_enabled" />
-              </div>
-            </div>
-          </div>
+              <SettingToggleRow
+                v-model="form.openai_advanced_scheduler_enabled"
+                :label="t('admin.settings.openaiExperimentalScheduler.title')"
+                :hint="t('admin.settings.openaiExperimentalScheduler.description')"
+              />
+            </SectionCard>
 
           <!-- Gateway Forwarding Behavior -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.gatewayForwarding.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.gatewayForwarding.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.gatewayForwarding.title')"
+            :description="t('admin.settings.gatewayForwarding.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Fingerprint Unification -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{
-                      t(
-                        "admin.settings.gatewayForwarding.fingerprintUnification",
-                      )
-                    }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{
-                      t(
-                        "admin.settings.gatewayForwarding.fingerprintUnificationHint",
-                      )
-                    }}
-                  </p>
-                </div>
-                <Toggle v-model="form.enable_fingerprint_unification" />
-              </div>
+              <SettingToggleRow v-model="form.enable_fingerprint_unification" :label="t('admin.settings.gatewayForwarding.fingerprintUnification')" :hint="t('admin.settings.gatewayForwarding.fingerprintUnificationHint')" />
 
               <!-- Metadata Passthrough -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{
-                      t("admin.settings.gatewayForwarding.metadataPassthrough")
-                    }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{
-                      t(
-                        "admin.settings.gatewayForwarding.metadataPassthroughHint",
-                      )
-                    }}
-                  </p>
-                </div>
-                <Toggle v-model="form.enable_metadata_passthrough" />
-              </div>
+              <SettingToggleRow
+                v-model="form.enable_metadata_passthrough"
+                :label="t('admin.settings.gatewayForwarding.metadataPassthrough')"
+                :hint="t('admin.settings.gatewayForwarding.metadataPassthroughHint')"
+              />
 
               <!-- CCH Signing -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ t("admin.settings.gatewayForwarding.cchSigning") }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.gatewayForwarding.cchSigningHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.enable_cch_signing" />
-              </div>
+              <SettingToggleRow
+                v-model="form.enable_cch_signing"
+                :label="t('admin.settings.gatewayForwarding.cchSigning')"
+                :hint="t('admin.settings.gatewayForwarding.cchSigningHint')"
+              />
 
               <!-- Claude OAuth System Prompt Injection -->
               <div class="flex items-center justify-between">
@@ -4106,27 +3721,7 @@
               </div>
 
               <!-- messages cache_control 改写 -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{
-                      t(
-                        "admin.settings.gatewayForwarding.rewriteMessageCacheControl",
-                      )
-                    }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{
-                      t(
-                        "admin.settings.gatewayForwarding.rewriteMessageCacheControlHint",
-                      )
-                    }}
-                  </p>
-                </div>
-                <Toggle v-model="form.rewrite_message_cache_control" />
-              </div>
+              <SettingToggleRow v-model="form.rewrite_message_cache_control" :label="t('admin.settings.gatewayForwarding.rewriteMessageCacheControl')" :hint="t('admin.settings.gatewayForwarding.rewriteMessageCacheControlHint')" />
 
               <!-- Antigravity UA 版本 -->
               <div>
@@ -4189,46 +3784,24 @@
               </div>
 
               <!-- 是否允许在 Claude Code 中使用 Codex 插件（全局开关） -->
-              <div class="flex items-center justify-between">
-                <div class="pr-4">
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ t("admin.settings.gatewayForwarding.openaiAllowClaudeCodeCodexPlugin") }}
-                  </label>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.gatewayForwarding.openaiAllowClaudeCodeCodexPluginDesc") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.openai_allow_claude_code_codex_plugin" />
-              </div>
-            </div>
-          </div>
+              <SettingToggleRow
+                v-model="form.openai_allow_claude_code_codex_plugin"
+                :label="t('admin.settings.gatewayForwarding.openaiAllowClaudeCodeCodexPlugin')"
+                :hint="t('admin.settings.gatewayForwarding.openaiAllowClaudeCodeCodexPluginDesc')"
+              />
+            </SectionCard>
           <!-- Web Search Emulation -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.webSearchEmulation.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.webSearchEmulation.description") }}
-              </p>
-            </div>
-            <div class="space-y-5 p-6">
+          <SectionCard
+            :title="t('admin.settings.webSearchEmulation.title')"
+            :description="t('admin.settings.webSearchEmulation.description')"
+            body-class="space-y-5 p-6"
+          >
               <!-- Global Toggle -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ t("admin.settings.webSearchEmulation.enabled") }}
-                  </label>
-                  <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.webSearchEmulation.enabledHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="webSearchConfig.enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="webSearchConfig.enabled"
+                :label="t('admin.settings.webSearchEmulation.enabled')"
+                :hint="t('admin.settings.webSearchEmulation.enabledHint')"
+              />
 
               <!-- Providers -->
               <div v-if="webSearchConfig.enabled" class="space-y-4">
@@ -4553,7 +4126,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </SectionCard>
 
           <!-- Web Search Test Dialog -->
           <div
@@ -4639,65 +4212,34 @@
           </div>
 
         <!-- Usage Records Settings -->
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ t('admin.settings.usageRecords.title') }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ t('admin.settings.usageRecords.description') }}
-            </p>
-          </div>
-          <div class="space-y-4 p-6">
-            <!-- User error requests visibility -->
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.user_error_view.label') }}
-                </label>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.user_error_view.description') }}
-                </p>
-              </div>
-              <label class="toggle">
-                <input v-model="form.allow_user_view_error_requests" type="checkbox" />
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
+        <SectionCard
+          :title="t('admin.settings.usageRecords.title')"
+          :description="t('admin.settings.usageRecords.description')"
+          body-class="space-y-4 p-6"
+        >
+            <SettingToggleRow
+              v-model="form.allow_user_view_error_requests"
+              :label="t('admin.settings.user_error_view.label')"
+              :hint="t('admin.settings.user_error_view.description')"
+            />
+        </SectionCard>
         </div>
         <!-- /Tab: Gateway — Claude Code, Scheduling -->
 
         <!-- Tab: General -->
         <div v-show="activeTab === 'general'" class="space-y-6">
           <!-- Site Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.site.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.site.description") }}
-              </p>
-            </div>
-            <div class="space-y-6 p-6">
+          <SectionCard
+            :title="t('admin.settings.site.title')"
+            :description="t('admin.settings.site.description')"
+            body-class="space-y-6 p-6"
+          >
               <!-- Backend Mode -->
-              <div
-                class="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
-              >
-                <div>
-                  <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ t("admin.settings.site.backendMode") }}
-                  </h3>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.site.backendModeDescription") }}
-                  </p>
-	                </div>
-	                <Toggle v-model="form.backend_mode_enabled" />
-	              </div>
+              <SettingToggleRow
+                v-model="form.backend_mode_enabled"
+                :label="t('admin.settings.site.backendMode')"
+                :hint="t('admin.settings.site.backendModeDescription')"
+              />
 
 	              <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
@@ -5009,35 +4551,20 @@
               </div>
 
               <!-- Hide CCS Import Button -->
-              <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.site.hideCcsImportButton")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.site.hideCcsImportButtonHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.hide_ccs_import_button" />
-              </div>
-            </div>
-          </div>
+              <SettingToggleRow
+                v-model="form.hide_ccs_import_button"
+                :label="t('admin.settings.site.hideCcsImportButton')"
+                :hint="t('admin.settings.site.hideCcsImportButtonHint')"
+                bordered
+              />
+            </SectionCard>
 
           <!-- Custom Menu Items -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.customMenu.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.customMenu.description") }}
-              </p>
-            </div>
-            <div class="space-y-4 p-6">
+          <SectionCard
+            :title="t('admin.settings.customMenu.title')"
+            :description="t('admin.settings.customMenu.description')"
+            body-class="space-y-4 p-6"
+          >
               <!-- Existing menu items -->
               <div
                 v-for="(item, index) in form.custom_menu_items"
@@ -5213,21 +4740,20 @@
                 </svg>
                 {{ t("admin.settings.customMenu.add") }}
               </button>
-            </div>
-          </div>
+            </SectionCard>
 	        </div>
 	        <!-- /Tab: General -->
 
 	        <!-- Tab: Login Agreement -->
 	        <div v-show="activeTab === 'agreement'" class="space-y-6">
-	          <div class="card">
-	            <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
+	          <SectionCard body-class="space-y-6 p-6">
+	            <template #header>
 	              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 	                <div>
-	                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+	                  <h3 class="card-title">
 	                    {{ localText("登录条款确认", "Login agreement") }}
-	                  </h2>
-	                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+	                  </h3>
+	                  <p class="card-desc">
 	                    {{
 	                      localText(
 	                        "控制登录页是否要求用户先阅读并同意服务条款、隐私政策或其他 Markdown 文档。",
@@ -5243,9 +4769,7 @@
 	                  <Toggle v-model="form.login_agreement_enabled" />
 	                </div>
 	              </div>
-	            </div>
-
-	            <div class="space-y-6 p-6">
+	            </template>
 	              <div class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_220px]">
 	                <div>
 	                  <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -5415,22 +4939,17 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+          </SectionCard>
         </div>
         <!-- /Tab: Login Agreement -->
 
 	        <!-- Tab: Features (功能开关) -->
         <div v-show="activeTab === 'features'" class="space-y-6">
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ t('admin.settings.features.channelMonitor.title') }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ t('admin.settings.features.channelMonitor.description') }}
-            </p>
+        <SectionCard body-class="space-y-5 p-6">
+          <template #header>
+            <h3 class="card-title">{{ t('admin.settings.features.channelMonitor.title') }}</h3>
+            <p class="card-desc">{{ t('admin.settings.features.channelMonitor.description') }}</p>
             <p class="mt-1.5 text-xs">
               <router-link
                 to="/admin/channels/monitor"
@@ -5440,19 +4959,12 @@
                 <span aria-hidden="true">→</span>
               </router-link>
             </p>
-          </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.features.channelMonitor.enabled') }}
-                </label>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.features.channelMonitor.enabledHint') }}
-                </p>
-              </div>
-              <Toggle v-model="form.channel_monitor_enabled" />
-            </div>
+          </template>
+            <SettingToggleRow
+                v-model="form.channel_monitor_enabled"
+                :label="t('admin.settings.features.channelMonitor.enabled')"
+                :hint="t('admin.settings.features.channelMonitor.enabledHint')"
+              />
 
             <div v-if="form.channel_monitor_enabled">
               <label class="input-label">
@@ -5470,17 +4982,12 @@
                 {{ t('admin.settings.features.channelMonitor.defaultIntervalHint') }}
               </p>
             </div>
-          </div>
-        </div>
+        </SectionCard>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ t('admin.settings.features.availableChannels.title') }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ t('admin.settings.features.availableChannels.description') }}
-            </p>
+        <SectionCard body-class="space-y-5 p-6">
+          <template #header>
+            <h3 class="card-title">{{ t('admin.settings.features.availableChannels.title') }}</h3>
+            <p class="card-desc">{{ t('admin.settings.features.availableChannels.description') }}</p>
             <p class="mt-1.5 text-xs">
               <router-link
                 to="/admin/channels/pricing"
@@ -5490,30 +4997,18 @@
                 <span aria-hidden="true">→</span>
               </router-link>
             </p>
-          </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.features.availableChannels.enabled') }}
-                </label>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.features.availableChannels.enabledHint') }}
-                </p>
-              </div>
-              <Toggle v-model="form.available_channels_enabled" />
-            </div>
-          </div>
-        </div>
+          </template>
+            <SettingToggleRow
+                v-model="form.available_channels_enabled"
+                :label="t('admin.settings.features.availableChannels.enabled')"
+                :hint="t('admin.settings.features.availableChannels.enabledHint')"
+              />
+        </SectionCard>
 
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ t('admin.settings.features.riskControl.title') }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ t('admin.settings.features.riskControl.description') }}
-            </p>
+        <SectionCard body-class="space-y-5 p-6">
+          <template #header>
+            <h3 class="card-title">{{ t('admin.settings.features.riskControl.title') }}</h3>
+            <p class="card-desc">{{ t('admin.settings.features.riskControl.description') }}</p>
             <p class="mt-1.5 text-xs">
               <router-link
                 to="/admin/risk-control"
@@ -5523,31 +5018,18 @@
                 <span aria-hidden="true">→</span>
               </router-link>
             </p>
-          </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.features.riskControl.enabled') }}
-                </label>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.features.riskControl.enabledHint') }}
-                </p>
-              </div>
-              <Toggle v-model="form.risk_control_enabled" />
-            </div>
+          </template>
+            <SettingToggleRow
+                v-model="form.risk_control_enabled"
+                :label="t('admin.settings.features.riskControl.enabled')"
+                :hint="t('admin.settings.features.riskControl.enabledHint')"
+              />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.features.riskControl.cyberSessionBlock') }}
-                </label>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.features.riskControl.cyberSessionBlockHint') }}
-                </p>
-              </div>
-              <Toggle v-model="form.cyber_session_block_enabled" />
-            </div>
+            <SettingToggleRow
+                v-model="form.cyber_session_block_enabled"
+                :label="t('admin.settings.features.riskControl.cyberSessionBlock')"
+                :hint="t('admin.settings.features.riskControl.cyberSessionBlockHint')"
+              />
 
             <div v-if="form.cyber_session_block_enabled">
               <label class="input-label">
@@ -5561,31 +5043,19 @@
                 class="input"
               />
             </div>
-          </div>
-        </div>
+        </SectionCard>
 
         <!-- Affiliate (邀请返利) feature card -->
-        <div class="card">
-          <div class="border-b border-gray-100 px-6 py-4 dark:border-dark-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ t('admin.settings.features.affiliate.title') }}
-            </h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ t('admin.settings.features.affiliate.description') }}
-            </p>
-          </div>
-          <div class="space-y-5 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {{ t('admin.settings.features.affiliate.enabled') }}
-                </label>
-                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                  {{ t('admin.settings.features.affiliate.enabledHint') }}
-                </p>
-              </div>
-              <Toggle v-model="form.affiliate_enabled" />
-            </div>
+        <SectionCard
+          :title="t('admin.settings.features.affiliate.title')"
+          :description="t('admin.settings.features.affiliate.description')"
+          body-class="space-y-5 p-6"
+        >
+            <SettingToggleRow
+                v-model="form.affiliate_enabled"
+                :label="t('admin.settings.features.affiliate.enabled')"
+                :hint="t('admin.settings.features.affiliate.enabledHint')"
+              />
 
             <div v-if="form.affiliate_enabled" class="space-y-6">
               <div>
@@ -5792,8 +5262,7 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+        </SectionCard>
 
         <!-- Affiliate add/edit modal -->
         <div
@@ -5970,14 +5439,10 @@
         <!-- Tab: Payment -->
         <div v-show="activeTab === 'payment'" class="space-y-6">
           <!-- Payment System Settings -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.payment.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <SectionCard body-class="space-y-4 p-6">
+            <template #header>
+              <h3 class="card-title">{{ t("admin.settings.payment.title") }}</h3>
+              <p class="card-desc">
                 {{ t("admin.settings.payment.description") }}
                 <a
                   :href="paymentGuideHref"
@@ -6001,20 +5466,13 @@
                   {{ t("admin.settings.payment.configGuide") }}
                 </a>
               </p>
-            </div>
-            <div class="space-y-4 p-6">
+            </template>
               <!-- Enable toggle -->
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.payment.enabled")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.payment.enabledHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.payment_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="form.payment_enabled"
+                :label="t('admin.settings.payment.enabled')"
+                :hint="t('admin.settings.payment.enabledHint')"
+              />
               <template v-if="form.payment_enabled">
                 <!-- Row 1: Product name -->
                 <div class="grid grid-cols-3 gap-3">
@@ -6437,8 +5895,7 @@
                   </div>
                 </div>
               </template>
-            </div>
-          </div>
+          </SectionCard>
 
           <!-- Provider Management -->
           <PaymentProviderList
@@ -6461,8 +5918,7 @@
 
         <div v-show="activeTab === 'email'" class="space-y-6">
           <!-- Email disabled hint - show when email_verify_enabled is off -->
-          <div v-if="!form.email_verify_enabled" class="card">
-            <div class="p-6">
+          <SectionCard v-if="!form.email_verify_enabled" body-class="p-6">
               <div class="flex items-start gap-3">
                 <Icon
                   name="mail"
@@ -6478,56 +5934,50 @@
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+          </SectionCard>
 
           <!-- SMTP Settings - Only show when email verification is enabled -->
-          <div v-if="form.email_verify_enabled" class="card">
-            <div
-              class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  {{ t("admin.settings.smtp.title") }}
-                </h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {{ t("admin.settings.smtp.description") }}
-                </p>
-              </div>
-              <button
-                type="button"
-                @click="testSmtpConnection"
-                :disabled="testingSmtp || loadFailed"
-                class="btn btn-secondary btn-sm"
-              >
-                <svg
-                  v-if="testingSmtp"
-                  class="h-4 w-4 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
+          <SectionCard v-if="form.email_verify_enabled" body-class="space-y-6 p-6">
+            <template #header>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="card-title">{{ t("admin.settings.smtp.title") }}</h3>
+                  <p class="card-desc">{{ t("admin.settings.smtp.description") }}</p>
+                </div>
+                <button
+                  type="button"
+                  @click="testSmtpConnection"
+                  :disabled="testingSmtp || loadFailed"
+                  class="btn btn-secondary btn-sm"
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                {{
-                  testingSmtp
-                    ? t("admin.settings.smtp.testing")
-                    : t("admin.settings.smtp.testConnection")
-                }}
-              </button>
-            </div>
-            <div class="space-y-6 p-6">
+                  <svg
+                    v-if="testingSmtp"
+                    class="h-4 w-4 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {{
+                    testingSmtp
+                      ? t("admin.settings.smtp.testing")
+                      : t("admin.settings.smtp.testConnection")
+                  }}
+                </button>
+              </div>
+            </template>
               <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <label
@@ -6628,35 +6078,21 @@
               </div>
 
               <!-- Use TLS Toggle -->
-              <div
-                class="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-dark-700"
-              >
-                <div>
-                  <label class="font-medium text-gray-900 dark:text-white">{{
-                    t("admin.settings.smtp.useTls")
-                  }}</label>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.smtp.useTlsHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.smtp_use_tls" />
-              </div>
-            </div>
-          </div>
+              <SettingToggleRow
+                v-model="form.smtp_use_tls"
+                :label="t('admin.settings.smtp.useTls')"
+                :hint="t('admin.settings.smtp.useTlsHint')"
+                bordered
+              />
+          </SectionCard>
 
           <!-- Send Test Email - Only show when email verification is enabled -->
-          <div v-if="form.email_verify_enabled" class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ t("admin.settings.testEmail.title") }}
-              </h2>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.testEmail.description") }}
-              </p>
-            </div>
-            <div class="p-6">
+          <SectionCard
+            v-if="form.email_verify_enabled"
+            :title="t('admin.settings.testEmail.title')"
+            :description="t('admin.settings.testEmail.description')"
+            body-class="p-6"
+          >
               <div class="flex items-end gap-4">
                 <div class="flex-1">
                   <label
@@ -6708,60 +6144,30 @@
                   }}
                 </button>
               </div>
-            </div>
-          </div>
+          </SectionCard>
 
           <!-- 订阅到期提醒 -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h3 class="text-base font-medium text-gray-900 dark:text-white">
-                {{ t("admin.settings.subscriptionExpiryNotify.title") }}
-              </h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.subscriptionExpiryNotify.description") }}
-              </p>
-            </div>
-            <div class="px-6 py-6">
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <label
-                    class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ t("admin.settings.subscriptionExpiryNotify.enabled") }}
-                  </label>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ t("admin.settings.subscriptionExpiryNotify.enabledHint") }}
-                  </p>
-                </div>
-                <Toggle v-model="form.subscription_expiry_notify_enabled" />
-              </div>
-            </div>
-          </div>
+          <SectionCard
+            :title="t('admin.settings.subscriptionExpiryNotify.title')"
+            :description="t('admin.settings.subscriptionExpiryNotify.description')"
+            body-class="px-6 py-6"
+          >
+              <SettingToggleRow
+                v-model="form.subscription_expiry_notify_enabled"
+                :label="t('admin.settings.subscriptionExpiryNotify.enabled')"
+                :hint="t('admin.settings.subscriptionExpiryNotify.enabledHint')"
+              />
+            </SectionCard>
 
           <EmailTemplateEditor />
 
           <!-- Balance Low Notification -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h3 class="text-base font-medium text-gray-900 dark:text-white">
-                {{ t("admin.settings.balanceNotify.title") }}
-              </h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.balanceNotify.description") }}
-              </p>
-            </div>
-            <div class="px-6 py-6 space-y-4">
-              <div class="flex items-center justify-between">
-                <label
-                  class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >{{ t("admin.settings.balanceNotify.enabled") }}</label
-                >
-                <Toggle v-model="form.balance_low_notify_enabled" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.balanceNotify.title')"
+            :description="t('admin.settings.balanceNotify.description')"
+            body-class="px-6 py-6 space-y-4"
+          >
+              <SettingToggleRow v-model="form.balance_low_notify_enabled" :label="t('admin.settings.balanceNotify.enabled')" />
               <div v-if="form.balance_low_notify_enabled">
                 <label
                   class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -6799,29 +6205,15 @@
                   {{ t("admin.settings.balanceNotify.rechargeUrlHint") }}
                 </p>
               </div>
-            </div>
-          </div>
+            </SectionCard>
 
           <!-- Account Quota Notification -->
-          <div class="card">
-            <div
-              class="border-b border-gray-100 px-6 py-4 dark:border-dark-700"
-            >
-              <h3 class="text-base font-medium text-gray-900 dark:text-white">
-                {{ t("admin.settings.quotaNotify.title") }}
-              </h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ t("admin.settings.quotaNotify.description") }}
-              </p>
-            </div>
-            <div class="px-6 py-6 space-y-4">
-              <div class="flex items-center justify-between">
-                <label
-                  class="mb-0 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >{{ t("admin.settings.quotaNotify.enabled") }}</label
-                >
-                <Toggle v-model="form.account_quota_notify_enabled" />
-              </div>
+          <SectionCard
+            :title="t('admin.settings.quotaNotify.title')"
+            :description="t('admin.settings.quotaNotify.description')"
+            body-class="px-6 py-6 space-y-4"
+          >
+              <SettingToggleRow v-model="form.account_quota_notify_enabled" :label="t('admin.settings.quotaNotify.enabled')" />
               <div v-if="form.account_quota_notify_enabled">
                 <label
                   class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -6875,8 +6267,7 @@
                   {{ t("admin.settings.quotaNotify.emailsHint") }}
                 </p>
               </div>
-            </div>
-          </div>
+            </SectionCard>
         </div>
         <!-- /Tab: Email -->
 
@@ -6999,6 +6390,8 @@ import PaymentProviderDialog from "@/components/payment/PaymentProviderDialog.vu
 import GroupBadge from "@/components/common/GroupBadge.vue";
 import GroupOptionItem from "@/components/common/GroupOptionItem.vue";
 import Toggle from "@/components/common/Toggle.vue";
+import SettingToggleRow from "@/components/common/SettingToggleRow.vue";
+import SectionCard from "@/components/common/SectionCard.vue";
 import ProxySelector from "@/components/common/ProxySelector.vue";
 import ImageUpload from "@/components/common/ImageUpload.vue";
 import BackupSettings from "@/views/admin/BackupView.vue";

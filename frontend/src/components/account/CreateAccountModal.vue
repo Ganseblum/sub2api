@@ -45,8 +45,7 @@
       @submit.prevent="handleSubmit"
       class="space-y-5"
     >
-      <div>
-        <label class="input-label">{{ t('admin.accounts.accountName') }}</label>
+      <FormField :label="t('admin.accounts.accountName')" :required="true">
         <input
           v-model="form.name"
           type="text"
@@ -55,17 +54,15 @@
           :placeholder="t('admin.accounts.enterAccountName')"
           data-tour="account-form-name"
         />
-      </div>
-      <div>
-        <label class="input-label">{{ t('admin.accounts.notes') }}</label>
+      </FormField>
+      <FormField :label="t('admin.accounts.notes')" :hint="t('admin.accounts.notesHint')">
         <textarea
           v-model="form.notes"
           rows="3"
           class="input"
           :placeholder="t('admin.accounts.notesPlaceholder')"
         ></textarea>
-        <p class="input-hint">{{ t('admin.accounts.notesHint') }}</p>
-      </div>
+      </FormField>
 
       <!-- Platform Selection - Segmented Control Style -->
       <div>
@@ -776,8 +773,11 @@
 
       <!-- Upstream config (only for Antigravity upstream type) -->
       <div v-if="form.platform === 'antigravity' && antigravityAccountType === 'upstream'" class="space-y-4">
-        <div>
-          <label class="input-label">{{ t('admin.accounts.upstream.baseUrl') }}</label>
+        <FormField
+          :label="t('admin.accounts.upstream.baseUrl')"
+          :hint="t('admin.accounts.upstream.baseUrlHint')"
+          :required="true"
+        >
           <input
             v-model="upstreamBaseUrl"
             type="text"
@@ -785,10 +785,12 @@
             class="input"
             placeholder="https://cloudcode-pa.googleapis.com"
           />
-          <p class="input-hint">{{ t('admin.accounts.upstream.baseUrlHint') }}</p>
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.accounts.upstream.apiKey') }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.accounts.upstream.apiKey')"
+          :hint="t('admin.accounts.upstream.apiKeyHint')"
+          :required="true"
+        >
           <input
             v-model="upstreamApiKey"
             type="password"
@@ -796,8 +798,7 @@
             class="input font-mono"
             placeholder="sk-..."
           />
-          <p class="input-hint">{{ t('admin.accounts.upstream.apiKeyHint') }}</p>
-        </div>
+        </FormField>
       </div>
 
       <!-- Vertex Service Account -->
@@ -854,8 +855,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label class="input-label">{{ t('admin.accounts.vertexProjectIdLabel') }}</label>
+          <FormField :label="t('admin.accounts.vertexProjectIdLabel')">
             <input
               v-model="vertexProjectId"
               type="text"
@@ -863,9 +863,12 @@
               readonly
               :placeholder="t('admin.accounts.vertexProjectIdPlaceholder')"
             />
-          </div>
-          <div>
-            <label class="input-label">{{ t('admin.accounts.vertexLocationLabel') }}</label>
+          </FormField>
+          <FormField
+            :label="t('admin.accounts.vertexLocationLabel')"
+            :hint="t('admin.accounts.vertexLocationHint')"
+            :required="true"
+          >
             <select
               v-model="vertexLocation"
               required
@@ -885,8 +888,7 @@
                 </option>
               </optgroup>
             </select>
-            <p class="input-hint">{{ t('admin.accounts.vertexLocationHint') }}</p>
-          </div>
+          </FormField>
         </div>
       </div>
 
@@ -1010,8 +1012,7 @@
 
       <!-- API Key input (only for apikey type, excluding Antigravity which has its own fields) -->
       <div v-if="form.type === 'apikey' && form.platform !== 'antigravity'" class="space-y-4">
-        <div>
-          <label class="input-label">{{ t('admin.accounts.baseUrl') }}</label>
+        <FormField :label="t('admin.accounts.baseUrl')" :hint="baseUrlHint">
           <input
             v-model="apiKeyBaseUrl"
             type="text"
@@ -1024,10 +1025,8 @@
                   : 'https://api.anthropic.com'
             "
           />
-          <p class="input-hint">{{ baseUrlHint }}</p>
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.accounts.apiKeyRequired') }}</label>
+        </FormField>
+        <FormField :label="t('admin.accounts.apiKeyRequired')" :hint="apiKeyHint" :required="true">
           <input
             v-model="apiKeyValue"
             type="password"
@@ -1041,18 +1040,19 @@
                   : 'sk-ant-...'
             "
           />
-          <p class="input-hint">{{ apiKeyHint }}</p>
-        </div>
+        </FormField>
 
         <!-- Gemini API Key tier selection -->
-        <div v-if="form.platform === 'gemini'">
-          <label class="input-label">{{ t('admin.accounts.gemini.tier.label') }}</label>
+        <FormField
+          v-if="form.platform === 'gemini'"
+          :label="t('admin.accounts.gemini.tier.label')"
+          :hint="t('admin.accounts.gemini.tier.aiStudioHint')"
+        >
           <select v-model="geminiTierAIStudio" class="input">
             <option value="aistudio_free">{{ t('admin.accounts.gemini.tier.aiStudio.free') }}</option>
             <option value="aistudio_paid">{{ t('admin.accounts.gemini.tier.aiStudio.paid') }}</option>
           </select>
-          <p class="input-hint">{{ t('admin.accounts.gemini.tier.aiStudioHint') }}</p>
-        </div>
+        </FormField>
 
         <!-- Model Restriction Section (Antigravity 已在上层条件排除) -->
         <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
@@ -1242,29 +1242,11 @@
 
         <!-- Pool Mode Section -->
         <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.poolModeHint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="poolModeEnabled = !poolModeEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                poolModeEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  poolModeEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="poolModeEnabled"
+  :label="t('admin.accounts.poolMode')"
+  :hint="t('admin.accounts.poolModeHint')"
+/>
           <div v-if="poolModeEnabled" class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
             <p class="text-xs text-blue-700 dark:text-blue-400">
               <Icon name="exclamationCircle" size="sm" class="mr-1 inline" :stroke-width="2" />
@@ -1306,29 +1288,11 @@
 
         <!-- Custom Error Codes Section -->
         <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.customErrorCodes') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.customErrorCodesHint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="customErrorCodesEnabled = !customErrorCodesEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                customErrorCodesEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  customErrorCodesEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="customErrorCodesEnabled"
+  :label="t('admin.accounts.customErrorCodes')"
+  :hint="t('admin.accounts.customErrorCodesHint')"
+/>
 
           <div v-if="customErrorCodesEnabled" class="space-y-3">
             <div class="rounded-lg bg-amber-50 p-3 dark:bg-amber-900/20">
@@ -1433,8 +1397,7 @@
 
         <!-- SigV4 fields -->
         <template v-if="bedrockAuthMode === 'sigv4'">
-          <div>
-            <label class="input-label">{{ t('admin.accounts.bedrockAccessKeyId') }}</label>
+          <FormField :label="t('admin.accounts.bedrockAccessKeyId')" :required="true">
             <input
               v-model="bedrockAccessKeyId"
               type="text"
@@ -1442,41 +1405,42 @@
               class="input font-mono"
               placeholder="AKIA..."
             />
-          </div>
-          <div>
-            <label class="input-label">{{ t('admin.accounts.bedrockSecretAccessKey') }}</label>
+          </FormField>
+          <FormField :label="t('admin.accounts.bedrockSecretAccessKey')" :required="true">
             <input
               v-model="bedrockSecretAccessKey"
               type="password"
               required
               class="input font-mono"
             />
-          </div>
-          <div>
-            <label class="input-label">{{ t('admin.accounts.bedrockSessionToken') }}</label>
+          </FormField>
+          <FormField
+            :label="t('admin.accounts.bedrockSessionToken')"
+            :hint="t('admin.accounts.bedrockSessionTokenHint')"
+          >
             <input
               v-model="bedrockSessionToken"
               type="password"
               class="input font-mono"
             />
-            <p class="input-hint">{{ t('admin.accounts.bedrockSessionTokenHint') }}</p>
-          </div>
+          </FormField>
         </template>
 
         <!-- API Key field -->
-        <div v-if="bedrockAuthMode === 'apikey'">
-          <label class="input-label">{{ t('admin.accounts.bedrockApiKeyInput') }}</label>
+        <FormField v-if="bedrockAuthMode === 'apikey'" :label="t('admin.accounts.bedrockApiKeyInput')" :required="true">
           <input
             v-model="bedrockApiKeyValue"
             type="password"
             required
             class="input font-mono"
           />
-        </div>
+        </FormField>
 
         <!-- Shared: Region -->
-        <div>
-          <label class="input-label">{{ t('admin.accounts.bedrockRegion') }}</label>
+        <FormField
+          :label="t('admin.accounts.bedrockRegion')"
+          :hint="t('admin.accounts.bedrockRegionHint')"
+        >
           <select v-model="bedrockRegion" class="input">
             <optgroup label="US">
               <option value="us-east-1">us-east-1 (N. Virginia)</option>
@@ -1512,8 +1476,7 @@
               <option value="sa-east-1">sa-east-1 (São Paulo)</option>
             </optgroup>
           </select>
-          <p class="input-hint">{{ t('admin.accounts.bedrockRegionHint') }}</p>
-        </div>
+        </FormField>
 
         <!-- Shared: Force Global -->
         <div>
@@ -1599,29 +1562,11 @@
 
         <!-- Pool Mode Section for Bedrock -->
         <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.poolMode') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.poolModeHint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="poolModeEnabled = !poolModeEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                poolModeEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  poolModeEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="poolModeEnabled"
+  :label="t('admin.accounts.poolMode')"
+  :hint="t('admin.accounts.poolModeHint')"
+/>
           <div v-if="poolModeEnabled" class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
             <p class="text-xs text-blue-700 dark:text-blue-400">
               <Icon name="exclamationCircle" size="sm" class="mr-1 inline" :stroke-width="2" />
@@ -1904,29 +1849,11 @@
 
       <!-- Temp Unschedulable Rules -->
       <div class="border-t border-gray-200 pt-4 dark:border-dark-600 space-y-4">
-        <div class="mb-3 flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{ t('admin.accounts.tempUnschedulable.title') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.tempUnschedulable.hint') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="tempUnschedEnabled = !tempUnschedEnabled"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              tempUnschedEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                tempUnschedEnabled ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="tempUnschedEnabled"
+  :label="t('admin.accounts.tempUnschedulable.title')"
+  :hint="t('admin.accounts.tempUnschedulable.hint')"
+/>
 
         <div v-if="tempUnschedEnabled" class="space-y-3">
           <div class="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
@@ -1988,8 +1915,7 @@
               </div>
 
               <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <label class="input-label">{{ t('admin.accounts.tempUnschedulable.errorCode') }}</label>
+                <FormField :label="t('admin.accounts.tempUnschedulable.errorCode')">
                   <input
                     v-model.number="rule.error_code"
                     type="number"
@@ -1998,9 +1924,8 @@
                     class="input"
                     :placeholder="t('admin.accounts.tempUnschedulable.errorCodePlaceholder')"
                   />
-                </div>
-                <div>
-                  <label class="input-label">{{ t('admin.accounts.tempUnschedulable.durationMinutes') }}</label>
+                </FormField>
+                <FormField :label="t('admin.accounts.tempUnschedulable.durationMinutes')">
                   <input
                     v-model.number="rule.duration_minutes"
                     type="number"
@@ -2008,26 +1933,30 @@
                     class="input"
                     :placeholder="t('admin.accounts.tempUnschedulable.durationPlaceholder')"
                   />
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="input-label">{{ t('admin.accounts.tempUnschedulable.keywords') }}</label>
+                </FormField>
+                <FormField
+                  field-class="sm:col-span-2"
+                  :label="t('admin.accounts.tempUnschedulable.keywords')"
+                  :hint="t('admin.accounts.tempUnschedulable.keywordsHint')"
+                >
                   <input
                     v-model="rule.keywords"
                     type="text"
                     class="input"
                     :placeholder="t('admin.accounts.tempUnschedulable.keywordsPlaceholder')"
                   />
-                  <p class="input-hint">{{ t('admin.accounts.tempUnschedulable.keywordsHint') }}</p>
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="input-label">{{ t('admin.accounts.tempUnschedulable.description') }}</label>
+                </FormField>
+                <FormField
+                  field-class="sm:col-span-2"
+                  :label="t('admin.accounts.tempUnschedulable.description')"
+                >
                   <input
                     v-model="rule.description"
                     type="text"
                     class="input"
                     :placeholder="t('admin.accounts.tempUnschedulable.descriptionPlaceholder')"
                   />
-                </div>
+                </FormField>
               </div>
             </div>
           </div>
@@ -2055,31 +1984,11 @@
         v-if="form.platform === 'anthropic' || form.platform === 'antigravity'"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{
-              t('admin.accounts.interceptWarmupRequests')
-            }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.interceptWarmupRequestsDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="interceptWarmupRequests = !interceptWarmupRequests"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              interceptWarmupRequests ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                interceptWarmupRequests ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="interceptWarmupRequests"
+  :label="t('admin.accounts.interceptWarmupRequests')"
+  :hint="t('admin.accounts.interceptWarmupRequestsDesc')"
+/>
       </div>
 
       <!-- 配额控制 (Anthropic OAuth/SetupToken: 亲和 + 窗口费用 + 会话 + RPM 等) -->
@@ -2096,29 +2005,11 @@
 
         <!-- Window Cost Limit -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.windowCost.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.windowCost.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="windowCostEnabled = !windowCostEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                windowCostEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  windowCostEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="windowCostEnabled"
+  :label="t('admin.accounts.quotaControl.windowCost.label')"
+  :hint="t('admin.accounts.quotaControl.windowCost.hint')"
+/>
 
           <div v-if="windowCostEnabled" class="grid grid-cols-2 gap-4">
             <div>
@@ -2156,29 +2047,11 @@
 
         <!-- Session Limit -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionLimit.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.sessionLimit.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="sessionLimitEnabled = !sessionLimitEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                sessionLimitEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  sessionLimitEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="sessionLimitEnabled"
+  :label="t('admin.accounts.quotaControl.sessionLimit.label')"
+  :hint="t('admin.accounts.quotaControl.sessionLimit.hint')"
+/>
 
           <div v-if="sessionLimitEnabled" class="grid grid-cols-2 gap-4">
             <div>
@@ -2213,29 +2086,11 @@
 
         <!-- RPM Limit -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="mb-3 flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.rpmLimit.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.rpmLimit.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="rpmLimitEnabled = !rpmLimitEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                rpmLimitEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  rpmLimitEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="rpmLimitEnabled"
+  :label="t('admin.accounts.quotaControl.rpmLimit.label')"
+  :hint="t('admin.accounts.quotaControl.rpmLimit.hint')"
+/>
 
           <div v-if="rpmLimitEnabled" class="space-y-4">
             <div>
@@ -2326,29 +2181,11 @@
 
         <!-- TLS Fingerprint -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.tlsFingerprint.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.tlsFingerprint.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="tlsFingerprintEnabled = !tlsFingerprintEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                tlsFingerprintEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  tlsFingerprintEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="tlsFingerprintEnabled"
+  :label="t('admin.accounts.quotaControl.tlsFingerprint.label')"
+  :hint="t('admin.accounts.quotaControl.tlsFingerprint.hint')"
+/>
           <!-- Profile selector -->
           <div v-if="tlsFingerprintEnabled" class="mt-3">
             <select v-model="tlsFingerprintProfileId" class="input">
@@ -2361,56 +2198,20 @@
 
         <!-- Session ID Masking -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.sessionIdMasking.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.sessionIdMasking.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="sessionIdMaskingEnabled = !sessionIdMaskingEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                sessionIdMaskingEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  sessionIdMaskingEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="sessionIdMaskingEnabled"
+  :label="t('admin.accounts.quotaControl.sessionIdMasking.label')"
+  :hint="t('admin.accounts.quotaControl.sessionIdMasking.hint')"
+/>
         </div>
 
         <!-- Cache TTL Override -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.cacheTTLOverride.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.cacheTTLOverride.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="cacheTTLOverrideEnabled = !cacheTTLOverrideEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                cacheTTLOverrideEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  cacheTTLOverrideEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="cacheTTLOverrideEnabled"
+  :label="t('admin.accounts.quotaControl.cacheTTLOverride.label')"
+  :hint="t('admin.accounts.quotaControl.cacheTTLOverride.hint')"
+/>
           <div v-if="cacheTTLOverrideEnabled" class="mt-3">
             <label class="input-label text-xs">{{ t('admin.accounts.quotaControl.cacheTTLOverride.target') }}</label>
             <select
@@ -2428,29 +2229,11 @@
 
         <!-- Custom Base URL Relay -->
         <div class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="input-label mb-0">{{ t('admin.accounts.quotaControl.customBaseUrl.label') }}</label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ t('admin.accounts.quotaControl.customBaseUrl.hint') }}
-              </p>
-            </div>
-            <button
-              type="button"
-              @click="customBaseUrlEnabled = !customBaseUrlEnabled"
-              :class="[
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                customBaseUrlEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  customBaseUrlEnabled ? 'translate-x-5' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+  v-model="customBaseUrlEnabled"
+  :label="t('admin.accounts.quotaControl.customBaseUrl.label')"
+  :hint="t('admin.accounts.quotaControl.customBaseUrl.hint')"
+/>
           <div v-if="customBaseUrlEnabled" class="mt-3">
             <input
               v-model="customBaseUrl"
@@ -2471,20 +2254,16 @@
       </div>
 
       <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div>
-          <label class="input-label">{{ t('admin.accounts.concurrency') }}</label>
+        <FormField :label="t('admin.accounts.concurrency')">
           <input v-model.number="form.concurrency" type="number" min="1" class="input"
             @input="form.concurrency = Math.max(1, form.concurrency || 1)" />
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.accounts.loadFactor') }}</label>
+        </FormField>
+        <FormField :label="t('admin.accounts.loadFactor')" :hint="t('admin.accounts.loadFactorHint')">
           <input v-model.number="form.load_factor" type="number" min="1"
             class="input" :placeholder="String(form.concurrency || 1)"
             @input="form.load_factor = (form.load_factor &amp;&amp; form.load_factor >= 1) ? form.load_factor : null" />
-          <p class="input-hint">{{ t('admin.accounts.loadFactorHint') }}</p>
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.accounts.priority') }}</label>
+        </FormField>
+        <FormField :label="t('admin.accounts.priority')" :hint="t('admin.accounts.priorityHint')">
           <input
             v-model.number="form.priority"
             type="number"
@@ -2492,48 +2271,32 @@
             class="input"
             data-tour="account-form-priority"
           />
-          <p class="input-hint">{{ t('admin.accounts.priorityHint') }}</p>
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.accounts.billingRateMultiplier') }}</label>
+        </FormField>
+        <FormField
+          :label="t('admin.accounts.billingRateMultiplier')"
+          :hint="t('admin.accounts.billingRateMultiplierHint')"
+        >
           <input v-model.number="form.rate_multiplier" type="number" min="0" step="0.001" class="input" />
-          <p class="input-hint">{{ t('admin.accounts.billingRateMultiplierHint') }}</p>
-        </div>
+        </FormField>
       </div>
-      <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
-        <label class="input-label">{{ t('admin.accounts.expiresAt') }}</label>
+      <FormField
+        :label="t('admin.accounts.expiresAt')"
+        :hint="t('admin.accounts.expiresAtHint')"
+        field-class="border-t border-gray-200 pt-4 dark:border-dark-600"
+      >
         <input v-model="expiresAtInput" type="datetime-local" class="input" />
-        <p class="input-hint">{{ t('admin.accounts.expiresAtHint') }}</p>
-      </div>
+      </FormField>
 
       <!-- OpenAI 自动透传开关（OAuth/API Key） -->
       <div
         v-if="form.platform === 'openai'"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{ t('admin.accounts.openai.oauthPassthrough') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.openai.oauthPassthroughDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="openaiPassthroughEnabled = !openaiPassthroughEnabled"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              openaiPassthroughEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                openaiPassthroughEnabled ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="openaiPassthroughEnabled"
+  :label="t('admin.accounts.openai.oauthPassthrough')"
+  :hint="t('admin.accounts.openai.oauthPassthroughDesc')"
+/>
       </div>
 
       <!-- OpenAI WS Mode 三态（off/ctx_pool/passthrough） -->
@@ -2562,29 +2325,11 @@
         v-if="form.platform === 'anthropic' && accountCategory === 'apikey'"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{ t('admin.accounts.anthropic.apiKeyPassthrough') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.anthropic.apiKeyPassthroughDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="anthropicPassthroughEnabled = !anthropicPassthroughEnabled"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              anthropicPassthroughEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                anthropicPassthroughEnabled ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="anthropicPassthroughEnabled"
+  :label="t('admin.accounts.anthropic.apiKeyPassthrough')"
+  :hint="t('admin.accounts.anthropic.apiKeyPassthroughDesc')"
+/>
       </div>
 
       <!-- Anthropic API Key: Web Search Emulation (hidden when global disabled) -->
@@ -2612,54 +2357,20 @@
         v-if="form.platform === 'openai' && accountCategory === 'oauth-based'"
         class="border-t border-gray-200 pt-4 dark:border-dark-600"
       >
-        <div class="flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{ t('admin.accounts.openai.codexCLIOnly') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.openai.codexCLIOnlyDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="codexCLIOnlyEnabled = !codexCLIOnlyEnabled"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              codexCLIOnlyEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                codexCLIOnlyEnabled ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="codexCLIOnlyEnabled"
+  :label="t('admin.accounts.openai.codexCLIOnly')"
+  :hint="t('admin.accounts.openai.codexCLIOnlyDesc')"
+/>
         <div
           v-if="codexCLIOnlyEnabled"
-          class="mt-4 flex items-center justify-between border-l-2 border-gray-200 pl-4 dark:border-dark-600"
+          class="mt-4 border-l-2 border-gray-200 pl-4 dark:border-dark-600"
         >
-          <div>
-            <label class="input-label mb-0">{{ t('admin.accounts.openai.codexCLIOnlyAllowClaudeCode') }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.openai.codexCLIOnlyAllowClaudeCodeDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="codexCLIOnlyAllowClaudeCodeEnabled = !codexCLIOnlyAllowClaudeCodeEnabled"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              codexCLIOnlyAllowClaudeCodeEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                codexCLIOnlyAllowClaudeCodeEnabled ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
+          <SettingToggleRow
+            v-model="codexCLIOnlyAllowClaudeCodeEnabled"
+            :label="t('admin.accounts.openai.codexCLIOnlyAllowClaudeCode')"
+            :hint="t('admin.accounts.openai.codexCLIOnlyAllowClaudeCodeDesc')"
+          />
         </div>
       </div>
 
@@ -2753,31 +2464,11 @@
       </div>
 
       <div>
-        <div class="flex items-center justify-between">
-          <div>
-            <label class="input-label mb-0">{{
-              t('admin.accounts.autoPauseOnExpired')
-            }}</label>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.accounts.autoPauseOnExpiredDesc') }}
-            </p>
-          </div>
-          <button
-            type="button"
-            @click="autoPauseOnExpired = !autoPauseOnExpired"
-            :class="[
-              'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              autoPauseOnExpired ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                autoPauseOnExpired ? 'translate-x-5' : 'translate-x-0'
-              ]"
-            />
-          </button>
-        </div>
+        <SettingToggleRow
+  v-model="autoPauseOnExpired"
+  :label="t('admin.accounts.autoPauseOnExpired')"
+  :hint="t('admin.accounts.autoPauseOnExpiredDesc')"
+/>
       </div>
 
       <div class="border-t border-gray-200 pt-4 dark:border-dark-600">
@@ -2882,84 +2573,60 @@
     </div>
 
     <template #footer>
-      <div v-if="step === 1" class="flex justify-end gap-3">
-        <button @click="handleClose" type="button" class="btn btn-secondary">
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          type="submit"
-          form="create-account-form"
-          :disabled="submitting"
-          class="btn btn-primary"
-          data-tour="account-form-submit"
-        >
-          <svg
-            v-if="submitting"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
+      <DialogFooter
+        v-if="step === 1"
+        :loading="submitting && !isOAuthFlow"
+        :loading-text="t('admin.accounts.creating')"
+        :confirm-text="isOAuthFlow ? t('common.next') : t('common.create')"
+        confirm-form="create-account-form"
+        confirm-data-tour="account-form-submit"
+        @cancel="handleClose"
+      />
+      <DialogFooter
+        v-else
+        :show-cancel="false"
+        :show-confirm="false"
+      >
+        <template #start>
+          <button type="button" class="btn btn-secondary" @click="goBackToBasicInfo">
+            {{ t('common.back') }}
+          </button>
+        </template>
+        <template v-if="isManualInputMethod" #actions>
+          <button
+            type="button"
+            :disabled="!canExchangeCode"
+            class="btn btn-primary"
+            @click="handleExchangeCode"
           >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          {{
-            isOAuthFlow
-              ? t('common.next')
-              : submitting
-                ? t('admin.accounts.creating')
-                : t('common.create')
-          }}
-        </button>
-      </div>
-      <div v-else class="flex justify-between gap-3">
-        <button type="button" class="btn btn-secondary" @click="goBackToBasicInfo">
-          {{ t('common.back') }}
-        </button>
-        <button
-          v-if="isManualInputMethod"
-          type="button"
-          :disabled="!canExchangeCode"
-          class="btn btn-primary"
-          @click="handleExchangeCode"
-        >
-          <svg
-            v-if="currentOAuthLoading"
-            class="-ml-1 mr-2 h-4 w-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          {{
-            currentOAuthLoading
-              ? t('admin.accounts.oauth.verifying')
-              : t('admin.accounts.oauth.completeAuth')
-          }}
-        </button>
-      </div>
+            <svg
+              v-if="currentOAuthLoading"
+              class="-ml-1 mr-2 h-4 w-4 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            {{
+              currentOAuthLoading
+                ? t('admin.accounts.oauth.verifying')
+                : t('admin.accounts.oauth.completeAuth')
+            }}
+          </button>
+        </template>
+      </DialogFooter>
     </template>
   </BaseDialog>
 
@@ -3172,11 +2839,11 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end">
-        <button @click="showGeminiHelpDialog = false" type="button" class="btn btn-primary">
-          {{ t('common.close') }}
-        </button>
-      </div>
+      <DialogFooter
+        :show-cancel="false"
+        :confirm-text="t('common.close')"
+        @confirm="showGeminiHelpDialog = false"
+      />
     </template>
   </BaseDialog>
 
@@ -3194,6 +2861,7 @@
 </template>
 
 <script setup lang="ts">
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
 import { ref, reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
@@ -3230,7 +2898,9 @@ import type {
   OpenAIEndpointCapability
 } from '@/types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import FormField from '@/components/common/FormField.vue'
 import Select from '@/components/common/Select.vue'
 import Icon from '@/components/icons/Icon.vue'
 import ProxySelector from '@/components/common/ProxySelector.vue'

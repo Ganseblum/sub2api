@@ -3,17 +3,15 @@
     <div class="mx-auto max-w-2xl space-y-6">
       <!-- Current Balance Card -->
       <div class="card overflow-hidden">
-        <div class="bg-gradient-to-br from-primary-500 to-primary-600 px-6 py-8 text-center">
-          <div
-            class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm"
-          >
-            <Icon name="creditCard" size="xl" class="text-white" />
+        <div class="youc-stat-banner px-6 py-8 text-center">
+          <div class="youc-stat-banner-icon">
+            <Icon name="creditCard" size="xl" />
           </div>
-          <p class="text-sm font-medium text-primary-100">{{ t('redeem.currentBalance') }}</p>
-          <p class="mt-2 text-4xl font-bold text-white">
+          <p class="youc-stat-banner-label">{{ t('redeem.currentBalance') }}</p>
+          <p class="youc-stat-banner-value">
             ${{ user?.balance?.toFixed(2) || '0.00' }}
           </p>
-          <p class="mt-2 text-sm text-primary-100">
+          <p class="youc-stat-banner-meta">
             {{ t('redeem.concurrency') }}: {{ user?.concurrency || 0 }} {{ t('redeem.requests') }}
           </p>
         </div>
@@ -29,7 +27,7 @@
               </label>
               <div class="relative mt-1">
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                  <Icon name="gift" size="md" class="text-gray-400 dark:text-dark-500" />
+                  <Icon name="gift" size="md" class="search-input-icon" />
                 </div>
                 <input
                   id="code"
@@ -163,37 +161,31 @@
       </transition>
 
       <!-- Information Card -->
-      <div
-        class="card border-primary-200 bg-primary-50 dark:border-primary-800/50 dark:bg-primary-900/20"
-      >
-        <div class="p-6">
-          <div class="flex items-start gap-4">
-            <div
-              class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 dark:bg-primary-900/30"
-            >
-              <Icon name="infoCircle" size="md" class="text-primary-600 dark:text-primary-400" />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-sm font-semibold text-primary-800 dark:text-primary-300">
-                {{ t('redeem.aboutCodes') }}
-              </h3>
-              <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-primary-700 dark:text-primary-400"
-              >
-                <li>{{ t('redeem.codeRule1') }}</li>
-                <li>{{ t('redeem.codeRule2') }}</li>
-                <li>
-                  {{ t('redeem.codeRule3') }}
-                  <span
-                    v-if="contactInfo"
-                    class="ml-1.5 inline-flex items-center rounded-md bg-primary-200/50 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-800/40 dark:text-primary-200"
-                  >
-                    {{ contactInfo }}
-                  </span>
-                </li>
-                <li>{{ t('redeem.codeRule4') }}</li>
-              </ul>
-            </div>
+      <div class="tour-success-box p-5">
+        <div class="flex items-start gap-4">
+          <div
+            class="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-[var(--youc-line)] bg-[var(--youc-soft)]"
+          >
+            <Icon name="infoCircle" size="md" class="text-[var(--youc-accent)]" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-sm font-bold text-[var(--youc-ink)]">
+              {{ t('redeem.aboutCodes') }}
+            </h3>
+            <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-[var(--youc-ink)]">
+              <li>{{ t('redeem.codeRule1') }}</li>
+              <li>{{ t('redeem.codeRule2') }}</li>
+              <li>
+                {{ t('redeem.codeRule3') }}
+                <span
+                  v-if="contactInfo"
+                  class="ml-1.5 inline-flex items-center border border-[var(--youc-line)] bg-[var(--youc-soft)] px-2 py-0.5 text-xs font-semibold text-[var(--youc-ink)]"
+                >
+                  {{ contactInfo }}
+                </span>
+              </li>
+              <li>{{ t('redeem.codeRule4') }}</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -326,12 +318,10 @@
 
           <!-- Empty State -->
           <div v-else class="empty-state py-8">
-            <div
-              class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-dark-800"
-            >
-              <Icon name="clock" size="xl" class="text-gray-400 dark:text-dark-500" />
+            <div class="empty-state-icon-box mb-4">
+              <Icon name="clock" size="xl" class="search-input-icon" />
             </div>
-            <p class="text-sm text-gray-500 dark:text-dark-400">
+            <p class="empty-state-description">
               {{ t('redeem.historyWillAppear') }}
             </p>
           </div>

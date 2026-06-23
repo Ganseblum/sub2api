@@ -17,6 +17,14 @@
     --youc-info: #1d4ed8;
     --youc-shadow: 4px 4px 0 var(--youc-line);
     --youc-shadow-lg: 8px 8px 0 var(--youc-line);
+    --youc-dropdown-hover-bg: color-mix(in srgb, var(--youc-ink) 68%, var(--youc-paper));
+    --youc-dropdown-hover-fg: var(--youc-bg);
+    --youc-dropdown-selected-bg: var(--youc-ink);
+    --youc-dropdown-selected-fg: var(--youc-bg);
+    --text-primary: #111111;
+    --text-secondary: #444444;
+    --text-success: #0b6b4d;
+    --text-cost: #b45309;
   }
 
   .dark {
@@ -31,6 +39,10 @@
     --youc-danger: #ef4444;
     --youc-warn: #f59e0b;
     --youc-info: #60a5fa;
+    --text-primary: #f4f3ee;
+    --text-secondary: #b8b4ab;
+    --text-success: #5eead4;
+    --text-cost: #fbbf24;
   }
 
   * {
@@ -167,6 +179,14 @@
     color: var(--youc-bg);
   }
 
+  .btn-primary:disabled {
+    background: color-mix(in srgb, var(--youc-muted) 22%, var(--youc-paper));
+    color: var(--youc-muted);
+    opacity: 1;
+    box-shadow: none;
+    transform: none;
+  }
+
   .btn-secondary {
     background: var(--youc-paper);
     color: var(--youc-ink);
@@ -242,7 +262,7 @@
   }
 
   .input::placeholder {
-    color: color-mix(in srgb, var(--youc-muted) 70%, transparent);
+    color: color-mix(in srgb, var(--youc-muted) 88%, var(--youc-ink));
   }
 
   .input:focus {
@@ -264,13 +284,28 @@
 
   .input-hint {
     @apply mt-1 text-xs;
-    color: var(--youc-muted);
+    color: color-mix(in srgb, var(--youc-muted) 82%, var(--youc-ink));
   }
 
   .input-error-text {
     @apply mt-1 text-xs;
     color: var(--youc-danger);
     font-weight: 700;
+  }
+
+  /* 表单行内控件统一高度（搜索 + 数字 + 按钮） */
+  .control-h {
+    height: 2.75rem;
+    min-height: 2.75rem;
+    padding-block: 0;
+  }
+
+  .inline-field-row {
+    @apply flex items-stretch gap-2;
+  }
+
+  .inline-field-row > .btn {
+    align-self: stretch;
   }
 
   /* Hide number input spinner buttons for cleaner UI */
@@ -323,6 +358,20 @@
   .card-header {
     border-bottom: 2.5px solid var(--youc-line);
     @apply px-6 py-4;
+  }
+
+  .card-title {
+    margin: 0;
+    @apply text-lg;
+    color: var(--youc-ink);
+    font-weight: 850;
+    letter-spacing: 0.04em;
+  }
+
+  .card-desc {
+    margin: 0.25rem 0 0;
+    @apply text-sm;
+    color: color-mix(in srgb, var(--youc-muted) 82%, var(--youc-ink));
   }
 
   .card-body {
@@ -501,7 +550,8 @@
   }
 
   .dropdown-item:hover {
-    background: var(--youc-soft);
+    background: var(--youc-dropdown-hover-bg);
+    color: var(--youc-dropdown-hover-fg);
   }
 
   /* ============ 模态框 ============ */
@@ -542,6 +592,7 @@
     @apply px-4 py-3;
     @apply sm:px-6 sm:py-4;
     @apply flex-1 overflow-y-auto;
+    min-width: 0;
   }
 
   .modal-footer {
@@ -550,6 +601,118 @@
     @apply sm:px-6 sm:py-4;
     @apply flex items-center justify-end gap-3;
     @apply flex-shrink-0;
+  }
+
+  .modal-footer--split {
+    justify-content: space-between;
+  }
+
+  .modal-footer__start {
+    @apply flex items-center gap-2;
+  }
+
+  .modal-footer__actions {
+    @apply flex items-center justify-end gap-3;
+  }
+
+  .form-field {
+    @apply w-full;
+  }
+
+  .form-field__label-row {
+    @apply mb-1.5 flex items-center gap-1;
+  }
+
+  .form-field__required {
+    color: var(--youc-danger);
+  }
+
+  .setting-toggle-row {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .setting-toggle-row--bordered {
+    border-top: 2.5px solid color-mix(in srgb, var(--youc-line) 35%, transparent);
+    @apply pt-4 mt-1;
+  }
+
+  .setting-toggle-row__main {
+    @apply min-w-0 flex-1;
+  }
+
+  .setting-toggle-row__label-row {
+    @apply flex items-center gap-1;
+  }
+
+  .setting-toggle-row__label {
+    @apply text-sm;
+    color: var(--youc-ink);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .setting-toggle-row__hint {
+    @apply mt-0.5 text-xs;
+    color: color-mix(in srgb, var(--youc-muted) 82%, var(--youc-ink));
+  }
+
+  .setting-toggle-row > .switch {
+    @apply shrink-0;
+  }
+
+  .locale-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 5.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    cursor: pointer;
+    box-shadow: none;
+    transition: background-color 120ms ease;
+  }
+
+  .locale-dropdown-trigger:hover:not(:disabled) {
+    background: var(--youc-soft);
+  }
+
+  .locale-dropdown-chevron {
+    flex-shrink: 0;
+    color: var(--youc-ink);
+  }
+
+  .locale-dropdown-value {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    font-weight: 700;
+  }
+
+  .locale-dropdown-panel {
+    min-width: 100%;
+  }
+
+  .modal-close-btn {
+    margin-right: -0.5rem;
+    padding: 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--youc-muted);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .modal-close-btn:hover {
+    background: var(--youc-soft);
+    color: var(--youc-ink);
   }
 
   /* 防止body滚动的工具类 */
@@ -763,9 +926,10 @@
     background: var(--youc-paper);
   }
 
-  .empty-state-icon {
-    @apply mb-4 h-16 w-16;
-    color: var(--youc-muted);
+  .empty-state-icon-box {
+    @apply mb-5 flex h-20 w-20 items-center justify-center;
+    border: 2.5px solid var(--youc-line);
+    background: var(--youc-soft);
   }
 
   .empty-state-title {
@@ -782,8 +946,14 @@
 
   /* ============ 加载状态 ============ */
   .spinner {
-    @apply h-5 w-5 rounded-full border-2 border-current border-t-transparent;
-    @apply animate-spin;
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    box-sizing: border-box;
+    border: 2.5px solid color-mix(in srgb, var(--youc-line) 28%, transparent);
+    border-top-color: var(--youc-accent);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
   }
 
   .skeleton {
@@ -849,11 +1019,21 @@
 
   /* ============ 开关 ============ */
   .switch {
-    @apply relative h-6 w-11 cursor-pointer;
+    @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer overflow-hidden p-0;
     border: 2.5px solid var(--youc-line);
     border-radius: 0;
-    background: var(--youc-paper);
-    @apply transition-colors duration-200;
+    background: color-mix(in srgb, var(--youc-muted) 18%, var(--youc-paper));
+    box-shadow: none;
+    transition: background-color 200ms ease;
+  }
+
+  .switch:hover:not(:disabled),
+  .switch:focus,
+  .switch:focus-visible {
+    box-shadow: none;
+    transform: none;
+    outline: 3px solid var(--youc-accent-2);
+    outline-offset: 2px;
   }
 
   .switch-active {
@@ -861,14 +1041,868 @@
   }
 
   .switch-thumb {
-    @apply absolute left-0.5 top-0.5 h-4 w-4;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
     border-radius: 0;
-    background: var(--youc-ink);
-    @apply transition-transform duration-200;
+    border: none;
+    background: var(--youc-paper);
+    box-shadow: none;
+    transition: transform 200ms ease;
   }
 
   .switch-active .switch-thumb {
-    @apply translate-x-5;
+    transform: translateX(100%);
+  }
+
+  .switch-sm {
+    @apply h-5 w-9;
+  }
+
+  .switch-sm .switch-thumb {
+    width: 50%;
+  }
+
+  .switch-disabled,
+  .switch:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* 表单开关行：标签左、开关右（兼容旧类名） */
+  .form-switch-row,
+  .setting-toggle-row {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .form-switch-row > .switch,
+  .setting-toggle-row > .switch {
+    @apply shrink-0;
+  }
+
+  /* ============ 头像块 ============ */
+  .youc-avatar {
+    @apply inline-flex shrink-0 items-center justify-center overflow-hidden;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+    box-shadow: none;
+    font-weight: 800;
+  }
+
+  .youc-avatar-sm {
+    @apply h-16 w-16 text-xl;
+  }
+
+  .youc-avatar-md {
+    @apply h-20 w-20 text-2xl;
+  }
+
+  .youc-avatar-lg {
+    @apply h-24 w-24 text-3xl;
+  }
+
+  .youc-avatar img {
+    @apply h-full w-full object-cover;
+  }
+
+  .youc-stat-banner {
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+  }
+
+  .youc-stat-banner-icon {
+    @apply mb-4 inline-flex h-16 w-16 items-center justify-center;
+    border: 2.5px solid color-mix(in srgb, var(--youc-bg) 35%, transparent);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--youc-bg) 12%, transparent);
+    color: var(--youc-bg);
+  }
+
+  .youc-stat-banner-label {
+    @apply text-sm font-bold uppercase tracking-wide;
+    color: color-mix(in srgb, var(--youc-bg) 72%, transparent);
+  }
+
+  .youc-stat-banner-value {
+    @apply mt-2 text-4xl font-bold tabular-nums;
+    color: var(--youc-bg);
+  }
+
+  .youc-stat-banner-meta {
+    @apply mt-2 text-sm;
+    color: color-mix(in srgb, var(--youc-bg) 72%, transparent);
+  }
+
+  .search-input-icon {
+    color: color-mix(in srgb, var(--youc-muted) 82%, var(--youc-ink));
+  }
+
+  /* ============ 模型市场筛选下拉 ============ */
+  .filter-select {
+    @apply relative min-w-0;
+  }
+
+  .filter-select-button {
+    @apply flex h-10 w-full min-w-0 items-center justify-between gap-2 px-3 text-left text-sm;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: none;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+
+  .filter-select-button:hover:not(:disabled) {
+    background: var(--youc-soft);
+  }
+
+  .filter-select-button-open {
+    border-color: var(--youc-line);
+    box-shadow: none;
+  }
+
+  .filter-select-label {
+    @apply min-w-0 flex-1 truncate font-semibold;
+    color: var(--youc-ink);
+  }
+
+  .filter-select-chevron {
+    @apply shrink-0 transition-transform;
+    color: var(--youc-muted);
+  }
+
+  .filter-select-chevron-open {
+    transform: rotate(180deg);
+  }
+
+  .filter-select-menu {
+    @apply absolute left-0 right-0 z-30 max-h-72 overflow-y-auto p-0;
+    top: calc(100% - 2.5px);
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: none;
+  }
+
+  .filter-select-option {
+    @apply flex w-full min-w-0 items-center justify-between gap-2 text-left text-sm;
+    border-radius: 0;
+    color: var(--youc-ink);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  /* ============ 分段控件（图表等） ============ */
+  .seg-control {
+    @apply inline-flex p-0;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+  }
+
+  .seg-control-btn {
+    @apply px-2.5 py-1 text-xs font-bold uppercase tracking-wide;
+    border: none;
+    border-right: 2px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--youc-muted);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .seg-control-btn:last-child {
+    border-right: none;
+  }
+
+  .seg-control-btn:hover:not(.seg-control-btn-active) {
+    background: var(--youc-soft);
+    color: var(--youc-ink);
+  }
+
+  .seg-control-btn-active {
+    background: var(--youc-ink);
+    color: var(--youc-bg);
+  }
+
+  /* ============ 用量 Tooltip ============ */
+  .usage-tooltip {
+    @apply whitespace-nowrap px-3 py-2.5;
+    font-size: 0.75rem;
+    line-height: 1.25;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    box-shadow: var(--youc-shadow);
+  }
+
+  .usage-tooltip .text-gray-300,
+  .usage-tooltip .text-gray-400 {
+    color: var(--youc-muted) !important;
+  }
+
+  .usage-tooltip .text-white,
+  .usage-tooltip .font-medium.text-white,
+  .usage-tooltip .font-semibold.text-white {
+    color: var(--youc-ink) !important;
+    font-weight: 800 !important;
+  }
+
+  .usage-tooltip .text-blue-400,
+  .usage-tooltip .text-cyan-300,
+  .usage-tooltip .text-sky-300 {
+    color: var(--youc-info) !important;
+    font-weight: 800 !important;
+  }
+
+  .usage-tooltip .text-green-400 {
+    color: var(--text-success) !important;
+    font-weight: 800 !important;
+  }
+
+  .usage-tooltip .text-pink-300,
+  .usage-tooltip .text-violet-300 {
+    color: #6d28d9 !important;
+    font-weight: 800 !important;
+  }
+
+  .usage-tooltip .text-rose-400 {
+    color: var(--youc-danger) !important;
+    font-weight: 800 !important;
+  }
+
+  .usage-tooltip .border-gray-700 {
+    border-color: color-mix(in srgb, var(--youc-line) 35%, transparent) !important;
+  }
+
+  .usage-tooltip-arrow {
+    border-right-color: var(--youc-line) !important;
+  }
+
+  .usage-tooltip-title {
+    color: var(--youc-ink);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 2px solid var(--youc-line);
+  }
+
+  .usage-tooltip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 4px 0;
+  }
+
+  .usage-tooltip-label {
+    color: var(--youc-muted);
+    font-weight: 600;
+  }
+
+  .usage-tooltip-val {
+    color: var(--youc-ink);
+    font-weight: 800;
+  }
+
+  .usage-tooltip-divider {
+    margin-top: 0.375rem;
+    padding-top: 0.375rem;
+    border-top: 2px solid color-mix(in srgb, var(--youc-line) 35%, transparent);
+  }
+
+  .usage-tooltip-total {
+    color: var(--youc-accent);
+    font-weight: 800;
+  }
+
+  .pagination-bar {
+    border-top: 2px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+  }
+
+  .pagination-bar .text-gray-700,
+  .pagination-bar .text-gray-300 {
+    color: var(--youc-ink) !important;
+  }
+
+  .usage-filter-menu {
+    margin-top: 6px;
+  }
+
+  .usage-filter-search .youc-dropdown-panel-trigger {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ============ 仪表盘统计卡 ============ */
+  .stat-card-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--youc-muted);
+  }
+
+  .stat-card-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--youc-ink);
+  }
+
+  .stat-card-meta {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .stat-card-meta-success {
+    color: var(--text-success);
+  }
+
+  .stat-card-meta-danger {
+    color: var(--youc-danger);
+  }
+
+  .stat-card-icon {
+    padding: 0.5rem;
+    border: 2px solid var(--youc-line);
+    background: var(--youc-soft);
+    border-radius: 0;
+  }
+
+  .stat-card-icon svg {
+    color: var(--youc-ink);
+  }
+
+  /* ============ 平台类型徽章 ============ */
+  .platform-type-badge {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .platform-type-badge-row {
+    display: inline-flex;
+    align-items: stretch;
+    border: 2px solid var(--youc-line);
+  }
+
+  .platform-type-badge-seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-right: 2px solid var(--youc-line);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  .platform-type-badge-seg:last-child {
+    border-right: none;
+  }
+
+  .platform-type-badge-meta {
+    padding-left: 2px;
+    font-size: 10px;
+    line-height: 1.25;
+    color: var(--youc-muted);
+  }
+
+  /* ============ YOUC 进度条外壳 ============ */
+  .progress-track {
+    overflow: hidden;
+    border: 2px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+  }
+
+  .progress-track-sm {
+    height: 0.375rem;
+  }
+
+  .progress-track-md {
+    height: 0.5rem;
+  }
+
+  .progress-track-fill {
+    height: 100%;
+    border-radius: 0;
+    transition: width 300ms ease;
+  }
+
+  .progress-track-fill-ok {
+    background: var(--text-success);
+  }
+
+  .progress-track-fill-warn {
+    background: var(--youc-warn);
+  }
+
+  .progress-track-fill-danger {
+    background: var(--youc-danger);
+  }
+
+  .progress-track-fill-accent {
+    background: var(--youc-accent-2);
+  }
+
+  .usage-filter-option {
+    width: 100%;
+    text-align: left;
+  }
+
+  .usage-filter-clear {
+    color: var(--youc-muted);
+  }
+
+  .usage-filter-meta {
+    font-size: 0.75rem;
+    color: var(--youc-muted);
+    font-weight: 600;
+  }
+
+  /* ============ 用量 Token 列 ============ */
+  .usage-token-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .usage-token-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1875rem;
+  }
+
+  .usage-token-line {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .usage-token-num {
+    color: var(--text-primary);
+    font-weight: 800;
+  }
+
+  .usage-token-icon {
+    font-weight: 800;
+  }
+
+  .usage-token-icon-in {
+    color: var(--text-success);
+  }
+
+  .usage-token-icon-out {
+    color: #6d28d9;
+  }
+
+  .usage-token-icon-cache {
+    color: var(--youc-accent);
+  }
+
+  .usage-token-icon-create {
+    color: var(--youc-warn);
+  }
+
+  .usage-cost-value {
+    color: var(--text-cost);
+    font-weight: 800;
+  }
+
+  .usage-info-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    padding: 0;
+    border: 2px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--text-secondary);
+    cursor: help;
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .usage-info-btn:hover {
+    background: var(--youc-soft);
+    color: var(--youc-ink);
+  }
+
+  .usage-badge-mini {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 4px;
+    border: 1.5px solid var(--youc-line);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .usage-badge-mini-warn {
+    background: #fde68a;
+    color: #111111;
+  }
+
+  .usage-badge-mini-danger {
+    background: color-mix(in srgb, var(--youc-danger) 18%, var(--youc-paper));
+    color: var(--youc-danger);
+  }
+
+  /* ============ API Key 展示 ============ */
+  .code-key {
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border: 2px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-soft);
+    color: var(--youc-ink);
+  }
+
+  .copy-btn {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 2px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    cursor: pointer;
+    transition: background-color 120ms ease;
+  }
+
+  .copy-btn:hover {
+    background: var(--youc-soft);
+  }
+
+  .copy-btn.is-copied {
+    color: var(--text-success);
+  }
+
+  /* §22 YOUC Dropdown — LocaleSwitcher / Select 共用 */
+  .youc-dropdown-block {
+    width: 100%;
+  }
+
+  .youc-dropdown:not(.youc-dropdown-block) .youc-dropdown-trigger {
+    width: auto;
+  }
+
+  .youc-dropdown-trigger,
+  .locale-switcher-trigger,
+  .select-trigger {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    cursor: pointer;
+    transition: box-shadow 120ms ease, background-color 120ms ease;
+    box-shadow: none;
+  }
+
+  .select-trigger {
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .youc-dropdown-trigger:hover:not(:disabled),
+  .locale-switcher-trigger:hover:not(:disabled),
+  .select-trigger:hover:not(:disabled) {
+    background: var(--youc-soft);
+  }
+
+  .youc-dropdown-trigger-open,
+  .locale-switcher-trigger-open {
+    box-shadow: none;
+  }
+
+  .youc-dropdown-trigger-detached.youc-dropdown-trigger-open,
+  .select-trigger-open {
+    position: relative;
+    z-index: 51;
+    box-shadow: none;
+  }
+
+  .youc-dropdown-trigger:disabled,
+  .locale-switcher-trigger:disabled,
+  .select-trigger-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: var(--youc-soft);
+  }
+
+  .youc-dropdown-trigger-error,
+  .select-trigger-error {
+    border-color: var(--youc-danger);
+  }
+
+  .youc-dropdown-chevron,
+  .locale-switcher-chevron,
+  .select-icon {
+    flex-shrink: 0;
+    color: var(--youc-ink);
+  }
+
+  .youc-dropdown-value,
+  .select-value {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  .select-clear {
+    display: flex;
+    flex-shrink: 0;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--youc-muted);
+    transition: color 120ms ease;
+  }
+
+  .select-clear:hover {
+    color: var(--youc-ink);
+  }
+
+  .youc-dropdown-panel,
+  .locale-switcher-menu,
+  .select-dropdown,
+  .select-dropdown-portal,
+  .filter-select-menu,
+  .usage-filter-menu {
+    overflow: hidden;
+    border: 2.5px solid var(--youc-line);
+    border-radius: 0;
+    background: var(--youc-paper);
+    box-shadow: 5px 5px 0 var(--youc-line);
+  }
+
+  .select-dropdown {
+    position: absolute;
+    z-index: 100;
+    margin-top: 6px;
+    width: 100%;
+  }
+
+  .select-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid color-mix(in srgb, var(--youc-line) 25%, transparent);
+  }
+
+  .select-search {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .select-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+    color: var(--youc-ink);
+    outline: none;
+  }
+
+  .select-search-input::placeholder {
+    color: var(--youc-muted);
+  }
+
+  .select-options {
+    max-height: 15rem;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .select-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--youc-muted);
+  }
+
+  .batch-test-btn,
+  .proxy-test-btn {
+    flex-shrink: 0;
+    padding: 0.375rem;
+    border: 2px solid var(--youc-line);
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    transition: background-color 120ms ease;
+  }
+
+  .batch-test-btn:hover:not(:disabled),
+  .proxy-test-btn:hover:not(:disabled) {
+    background: var(--youc-soft);
+  }
+
+  .batch-test-btn:disabled,
+  .proxy-test-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .youc-dropdown-panel-inline {
+    position: absolute;
+    left: 0;
+    z-index: 50;
+    margin-top: 6px;
+  }
+
+  .youc-dropdown-panel-right {
+    right: 0;
+    left: auto;
+  }
+
+  .youc-dropdown-panel-floating,
+  .select-dropdown-portal {
+    width: max-content;
+    pointer-events: auto !important;
+  }
+
+  .youc-dropdown-panel-sm {
+    width: 8rem;
+  }
+
+  .youc-dropdown-panel-md {
+    min-width: 12.5rem;
+  }
+
+  .youc-dropdown-panel-lg {
+    min-width: 16rem;
+  }
+
+  .date-picker-dropdown {
+    min-width: 20rem;
+  }
+
+  .youc-dropdown-panel-trigger {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .youc-dropdown-panel-auto {
+    width: max-content;
+    min-width: 12.5rem;
+  }
+
+  .youc-dropdown-option,
+  .locale-switcher-option,
+  .select-option,
+  .filter-select-option {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--youc-ink);
+    background: var(--youc-paper);
+    border: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 16%, transparent);
+    transition: background-color 120ms ease, color 120ms ease, font-weight 120ms ease;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .youc-dropdown-option:last-child,
+  .locale-switcher-option:last-child,
+  .select-option:last-child,
+  .filter-select-option:last-child {
+    border-bottom: none;
+  }
+
+  .youc-dropdown-option:hover:not(:disabled):not(.youc-dropdown-option-selected),
+  .locale-switcher-option:hover:not(:disabled):not(.locale-switcher-option-selected),
+  .select-option:hover:not(.select-option-selected):not(.select-option-disabled),
+  .filter-select-option:hover:not(.filter-select-option-active) {
+    background: var(--youc-dropdown-hover-bg);
+    color: var(--youc-dropdown-hover-fg);
+    font-weight: 850;
+  }
+
+  .youc-dropdown-option-selected,
+  .youc-dropdown-option-selected:hover:not(:disabled),
+  .locale-switcher-option-selected,
+  .locale-switcher-option-selected:hover:not(:disabled),
+  .select-option-selected,
+  .select-option-selected:hover,
+  .select-option-selected.select-option-focused,
+  .filter-select-option-active,
+  .filter-select-option-active:hover {
+    background: var(--youc-dropdown-selected-bg);
+    color: var(--youc-dropdown-selected-fg);
+    font-weight: 850;
+  }
+
+  .youc-dropdown-option:disabled,
+  .locale-switcher-option:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .youc-dropdown-inline-enter-active,
+  .youc-dropdown-float-enter-active {
+    transition: opacity 0.08s ease;
+  }
+
+  .youc-dropdown-inline-leave-active,
+  .youc-dropdown-float-leave-active {
+    transition: none;
+  }
+
+  .youc-dropdown-inline-enter-from,
+  .youc-dropdown-float-enter-from {
+    opacity: 0;
+  }
+
+  .youc-dropdown-inline-leave-to,
+  .youc-dropdown-float-leave-to {
+    opacity: 1;
   }
 
   /* ============ 代码块 ============ */
@@ -907,23 +1941,47 @@
   }
 
   .tour-info-box {
-    @apply rounded-md border-l-4 border-blue-500 bg-blue-50 px-3 py-2 text-xs text-blue-900;
-    @apply dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200;
+    @apply px-3 py-2 text-xs;
+    border: 2.5px solid var(--youc-line);
+    border-left-width: 8px;
+    border-left-color: var(--youc-info);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 650;
   }
 
   .tour-success-box {
-    @apply rounded-md border-l-4 border-emerald-500 bg-emerald-50 px-3 py-2 text-xs text-emerald-900;
-    @apply dark:border-emerald-400 dark:bg-emerald-950/40 dark:text-emerald-200;
+    @apply px-3 py-2 text-xs;
+    border: 2.5px solid var(--youc-line);
+    border-left-width: 8px;
+    border-left-color: var(--text-success);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 650;
   }
 
   .tour-warning-box {
-    @apply rounded-md border-l-4 border-amber-500 bg-amber-50 px-3 py-2 text-xs text-amber-900;
-    @apply dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200;
+    @apply px-3 py-2 text-xs;
+    border: 2.5px solid var(--youc-line);
+    border-left-width: 8px;
+    border-left-color: var(--youc-warn);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 650;
   }
 
   .tour-error-box {
-    @apply rounded-md border-l-4 border-red-500 bg-red-50 px-3 py-2 text-xs text-red-900;
-    @apply dark:border-red-400 dark:bg-red-950/40 dark:text-red-200;
+    @apply px-3 py-2 text-xs;
+    border: 2.5px solid var(--youc-line);
+    border-left-width: 8px;
+    border-left-color: var(--youc-danger);
+    border-radius: 0;
+    background: var(--youc-paper);
+    color: var(--youc-ink);
+    font-weight: 650;
   }
 
   /* ============ 表格页面布局优化 ============ */
@@ -1121,6 +2179,31 @@
     border-radius: 0;
   }
 
+  /* Tailwind spinners: keep circular ring (§20) */
+  .animate-spin.rounded-full {
+    border-radius: 50% !important;
+    border-style: solid !important;
+    border-width: 2.5px !important;
+    border-color: color-mix(in srgb, var(--youc-line) 28%, transparent) !important;
+    border-top-color: var(--youc-accent) !important;
+    border-right-color: color-mix(in srgb, var(--youc-line) 28%, transparent) !important;
+    border-bottom-color: color-mix(in srgb, var(--youc-line) 28%, transparent) !important;
+    border-left-color: color-mix(in srgb, var(--youc-line) 28%, transparent) !important;
+  }
+
+  .animate-spin.rounded-full.border-4 {
+    border-width: 3.5px !important;
+  }
+
+  .animate-spin.rounded-full.border-white,
+  .animate-spin.rounded-full[class*="border-white"] {
+    border-color: color-mix(in srgb, #ffffff 35%, transparent) !important;
+    border-top-color: #ffffff !important;
+    border-right-color: color-mix(in srgb, #ffffff 35%, transparent) !important;
+    border-bottom-color: color-mix(in srgb, #ffffff 35%, transparent) !important;
+    border-left-color: color-mix(in srgb, #ffffff 35%, transparent) !important;
+  }
+
   .blur-3xl,
   .blur-2xl,
   .blur-xl {
@@ -1170,14 +2253,27 @@
   }
 
   input[type='checkbox'] {
+    width: 1.125rem;
+    height: 1.125rem;
     border: 2.5px solid var(--youc-line);
     border-radius: 0;
+    appearance: none;
     background-color: var(--youc-paper);
     color: var(--youc-accent);
+    display: inline-grid;
+    place-content: center;
   }
 
   input[type='checkbox']:checked {
     background-color: var(--youc-accent);
+  }
+
+  input[type='checkbox']:checked::after {
+    content: '✓';
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
   }
 
   input[type='date'],
@@ -1255,6 +2351,61 @@
 
 /* Scoped component styles for Select and DateRangePicker need an explicit
    post-layer override to match the shared YOUC controls. */
+.switch,
+.switch:hover,
+.switch:focus,
+.switch:focus-visible {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.switch-thumb {
+  box-shadow: none !important;
+}
+
+.switch-active .switch-thumb {
+  transform: translateX(100%) !important;
+}
+
+.filter-select-button,
+.filter-select-menu {
+  border-radius: 0 !important;
+}
+
+.filter-select-button {
+  border: 2.5px solid var(--youc-line) !important;
+  background: var(--youc-paper) !important;
+  color: var(--youc-ink) !important;
+  box-shadow: none !important;
+}
+
+.filter-select-button-open {
+  box-shadow: none !important;
+}
+
+.filter-select-menu {
+  border: 2.5px solid var(--youc-line) !important;
+  background: var(--youc-paper) !important;
+  box-shadow: none !important;
+}
+
+.filter-select-label {
+  color: var(--youc-ink) !important;
+}
+
+.filter-select-option-active,
+.filter-select-option-active:hover {
+  background: var(--youc-dropdown-selected-bg) !important;
+  color: var(--youc-dropdown-selected-fg) !important;
+  font-weight: 850 !important;
+}
+
+.youc-dropdown-panel,
+.select-dropdown-portal,
+.usage-filter-menu {
+  box-shadow: 5px 5px 0 var(--youc-line) !important;
+}
+
 .select-trigger,
 .date-picker-trigger,
 button.select-trigger,
@@ -1266,10 +2417,14 @@ button.date-picker-trigger {
   box-shadow: none !important;
 }
 
-.select-trigger-open,
-.date-picker-trigger-open {
+.select-trigger-open {
   border-color: var(--youc-line) !important;
-  box-shadow: 4px 4px 0 var(--youc-accent-2) !important;
+  box-shadow: none !important;
+}
+
+.locale-switcher-trigger-open {
+  border-color: var(--youc-line) !important;
+  box-shadow: none !important;
 }
 
 .select-dropdown-portal,
@@ -1278,7 +2433,7 @@ button.date-picker-trigger {
   border-radius: 0 !important;
   background: var(--youc-paper) !important;
   color: var(--youc-ink) !important;
-  box-shadow: 4px 4px 0 var(--youc-line) !important;
+  box-shadow: 5px 5px 0 var(--youc-line) !important;
 }
 
 .select-option,
@@ -1286,16 +2441,20 @@ button.date-picker-trigger {
   color: var(--youc-ink) !important;
 }
 
-.select-option-focused,
-.select-option:hover,
-.date-picker-preset:hover {
-  background: var(--youc-soft) !important;
+.select-option-focused:not(.select-option-selected),
+.select-option:hover:not(.select-option-selected):not(.select-option-disabled),
+.date-picker-preset:hover:not(.date-picker-preset-active) {
+  background: var(--youc-dropdown-hover-bg) !important;
+  color: var(--youc-dropdown-hover-fg) !important;
 }
 
 .select-option-selected,
+.select-option-selected.select-option-focused,
+.select-option-selected:hover,
 .date-picker-preset-active {
-  background: var(--youc-ink) !important;
-  color: var(--youc-bg) !important;
+  background: var(--youc-dropdown-selected-bg) !important;
+  color: var(--youc-dropdown-selected-fg) !important;
+  font-weight: 850 !important;
 }
 
 .date-picker-apply {
@@ -1350,6 +2509,168 @@ button.date-picker-trigger {
 .table-wrapper thead input[type='checkbox'] {
   background-color: var(--youc-bg) !important;
   color: var(--youc-accent) !important;
+}
+
+/* Modal inner tables — soft header, contained horizontal scroll */
+.modal-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  border: 2px solid color-mix(in srgb, var(--youc-line) 35%, transparent);
+  background: var(--youc-paper);
+  scrollbar-gutter: stable;
+}
+
+.modal-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.modal-table-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--youc-muted) 55%, transparent);
+  border-radius: 0;
+}
+
+.modal-inner-table {
+  width: 100%;
+  /* 列宽合计约 51.25rem；弹窗窄于此时出现横向滚动条 */
+  min-width: 52rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.modal-inner-table col.col-platform {
+  width: 8.5rem;
+}
+
+.modal-inner-table col.col-limit {
+  width: 9.75rem;
+}
+
+.modal-inner-table col.col-usage {
+  width: 13.5rem;
+}
+
+.modal-inner-table thead {
+  background: var(--youc-soft) !important;
+  color: var(--youc-ink) !important;
+}
+
+.modal-inner-table thead th {
+  padding: 0.625rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 2.5px solid var(--youc-line) !important;
+  background: var(--youc-soft) !important;
+  color: var(--youc-ink) !important;
+  opacity: 1 !important;
+}
+
+.modal-inner-table thead th:hover {
+  background: var(--youc-soft) !important;
+}
+
+.modal-inner-table tbody td {
+  padding: 0.625rem 0.5rem;
+  overflow: hidden;
+  vertical-align: middle;
+  color: var(--youc-ink);
+  font-weight: 600;
+  border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 18%, transparent);
+}
+
+.modal-inner-table .platform-quota-platform {
+  font-weight: 800;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-quota-cell-input {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.modal-quota-input {
+  width: 100%;
+  min-width: 0;
+  max-width: 7rem;
+  flex: 1;
+  padding: 0.375rem 0.5rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.modal-quota-usage {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--youc-muted);
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.modal-quota-reset {
+  flex-shrink: 0;
+  padding: 0 0.15rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--youc-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-quota-reset:hover:not(:disabled) {
+  color: var(--youc-accent);
+}
+
+.modal-quota-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.platform-quota-subtitle {
+  color: var(--youc-muted);
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.platform-quota-hint {
+  color: var(--youc-muted);
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* Chart card embedded tables — soft header (§02), not global black thead */
+.chart-inner-table thead {
+  background: var(--youc-soft) !important;
+  color: var(--youc-ink) !important;
+}
+
+.chart-inner-table thead th {
+  padding: 0.5rem 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 2.5px solid var(--youc-line) !important;
+  background: var(--youc-soft) !important;
+  color: var(--youc-ink) !important;
+  opacity: 1 !important;
+}
+
+.chart-inner-table thead th:hover {
+  background: var(--youc-soft) !important;
 }
 
 .table-scroll-container tbody,
@@ -1446,7 +2767,7 @@ button.date-picker-trigger {
 }
 
 .select-dropdown-portal .select-options {
-  padding-block: 0.25rem !important;
+  padding-block: 0 !important;
 }
 
 .select-dropdown-portal .select-option,
@@ -1456,6 +2777,7 @@ button.date-picker-trigger {
   font-size: 0.8125rem !important;
   font-weight: 750 !important;
   line-height: 1.25 !important;
+  border-bottom: none !important;
 }
 
 .select-dropdown-portal .select-option-label,
@@ -1496,4 +2818,18 @@ nav[aria-label='Pagination'] button:first-child {
 nav[aria-label='Pagination'] button[aria-current='page'] {
   background: var(--youc-ink) !important;
   color: var(--youc-bg) !important;
+}
+
+/* Square YOUC shells for legacy Tailwind progress tracks */
+div[class*='overflow-hidden'][class*='rounded-full'][class*='bg-gray-200'],
+div[class*='overflow-hidden'][class*='rounded-full'][class*='bg-gray-100'],
+div[class*='overflow-hidden'][class*='rounded-full'][class*='bg-dark-600'],
+div[class*='overflow-hidden'][class*='rounded-full'][class*='bg-dark-700'] {
+  border-radius: 0 !important;
+  border: 2px solid var(--youc-line);
+  background: var(--youc-paper) !important;
+}
+
+div[class*='overflow-hidden'][class*='rounded-full'] > div[class*='h-full'] {
+  border-radius: 0 !important;
 }

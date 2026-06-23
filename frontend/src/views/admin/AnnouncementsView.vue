@@ -211,14 +211,12 @@
       </form>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button type="button" @click="closeEdit" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button type="submit" form="announcement-form" :disabled="saving" class="btn btn-primary">
-            {{ saving ? t('common.saving') : t('common.save') }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="saving"
+          :loading-text="t('common.saving')"
+          confirm-form="announcement-form"
+          @cancel="closeEdit"
+        />
       </template>
     </BaseDialog>
 
@@ -258,6 +256,7 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import Select from '@/components/common/Select.vue'
 import EmptyState from '@/components/common/EmptyState.vue'

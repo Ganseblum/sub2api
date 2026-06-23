@@ -224,14 +224,13 @@
         </div>
       </form>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button type="button" @click="showCreateDialog = false" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button type="submit" form="create-promo-form" :disabled="creating" class="btn btn-primary">
-            {{ creating ? t('common.creating') : t('common.create') }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="creating"
+          :loading-text="t('common.creating')"
+          :confirm-text="t('common.create')"
+          confirm-form="create-promo-form"
+          @cancel="showCreateDialog = false"
+        />
       </template>
     </BaseDialog>
 
@@ -302,14 +301,12 @@
         </div>
       </form>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button type="button" @click="closeEditDialog" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button type="submit" form="edit-promo-form" :disabled="updating" class="btn btn-primary">
-            {{ updating ? t('common.saving') : t('common.save') }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="updating"
+          :loading-text="t('common.saving')"
+          confirm-form="edit-promo-form"
+          @cancel="closeEditDialog"
+        />
       </template>
     </BaseDialog>
 
@@ -363,11 +360,11 @@
         </div>
       </div>
       <template #footer>
-        <div class="flex justify-end">
-          <button type="button" @click="showUsagesDialog = false" class="btn btn-secondary">
-            {{ t('common.close') }}
-          </button>
-        </div>
+        <DialogFooter
+          :show-confirm="false"
+          :cancel-text="t('common.close')"
+          @cancel="showUsagesDialog = false"
+        />
       </template>
     </BaseDialog>
 
@@ -401,6 +398,7 @@ import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Select from '@/components/common/Select.vue'
 import Icon from '@/components/icons/Icon.vue'
 

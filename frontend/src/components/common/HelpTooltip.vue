@@ -5,9 +5,11 @@ const props = withDefaults(defineProps<{
   content?: string
   trigger?: 'hover' | 'click'
   widthClass?: string
+  variant?: 'default' | 'youc'
 }>(), {
   trigger: 'hover',
   widthClass: 'w-64',
+  variant: 'default',
 })
 
 const show = ref(false)
@@ -99,7 +101,16 @@ onBeforeUnmount(() => {
   >
     <!-- Trigger Icon -->
     <slot name="trigger">
+      <button
+        v-if="props.variant === 'youc'"
+        type="button"
+        class="usage-info-btn"
+        aria-label="Help"
+      >
+        ?
+      </button>
       <svg
+        v-else
         class="h-4 w-4 cursor-help text-gray-400 transition-colors hover:text-primary-600 dark:text-gray-500 dark:hover:text-primary-400"
         fill="none"
         viewBox="0 0 24 24"

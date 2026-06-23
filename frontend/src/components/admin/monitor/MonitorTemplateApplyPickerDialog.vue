@@ -68,20 +68,14 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <button class="btn btn-secondary" @click="$emit('close')">
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          class="btn btn-primary"
-          :disabled="submitting || selectedIds.length === 0"
-          @click="handleApply"
-        >
-          {{ submitting
-            ? t('common.submitting')
-            : t('admin.channelMonitor.template.applyPickerConfirm', { n: selectedIds.length }) }}
-        </button>
-      </div>
+      <DialogFooter
+        :confirm-text="t('admin.channelMonitor.template.applyPickerConfirm', { n: selectedIds.length })"
+        :loading="submitting"
+        :loading-text="t('common.submitting')"
+        :confirm-disabled="selectedIds.length === 0"
+        @cancel="$emit('close')"
+        @confirm="handleApply"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -94,6 +88,7 @@ import { extractApiErrorMessage } from '@/utils/apiError'
 import { adminAPI } from '@/api/admin'
 import type { AssociatedMonitorBrief } from '@/api/admin/channelMonitorTemplate'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 
 const props = defineProps<{
   show: boolean

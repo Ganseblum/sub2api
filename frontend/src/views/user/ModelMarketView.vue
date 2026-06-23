@@ -41,7 +41,7 @@
             <Icon
               name="search"
               size="md"
-              class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              class="search-input-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
             />
             <input
               v-model="searchQuery"
@@ -51,42 +51,42 @@
             />
           </div>
 
-          <FilterSelect
+          <Select
             v-model="familyFilter"
             :options="familyOptions"
-            :aria-label="t('modelMarket.filters.platform')"
+            :searchable="false"
           />
 
-          <FilterSelect
+          <Select
             v-model="tierFilter"
             :options="tierFilterOptions"
-            :aria-label="t('modelMarket.filters.tier')"
+            :searchable="false"
           />
 
-          <FilterSelect
+          <Select
             v-model="groupFilter"
             :options="groupFilterOptions"
-            :aria-label="t('modelMarket.filters.group')"
+            :searchable="false"
           />
 
-          <FilterSelect
+          <Select
             v-model="sortKey"
             :options="sortOptions"
-            :aria-label="t('modelMarket.filters.sort')"
+            :searchable="false"
           />
 
-          <div class="inline-flex h-10 rounded-md border border-gray-200 bg-white p-1 shadow-sm">
+          <div class="seg-control h-10 shrink-0">
             <button
-              class="view-toggle"
-              :class="{ 'view-toggle-active': viewMode === 'table' }"
+              class="seg-control-btn view-toggle"
+              :class="{ 'seg-control-btn-active': viewMode === 'table' }"
               :title="t('modelMarket.view.table')"
               @click="viewMode = 'table'"
             >
               <Icon name="menu" size="sm" />
             </button>
             <button
-              class="view-toggle"
-              :class="{ 'view-toggle-active': viewMode === 'cards' }"
+              class="seg-control-btn view-toggle"
+              :class="{ 'seg-control-btn-active': viewMode === 'cards' }"
               :title="t('modelMarket.view.cards')"
               @click="viewMode = 'cards'"
             >
@@ -353,22 +353,30 @@
       </template>
 
       <template #footer>
-        <button class="btn btn-secondary" @click="copyDetailModelName">
-          <Icon name="copy" size="sm" />
-          <span>{{ t('modelMarket.actions.copyModel') }}</span>
-        </button>
-        <button class="btn btn-primary" @click="detailRow = null">{{ t('common.close') }}</button>
+        <DialogFooter :show-cancel="false" :show-confirm="false">
+          <template #actions>
+            <button type="button" class="btn btn-secondary" @click="copyDetailModelName">
+              <Icon name="copy" size="sm" />
+              <span>{{ t('modelMarket.actions.copyModel') }}</span>
+            </button>
+            <button type="button" class="btn btn-primary" @click="detailRow = null">
+              {{ t('common.close') }}
+            </button>
+          </template>
+        </DialogFooter>
       </template>
     </BaseDialog>
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, watch, type PropType } from 'vue'
+import { computed, defineComponent, h, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
+import Select, { type SelectOption } from '@/components/common/Select.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import GroupBadge from '@/components/common/GroupBadge.vue'
 import userGroupsAPI from '@/api/groups'
@@ -394,7 +402,7 @@ interface SummaryStats {
   lowestGroupName: string
 }
 
-interface FilterOption {
+interface FilterOption extends SelectOption {
   value: string
   label: string
 }
@@ -423,74 +431,6 @@ const staticModelSpecs: ModelMarketModel[] = [
   makeStaticModel('claude-sonnet-4-6', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
   makeStaticModel('claude-haiku-4-5', 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
 ]
-
-const FilterSelect = defineComponent({
-  name: 'FilterSelect',
-  props: {
-    modelValue: { type: String, required: true },
-    options: { type: Array as PropType<FilterOption[]>, required: true },
-    ariaLabel: { type: String, default: '' },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const open = ref(false)
-    const root = ref<HTMLElement | null>(null)
-    const selected = computed(() => props.options.find((option) => option.value === props.modelValue) ?? props.options[0])
-
-    const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!root.value?.contains(event.target as Node)) open.value = false
-    }
-
-    onMounted(() => document.addEventListener('click', closeOnOutsideClick))
-    onBeforeUnmount(() => document.removeEventListener('click', closeOnOutsideClick))
-
-    const choose = (value: string) => {
-      emit('update:modelValue', value)
-      open.value = false
-    }
-
-    return () =>
-      h('div', { ref: root, class: 'filter-select' }, [
-        h(
-          'button',
-          {
-            type: 'button',
-            class: ['filter-select-button', open.value ? 'filter-select-button-open' : ''],
-            'aria-label': props.ariaLabel,
-            'aria-expanded': open.value ? 'true' : 'false',
-            onClick: () => {
-              open.value = !open.value
-            },
-          },
-          [
-            h('span', { class: 'filter-select-label' }, selected.value?.label ?? ''),
-            h(Icon, { name: 'chevronDown', size: 'sm', class: ['filter-select-chevron', open.value ? 'filter-select-chevron-open' : ''] }),
-          ],
-        ),
-        open.value
-          ? h(
-              'div',
-              { class: 'filter-select-menu' },
-              props.options.map((option) =>
-                h(
-                  'button',
-                  {
-                    key: option.value,
-                    type: 'button',
-                    class: ['filter-select-option', option.value === props.modelValue ? 'filter-select-option-active' : ''],
-                    onClick: () => choose(option.value),
-                  },
-                  [
-                    h('span', { class: 'min-w-0 truncate' }, option.label),
-                    option.value === props.modelValue ? h(Icon, { name: 'check', size: 'sm', class: 'shrink-0' }) : null,
-                  ],
-                ),
-              ),
-            )
-          : null,
-      ])
-  },
-})
 
 const PriceLines = defineComponent({
   name: 'PriceLines',
@@ -885,7 +825,7 @@ onMounted(loadModels)
 }
 
 .market-toolbar {
-  @apply grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(260px,2fr)_150px_150px_minmax(220px,1.2fr)_160px_auto] xl:items-center;
+  @apply grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(260px,2fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(220px,1.2fr)_minmax(170px,1fr)_auto] xl:items-center;
 }
 
 .market-table {
@@ -900,48 +840,8 @@ onMounted(loadModels)
   @apply flex max-w-[310px] flex-col gap-2;
 }
 
-:global(.filter-select) {
-  @apply relative min-w-0;
-}
-
-:global(.filter-select-button) {
-  @apply flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 text-left text-sm text-gray-700 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-200 dark:bg-white dark:text-gray-700 dark:hover:border-gray-300 dark:hover:bg-gray-50;
-}
-
-:global(.filter-select-button-open) {
-  @apply border-primary-500 ring-2 ring-primary-500/20 dark:border-primary-500;
-}
-
-:global(.filter-select-label) {
-  @apply min-w-0 flex-1 truncate;
-}
-
-:global(.filter-select-chevron) {
-  @apply shrink-0 text-gray-400 transition-transform dark:text-gray-400;
-}
-
-:global(.filter-select-chevron-open) {
-  @apply rotate-180;
-}
-
-:global(.filter-select-menu) {
-  @apply absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-72 overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-xl dark:border-gray-200 dark:bg-white;
-}
-
-:global(.filter-select-option) {
-  @apply flex w-full min-w-0 items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-700 dark:hover:bg-gray-50;
-}
-
-:global(.filter-select-option-active) {
-  @apply bg-primary-50 text-primary-700 hover:bg-primary-100 dark:bg-primary-50 dark:text-primary-700 dark:hover:bg-primary-100;
-}
-
 .view-toggle {
-  @apply inline-flex h-8 w-9 items-center justify-center rounded text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-500 dark:hover:bg-gray-100;
-}
-
-.view-toggle-active {
-  @apply bg-primary-50 text-primary-700 hover:bg-primary-100 dark:bg-primary-50 dark:text-primary-700 dark:hover:bg-primary-100;
+  @apply inline-flex h-full min-h-[2rem] w-9 items-center justify-center;
 }
 
 .platform-chip,

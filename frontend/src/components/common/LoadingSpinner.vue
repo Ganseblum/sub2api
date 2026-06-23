@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="['spinner', sizeClasses, colorClass]"
+    :class="['loading-spinner', `loading-spinner--${size}`, `loading-spinner--${color}`]"
     role="status"
     :aria-label="t('common.loading')"
   >
@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -22,39 +21,63 @@ interface Props {
   color?: SpinnerColor
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   size: 'md',
   color: 'primary'
-})
-
-const sizeClasses = computed(() => {
-  const sizes: Record<SpinnerSize, string> = {
-    sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-2',
-    lg: 'w-12 h-12 border-[3px]',
-    xl: 'w-16 h-16 border-4'
-  }
-  return sizes[props.size]
-})
-
-const colorClass = computed(() => {
-  const colors: Record<SpinnerColor, string> = {
-    primary: 'text-primary-500',
-    secondary: 'text-gray-500 dark:text-dark-400',
-    white: 'text-white',
-    gray: 'text-gray-400 dark:text-dark-500'
-  }
-  return colors[props.color]
 })
 </script>
 
 <style scoped>
-.spinner {
-  @apply inline-block rounded-full border-solid border-current border-r-transparent;
-  animation: spin 0.75s linear infinite;
+.loading-spinner {
+  display: inline-block;
+  box-sizing: border-box;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--youc-line) 28%, transparent);
+  border-top-color: var(--youc-accent);
+  border-radius: 50%;
+  animation: loading-spinner-spin 0.75s linear infinite;
 }
 
-@keyframes spin {
+.loading-spinner--sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.loading-spinner--md {
+  width: 2rem;
+  height: 2rem;
+  border-width: 2.5px;
+}
+
+.loading-spinner--lg {
+  width: 3rem;
+  height: 3rem;
+  border-width: 3px;
+}
+
+.loading-spinner--xl {
+  width: 4rem;
+  height: 4rem;
+  border-width: 3.5px;
+}
+
+.loading-spinner--secondary {
+  border-color: color-mix(in srgb, var(--youc-muted) 35%, transparent);
+  border-top-color: var(--youc-muted);
+}
+
+.loading-spinner--white {
+  border-color: color-mix(in srgb, #ffffff 35%, transparent);
+  border-top-color: #ffffff;
+}
+
+.loading-spinner--gray {
+  border-color: color-mix(in srgb, var(--youc-muted) 25%, transparent);
+  border-top-color: color-mix(in srgb, var(--youc-muted) 70%, transparent);
+}
+
+@keyframes loading-spinner-spin {
   from {
     transform: rotate(0deg);
   }

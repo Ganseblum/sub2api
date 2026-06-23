@@ -50,11 +50,7 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end">
-        <button @click="$emit('close')" class="btn btn-secondary">
-          {{ t('channelStatus.closeDetail') }}
-        </button>
-      </div>
+      <DialogFooter :show-cancel="false" :confirm-text="t('channelStatus.closeDetail')" @confirm="$emit('close')" />
     </template>
   </BaseDialog>
 </template>
@@ -69,6 +65,7 @@ import {
   type UserMonitorDetail,
 } from '@/api/channelMonitor'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
 
 const props = defineProps<{

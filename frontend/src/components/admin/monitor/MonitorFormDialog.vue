@@ -115,10 +115,10 @@
         <p class="mt-1 text-xs text-gray-400">{{ t('admin.channelMonitor.form.jitterSecondsHint') }}</p>
       </div>
 
-      <div class="flex items-center justify-between">
-        <label class="input-label mb-0">{{ t('admin.channelMonitor.form.enabled') }}</label>
-        <Toggle v-model="form.enabled" />
-      </div>
+      <SettingToggleRow
+        v-model="form.enabled"
+        :label="t('admin.channelMonitor.form.enabled')"
+      />
 
       <!-- 高级设置区：请求模板 + 自定义 headers/body -->
       <details class="rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-dark-700 dark:bg-dark-900/30">
@@ -153,21 +153,13 @@
     </form>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button @click="$emit('close')" type="button" class="btn btn-secondary">
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          type="submit"
-          form="channel-monitor-form"
-          :disabled="submitting"
-          class="btn btn-primary"
-        >
-          {{ submitting
-            ? t('common.submitting')
-            : editing ? t('common.update') : t('common.create') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="submitting"
+        :loading-text="t('common.submitting')"
+        :confirm-text="editing ? t('common.update') : t('common.create')"
+        confirm-form="channel-monitor-form"
+        @cancel="$emit('close')"
+      />
     </template>
   </BaseDialog>
 
@@ -201,7 +193,8 @@ import type {
 import type { ChannelMonitorTemplate } from '@/api/admin/channelMonitorTemplate'
 import type { ApiKey } from '@/types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
-import Toggle from '@/components/common/Toggle.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
 import Select from '@/components/common/Select.vue'
 import ModelTagInput from '@/components/admin/channel/ModelTagInput.vue'
 import { getPlatformTextClass } from '@/components/admin/channel/types'

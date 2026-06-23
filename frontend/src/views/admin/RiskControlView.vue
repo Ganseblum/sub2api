@@ -64,9 +64,7 @@
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ t('admin.riskControl.preBlockSyncStatus') }}</h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.preBlockSyncHint') }}</p>
               </div>
-              <span class="inline-flex w-fit items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-dark-700 dark:text-gray-300">
-                {{ modeLabel(status?.mode ?? configForm.mode) }}
-              </span>
+              <span class="badge badge-gray">{{ modeLabel(status?.mode ?? configForm.mode) }}</span>
             </div>
 
             <div class="p-6">
@@ -93,9 +91,7 @@
                   {{ t('admin.riskControl.preBlockAPIKeyLoadHint') }}
                 </p>
               </div>
-              <span class="inline-flex w-fit items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-dark-700 dark:text-gray-300">
-                {{ preBlockAPIKeyLoadSummaryText }}
-              </span>
+              <span class="badge badge-gray">{{ preBlockAPIKeyLoadSummaryText }}</span>
             </div>
 
             <div class="p-6">
@@ -210,9 +206,7 @@
                     {{ t('admin.riskControl.workerPoolMeta', { active: status?.active_workers ?? 0, idle: status?.idle_workers ?? configForm.worker_count, total: status?.worker_count ?? configForm.worker_count }) }}
                   </p>
                 </div>
-                <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-dark-700 dark:text-gray-300">
-                  {{ modeLabel(status?.mode ?? configForm.mode) }}
-                </span>
+                <span class="badge badge-gray">{{ modeLabel(status?.mode ?? configForm.mode) }}</span>
               </div>
               <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
                 <div
@@ -386,12 +380,12 @@
 
           <div v-if="activeSettingsTab === 'basic'" class="space-y-5">
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
-              <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4 dark:border-dark-700">
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.enabled') }}</p>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.enabledHint') }}</p>
-                </div>
-                <Toggle v-model="configForm.enabled" />
+              <div class="rounded-lg border border-gray-100 p-4 dark:border-dark-700">
+                <SettingToggleRow
+                  v-model="configForm.enabled"
+                  :label="t('admin.riskControl.enabled')"
+                  :hint="t('admin.riskControl.enabledHint')"
+                />
               </div>
               <div>
                 <label class="input-label">{{ t('admin.riskControl.mode') }}</label>
@@ -803,21 +797,19 @@
               <label class="input-label">{{ t('admin.riskControl.queueSize') }}</label>
               <input v-model.number="configForm.queue_size" type="number" min="100" max="100000" class="input" />
             </div>
-            <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4 dark:border-dark-700 lg:col-span-2">
-              <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.recordNonHits') }}</p>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.recordNonHitsHint') }}</p>
-              </div>
-              <Toggle v-model="configForm.record_non_hits" />
+            <div class="rounded-lg border border-gray-100 p-4 dark:border-dark-700 lg:col-span-2">
+              <SettingToggleRow
+                v-model="configForm.record_non_hits"
+                :label="t('admin.riskControl.recordNonHits')"
+                :hint="t('admin.riskControl.recordNonHitsHint')"
+              />
             </div>
             <div class="space-y-4 rounded-lg border border-gray-100 p-4 dark:border-dark-700 lg:col-span-2">
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.preHashCheck') }}</p>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.preHashCheckHint') }}</p>
-                </div>
-                <Toggle v-model="configForm.pre_hash_check_enabled" />
-              </div>
+              <SettingToggleRow
+                v-model="configForm.pre_hash_check_enabled"
+                :label="t('admin.riskControl.preHashCheck')"
+                :hint="t('admin.riskControl.preHashCheckHint')"
+              />
               <div class="rounded-lg bg-gray-50 p-3 dark:bg-dark-900/30">
                 <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                   <div>
@@ -867,26 +859,26 @@
                 <label class="input-label">{{ t('admin.riskControl.blockMessage') }}</label>
                 <input v-model.trim="configForm.block_message" type="text" class="input" />
               </div>
-              <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4 dark:border-dark-700">
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.emailOnHit') }}</p>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.emailOnHitHint') }}</p>
-                </div>
-                <Toggle v-model="configForm.email_on_hit" />
+              <div class="rounded-lg border border-gray-100 p-4 dark:border-dark-700">
+                <SettingToggleRow
+                  v-model="configForm.email_on_hit"
+                  :label="t('admin.riskControl.emailOnHit')"
+                  :hint="t('admin.riskControl.emailOnHitHint')"
+                />
               </div>
-              <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4 dark:border-dark-700">
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.autoBan') }}</p>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.autoBanHint') }}</p>
-                </div>
-                <Toggle v-model="configForm.auto_ban_enabled" />
+              <div class="rounded-lg border border-gray-100 p-4 dark:border-dark-700">
+                <SettingToggleRow
+                  v-model="configForm.auto_ban_enabled"
+                  :label="t('admin.riskControl.autoBan')"
+                  :hint="t('admin.riskControl.autoBanHint')"
+                />
               </div>
-              <div class="flex items-center justify-between rounded-lg border border-gray-100 p-4 dark:border-dark-700 lg:col-span-2">
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ t('admin.riskControl.cyberPolicyExcludeBan') }}</p>
-                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.riskControl.cyberPolicyExcludeBanHint') }}</p>
-                </div>
-                <Toggle v-model="configForm.cyber_policy_exclude_from_ban_count" />
+              <div class="rounded-lg border border-gray-100 p-4 dark:border-dark-700 lg:col-span-2">
+                <SettingToggleRow
+                  v-model="configForm.cyber_policy_exclude_from_ban_count"
+                  :label="t('admin.riskControl.cyberPolicyExcludeBan')"
+                  :hint="t('admin.riskControl.cyberPolicyExcludeBanHint')"
+                />
               </div>
               <div>
                 <label class="input-label">{{ t('admin.riskControl.banThreshold') }}</label>
@@ -1039,14 +1031,13 @@
         </div>
 
         <template #footer>
-          <div class="flex justify-end gap-2">
-            <button type="button" class="btn btn-secondary" @click="settingsOpen = false">{{ t('common.cancel') }}</button>
-            <button type="button" class="btn btn-primary inline-flex items-center gap-2" :disabled="saving" @click="saveConfig">
-              <Icon v-if="saving" name="refresh" size="sm" class="animate-spin" />
-              <Icon v-else name="check" size="sm" />
-              {{ saving ? t('common.saving') : t('admin.riskControl.saveConfig') }}
-            </button>
-          </div>
+          <DialogFooter
+            :confirm-text="t('admin.riskControl.saveConfig')"
+            :loading="saving"
+            :loading-text="t('common.saving')"
+            @cancel="settingsOpen = false"
+            @confirm="saveConfig"
+          />
         </template>
       </BaseDialog>
 
@@ -1111,9 +1102,10 @@ import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Icon from '@/components/icons/Icon.vue'
 import Select from '@/components/common/Select.vue'
-import Toggle from '@/components/common/Toggle.vue'
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ModelWhitelistSelector from '@/components/account/ModelWhitelistSelector.vue'
 import { adminAPI } from '@/api/admin'

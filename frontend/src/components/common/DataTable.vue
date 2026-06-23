@@ -1,5 +1,6 @@
 <template>
-  <div v-if="!isDesktopViewport" class="space-y-3" :class="{ 'is-refreshing': isRefreshingRows }">
+  <div v-if="!isDesktopViewport" class="relative space-y-3" :class="{ 'is-refreshing': showRefreshing }">
+    <div v-if="showRefreshing" class="table-refresh-bar" aria-hidden="true" />
     <template v-if="showLoadingSkeleton">
       <div v-for="i in 5" :key="i" class="rounded-lg border border-gray-200 bg-white p-4 dark:border-dark-700 dark:bg-dark-900">
         <div class="space-y-3">
@@ -67,9 +68,10 @@
     :class="{
       'actions-expanded': actionsExpanded,
       'is-scrollable': isScrollable,
-      'is-refreshing': isRefreshingRows
+      'is-refreshing': showRefreshing,
     }"
   >
+    <div v-if="showRefreshing" class="table-refresh-bar" aria-hidden="true" />
     <table class="w-full min-w-max divide-y divide-gray-200 dark:divide-dark-700">
       <thead class="table-header bg-gray-50 dark:bg-dark-800">
         <tr>
@@ -152,13 +154,13 @@
 
         <!-- Data rows (virtual scroll) -->
         <template v-else>
-          <tr v-if="virtualPaddingTop > 0" aria-hidden="true">
+          <tr v-if="resolvedVirtualPaddingTop > 0" aria-hidden="true">
             <td :colspan="columns.length"
-                :style="{ height: virtualPaddingTop + 'px', padding: 0, border: 'none' }">
+                :style="{ height: resolvedVirtualPaddingTop + 'px', padding: 0, border: 'none' }">
             </td>
           </tr>
           <tr
-            v-for="virtualRow in virtualItems"
+            v-for="virtualRow in resolvedVirtualItems"
             :key="resolveRowKey(sortedData[virtualRow.index], virtualRow.index)"
             :data-row-id="resolveRowKey(sortedData[virtualRow.index], virtualRow.index)"
             :data-index="virtualRow.index"
@@ -185,9 +187,9 @@
               </slot>
             </td>
           </tr>
-          <tr v-if="virtualPaddingBottom > 0" aria-hidden="true">
+          <tr v-if="resolvedVirtualPaddingBottom > 0" aria-hidden="true">
             <td :colspan="columns.length"
-                :style="{ height: virtualPaddingBottom + 'px', padding: 0, border: 'none' }">
+                :style="{ height: resolvedVirtualPaddingBottom + 'px', padding: 0, border: 'none' }">
             </td>
           </tr>
         </template>
@@ -552,6 +554,15 @@ watch(
   { flush: 'post' }
 )
 
+watch(
+  () => props.data,
+  async () => {
+    await nextTick()
+    rowVirtualizer.value.measure?.()
+  },
+  { flush: 'post' }
+)
+
 // 单独监听展开状态变化，只更新滚动状态
 watch(actionsExpanded, async () => {
   await nextTick()
@@ -610,16 +621,48 @@ const rowVirtualizer = useVirtualizer(computed(() => ({
 
 const virtualItems = computed(() => rowVirtualizer.value.getVirtualItems())
 
-const virtualPaddingTop = computed(() => {
+const resolvedVirtualLayout = computed(() => {
   const items = virtualItems.value
-  return items.length > 0 ? items[0].start : 0
+  const rows = sortedData.value
+  const rowCount = rows?.length ?? 0
+  if (rowCount === 0) {
+    return { items: [] as typeof items, paddingTop: 0, paddingBottom: 0 }
+  }
+
+  if (items.length > 0) {
+    return {
+      items,
+      paddingTop: items[0].start,
+      paddingBottom: rowVirtualizer.value.getTotalSize() - items[items.length - 1].end,
+    }
+  }
+
+  // 虚拟化器在数据替换后的首帧可能返回空 range；用估算行高兜底，避免 tbody 整段空白
+  const est = props.estimateRowHeight ?? 56
+  const overscan = props.overscan ?? 5
+  const visibleCount = Math.min(
+    rowCount,
+    Math.ceil(estimatedViewportHeight() / est) + overscan,
+  )
+  const fallbackItems = Array.from({ length: visibleCount }, (_, index) => ({
+    index,
+    start: index * est,
+    end: (index + 1) * est,
+    key: index,
+    lane: 0,
+    size: est,
+  }))
+
+  return {
+    items: fallbackItems,
+    paddingTop: 0,
+    paddingBottom: Math.max(0, rowCount * est - fallbackItems[fallbackItems.length - 1].end),
+  }
 })
 
-const virtualPaddingBottom = computed(() => {
-  const items = virtualItems.value
-  if (items.length === 0) return 0
-  return rowVirtualizer.value.getTotalSize() - items[items.length - 1].end
-})
+const resolvedVirtualItems = computed(() => resolvedVirtualLayout.value.items)
+const resolvedVirtualPaddingTop = computed(() => resolvedVirtualLayout.value.paddingTop)
+const resolvedVirtualPaddingBottom = computed(() => resolvedVirtualLayout.value.paddingBottom)
 
 const measureElement = (el: any) => {
   if (el) {
@@ -633,7 +676,7 @@ const hasActionsColumn = computed(() => {
 
 const hasDataRows = computed(() => Array.isArray(props.data) && props.data.length > 0)
 const showLoadingSkeleton = computed(() => props.loading && !hasDataRows.value)
-const isRefreshingRows = computed(() => props.loading && hasDataRows.value)
+const showRefreshing = computed(() => props.loading && hasDataRows.value)
 
 const hasSelectColumn = computed(() => {
   return props.columns.length > 0 && props.columns[0].key === 'select'
@@ -748,9 +791,37 @@ defineExpose({
   isolation: isolate;
 }
 
-.table-wrapper.is-refreshing,
-.is-refreshing {
-  cursor: progress;
+.table-refresh-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 220;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--youc-accent-2, #14b8a6) 45%,
+    var(--youc-accent-2, #14b8a6) 55%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: table-refresh-slide 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.table-wrapper.is-refreshing tbody {
+  transition: opacity 120ms ease;
+  opacity: 0.88;
+}
+
+@keyframes table-refresh-slide {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 /* 表头容器，确保在滚动时覆盖表体内容 */

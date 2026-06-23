@@ -529,39 +529,13 @@
         </div>
       </form>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button @click="closeAssignModal" type="button" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button
-            type="submit"
-            form="assign-subscription-form"
-            :disabled="submitting"
-            class="btn btn-primary"
-          >
-            <svg
-              v-if="submitting"
-              class="-ml-1 mr-2 h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ submitting ? t('admin.subscriptions.assigning') : t('admin.subscriptions.assign') }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="submitting"
+          :loading-text="t('admin.subscriptions.assigning')"
+          :confirm-text="t('admin.subscriptions.assign')"
+          confirm-form="assign-subscription-form"
+          @cancel="closeAssignModal"
+        />
       </template>
     </BaseDialog>
 
@@ -617,19 +591,14 @@
         </div>
       </form>
       <template #footer>
-        <div v-if="extendingSubscription" class="flex justify-end gap-3">
-          <button @click="closeExtendModal" type="button" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button
-            type="submit"
-            form="extend-subscription-form"
-            :disabled="submitting"
-            class="btn btn-primary"
-          >
-            {{ submitting ? t('admin.subscriptions.adjusting') : t('admin.subscriptions.adjust') }}
-          </button>
-        </div>
+        <DialogFooter
+          v-if="extendingSubscription"
+          :loading="submitting"
+          :loading-text="t('admin.subscriptions.adjusting')"
+          :confirm-text="t('admin.subscriptions.adjust')"
+          confirm-form="extend-subscription-form"
+          @cancel="closeExtendModal"
+        />
       </template>
     </BaseDialog>
 
@@ -752,6 +721,7 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Select from '@/components/common/Select.vue'

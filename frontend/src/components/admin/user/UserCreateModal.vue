@@ -6,10 +6,9 @@
     @close="$emit('close')"
   >
     <form id="create-user-form" @submit.prevent="submit" class="space-y-5">
-      <div>
-        <label class="input-label">{{ t('admin.users.email') }}</label>
+      <FormField :label="t('admin.users.email')">
         <input v-model="form.email" type="email" required class="input" :placeholder="t('admin.users.enterEmail')" />
-      </div>
+      </FormField>
       <div>
         <label class="input-label">{{ t('admin.users.password') }}</label>
         <div class="flex gap-2">
@@ -21,22 +20,21 @@
           </button>
         </div>
       </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.username') }}</label>
+      <FormField :label="t('admin.users.username')">
         <input v-model="form.username" type="text" class="input" :placeholder="t('admin.users.enterUsername')" />
-      </div>
+      </FormField>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="input-label">{{ t('admin.users.columns.balance') }}</label>
+        <FormField :label="t('admin.users.columns.balance')">
           <input v-model="form.balance" type="number" step="any" class="input" />
-        </div>
-        <div>
-          <label class="input-label">{{ t('admin.users.columns.concurrency') }}</label>
+        </FormField>
+        <FormField :label="t('admin.users.columns.concurrency')">
           <input v-model.number="form.concurrency" type="number" class="input" />
-        </div>
+        </FormField>
       </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.form.rpmLimit') }}</label>
+      <FormField
+        :label="t('admin.users.form.rpmLimit')"
+        :hint="t('admin.users.form.rpmLimitHint')"
+      >
         <input
           v-model.number="form.rpm_limit"
           type="number"
@@ -45,16 +43,16 @@
           class="input"
           :placeholder="t('admin.users.form.rpmLimitPlaceholder')"
         />
-        <p class="input-hint">{{ t('admin.users.form.rpmLimitHint') }}</p>
-      </div>
+      </FormField>
     </form>
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button @click="$emit('close')" type="button" class="btn btn-secondary">{{ t('common.cancel') }}</button>
-        <button type="submit" form="create-user-form" :disabled="loading" class="btn btn-primary">
-          {{ loading ? t('admin.users.creating') : t('common.create') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="loading"
+        :loading-text="t('admin.users.creating')"
+        :confirm-text="t('common.create')"
+        confirm-form="create-user-form"
+        @cancel="$emit('close')"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -64,6 +62,8 @@ import { reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'; import { adminAPI } from '@/api/admin'
 import { useForm } from '@/composables/useForm'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
+import FormField from '@/components/common/FormField.vue'
 import Icon from '@/components/icons/Icon.vue'
 
 const props = defineProps<{ show: boolean }>()

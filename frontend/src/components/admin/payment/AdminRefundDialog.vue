@@ -146,19 +146,15 @@
     </form>
 
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button type="button" @click="emit('cancel')" class="btn btn-secondary">
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          type="submit"
-          form="refund-form"
-          :disabled="submitting || form.amount <= 0 || (requireForce && !form.force)"
-          class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-dark-800"
-        >
-          {{ submitting ? t('common.processing') : t('payment.admin.confirmRefund') }}
-        </button>
-      </div>
+      <DialogFooter
+        variant="danger"
+        :loading="submitting"
+        :loading-text="t('common.processing')"
+        :confirm-text="t('payment.admin.confirmRefund')"
+        :confirm-disabled="form.amount <= 0 || (requireForce && !form.force)"
+        confirm-form="refund-form"
+        @cancel="emit('cancel')"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -167,6 +163,7 @@
 import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import type { PaymentOrder } from '@/types/payment'
 import { formatOrderDateTime } from '@/components/payment/orderUtils'
 

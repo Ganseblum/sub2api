@@ -59,17 +59,14 @@
         >
           <template #cell-key="{ value, row }">
             <div class="flex items-center gap-2">
-              <code class="code text-xs">
+              <code class="code-key">
                 {{ maskApiKey(value) }}
               </code>
               <button
+                type="button"
                 @click="copyToClipboard(value, row.id)"
-                class="rounded-lg p-1 transition-colors hover:bg-gray-100 dark:hover:bg-dark-700"
-                :class="
-                  copiedKeyId === row.id
-                    ? 'text-green-500'
-                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                "
+                class="copy-btn"
+                :class="{ 'is-copied': copiedKeyId === row.id }"
                 :title="copiedKeyId === row.id ? t('keys.copied') : t('keys.copyToClipboard')"
               >
                 <Icon
@@ -440,24 +437,10 @@
 
         <!-- Custom Key Section (only for create) -->
         <div v-if="!showEditModal" class="space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="input-label mb-0">{{ t('keys.customKeyLabel') }}</label>
-            <button
-              type="button"
-              @click="formData.use_custom_key = !formData.use_custom_key"
-              :class="[
-                'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
-                formData.use_custom_key ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  formData.use_custom_key ? 'translate-x-4' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="formData.use_custom_key"
+            :label="t('keys.customKeyLabel')"
+          />
           <div v-if="formData.use_custom_key">
             <input
               v-model="formData.custom_key"
@@ -482,24 +465,10 @@
 
         <!-- IP Restriction Section -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="input-label mb-0">{{ t('keys.ipRestriction') }}</label>
-            <button
-              type="button"
-              @click="formData.enable_ip_restriction = !formData.enable_ip_restriction"
-              :class="[
-                'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
-                formData.enable_ip_restriction ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  formData.enable_ip_restriction ? 'translate-x-4' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="formData.enable_ip_restriction"
+            :label="t('keys.ipRestriction')"
+          />
 
           <div v-if="formData.enable_ip_restriction" class="space-y-4 pt-2">
             <div>
@@ -530,24 +499,10 @@
         <div class="space-y-3">
           <label class="input-label">{{ t('keys.quotaLimit') }}</label>
           <!-- Switch commented out - always show input, 0 = unlimited
-          <div class="flex items-center justify-between">
-            <label class="input-label mb-0">{{ t('keys.quotaLimit') }}</label>
-            <button
-              type="button"
-              @click="formData.enable_quota = !formData.enable_quota"
-              :class="[
-                'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
-                formData.enable_quota ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  formData.enable_quota ? 'translate-x-4' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="formData.enable_quota"
+            :label="t('keys.quotaLimit')"
+          />
           -->
 
           <div class="space-y-4">
@@ -594,24 +549,10 @@
 
         <!-- Rate Limit Section -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="input-label mb-0">{{ t('keys.rateLimitSection') }}</label>
-            <button
-              type="button"
-              @click="formData.enable_rate_limit = !formData.enable_rate_limit"
-              :class="[
-                'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
-                formData.enable_rate_limit ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  formData.enable_rate_limit ? 'translate-x-4' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="formData.enable_rate_limit"
+            :label="t('keys.rateLimitSection')"
+          />
 
           <div v-if="formData.enable_rate_limit" class="space-y-4 pt-2">
             <p class="input-hint -mt-2">{{ t('keys.rateLimitHint') }}</p>
@@ -768,24 +709,10 @@
 
         <!-- Expiration Section -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="input-label mb-0">{{ t('keys.expiration') }}</label>
-            <button
-              type="button"
-              @click="formData.enable_expiration = !formData.enable_expiration"
-              :class="[
-                'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
-                formData.enable_expiration ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-              ]"
-            >
-              <span
-                :class="[
-                  'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                  formData.enable_expiration ? 'translate-x-4' : 'translate-x-0'
-                ]"
-              />
-            </button>
-          </div>
+          <SettingToggleRow
+            v-model="formData.enable_expiration"
+            :label="t('keys.expiration')"
+          />
 
           <div v-if="formData.enable_expiration" class="space-y-4 pt-2">
             <!-- Quick select buttons (for both create and edit mode) -->
@@ -840,46 +767,14 @@
         </div>
       </form>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button @click="closeModals" type="button" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button
-            form="key-form"
-            type="submit"
-            :disabled="submitting"
-            class="btn btn-primary"
-            data-tour="key-form-submit"
-          >
-            <svg
-              v-if="submitting"
-              class="-ml-1 mr-2 h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{
-              submitting
-                ? t('keys.saving')
-                : showEditModal
-                  ? t('common.update')
-                  : t('common.create')
-            }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="submitting"
+          :loading-text="t('keys.saving')"
+          :confirm-text="showEditModal ? t('common.update') : t('common.create')"
+          confirm-form="key-form"
+          confirm-data-tour="key-form-submit"
+          @cancel="closeModals"
+        />
       </template>
     </BaseDialog>
 
@@ -968,11 +863,7 @@
 	        </div>
 	      </div>
       <template #footer>
-        <div class="flex justify-end">
-          <button @click="closeCcsClientSelect" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-        </div>
+        <DialogFooter :show-confirm="false" @cancel="closeCcsClientSelect" />
       </template>
     </BaseDialog>
 
@@ -1062,7 +953,9 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 	import EmptyState from '@/components/common/EmptyState.vue'
 	import Select from '@/components/common/Select.vue'
 	import SearchInput from '@/components/common/SearchInput.vue'
-	import Icon from '@/components/icons/Icon.vue'
+	import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
+	import DialogFooter from '@/components/common/DialogFooter.vue'
+import Icon from '@/components/icons/Icon.vue'
 	import UseKeyModal from '@/components/keys/UseKeyModal.vue'
 	import EndpointPopover from '@/components/keys/EndpointPopover.vue'
 	import GroupBadge from '@/components/common/GroupBadge.vue'

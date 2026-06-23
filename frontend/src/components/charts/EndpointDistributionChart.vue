@@ -5,62 +5,46 @@
         {{ title || t('usage.endpointDistribution') }}
       </h3>
       <div class="flex flex-wrap items-center justify-end gap-2">
-        <div
-          v-if="showSourceToggle"
-          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
-        >
+        <div v-if="showSourceToggle" class="seg-control">
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-            :class="source === 'inbound'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            class="seg-control-btn"
+            :class="source === 'inbound' && 'seg-control-btn-active'"
             @click="emit('update:source', 'inbound')"
           >
             {{ t('usage.inbound') }}
           </button>
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-            :class="source === 'upstream'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            class="seg-control-btn"
+            :class="source === 'upstream' && 'seg-control-btn-active'"
             @click="emit('update:source', 'upstream')"
           >
             {{ t('usage.upstream') }}
           </button>
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-            :class="source === 'path'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            class="seg-control-btn"
+            :class="source === 'path' && 'seg-control-btn-active'"
             @click="emit('update:source', 'path')"
           >
             {{ t('usage.path') }}
           </button>
         </div>
 
-        <div
-          v-if="showMetricToggle"
-          class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
-        >
+        <div v-if="showMetricToggle" class="seg-control">
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-            :class="metric === 'tokens'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            class="seg-control-btn"
+            :class="metric === 'tokens' && 'seg-control-btn-active'"
             @click="emit('update:metric', 'tokens')"
           >
             {{ t('admin.dashboard.metricTokens') }}
           </button>
           <button
             type="button"
-            class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-            :class="metric === 'actual_cost'
-              ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+            class="seg-control-btn"
+            :class="metric === 'actual_cost' && 'seg-control-btn-active'"
             @click="emit('update:metric', 'actual_cost')"
           >
             {{ t('admin.dashboard.metricActualCost') }}
@@ -76,7 +60,7 @@
         <Doughnut :data="chartData" :options="doughnutOptions" />
       </div>
       <div class="max-h-48 flex-1 overflow-y-auto">
-        <table class="w-full text-xs">
+        <table class="chart-inner-table w-full text-xs">
           <thead>
             <tr class="text-gray-500 dark:text-gray-400">
               <th class="pb-2 text-left">{{ t('usage.endpoint') }}</th>

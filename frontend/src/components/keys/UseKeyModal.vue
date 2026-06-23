@@ -121,14 +121,11 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end">
-        <button
-          @click="emit('close')"
-          class="btn btn-secondary"
-        >
-          {{ t('common.close') }}
-        </button>
-      </div>
+      <DialogFooter
+        :show-confirm="false"
+        :cancel-text="t('common.close')"
+        @cancel="emit('close')"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -137,6 +134,7 @@
 import { ref, computed, h, watch, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { useClipboard } from '@/composables/useClipboard'
 import type { GroupPlatform } from '@/types'

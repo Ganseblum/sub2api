@@ -181,12 +181,7 @@
     <template v-else-if="account.platform === 'antigravity' && account.type === 'oauth'">
       <!-- 账户类型徽章 -->
       <div v-if="antigravityTierLabel" class="mb-1 flex items-center gap-1">
-        <span
-          :class="[
-            'inline-block rounded px-1.5 py-0.5 text-[10px] font-medium',
-            antigravityTierClass
-          ]"
-        >
+        <span :class="['badge text-[10px]', antigravityTierClass]">
           {{ antigravityTierLabel }}
         </span>
         <!-- 不合格账户警告图标 -->
@@ -324,12 +319,7 @@
     <template v-else-if="account.platform === 'gemini'">
       <!-- Auth Type + Tier Badge (first line) -->
       <div v-if="geminiAuthTypeLabel" class="mb-1 flex items-center gap-1">
-        <span
-          :class="[
-            'inline-block rounded px-1.5 py-0.5 text-[10px] font-medium',
-            geminiTierClass
-          ]"
-        >
+        <span :class="['badge text-[10px]', geminiTierClass]">
           {{ geminiAuthTypeLabel }}
         </span>
         <!-- Help icon -->
@@ -800,26 +790,25 @@ const geminiAuthTypeLabel = computed(() => {
 
 // Gemini 账户类型徽章样式（统一样式）
 const geminiTierClass = computed(() => {
-  // Use channel+level to choose a stable color without depending on raw tier_id variants.
   const channel = geminiChannelShort.value
   const level = geminiUserLevel.value
 
   if (channel === 'client' || channel === 'ai studio') {
-    return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    return 'badge-primary'
   }
 
   if (channel === 'google one') {
-    if (level === 'ultra') return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
-    if (level === 'pro') return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
-    return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+    if (level === 'ultra') return 'badge-purple'
+    if (level === 'pro') return 'badge-primary'
+    return 'badge-gray'
   }
 
   if (channel === 'gcp') {
-    if (level === 'enterprise') return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
-    return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+    if (level === 'enterprise') return 'badge-purple'
+    return 'badge-primary'
   }
 
-  return ''
+  return 'badge-gray'
 })
 
 // Gemini 配额政策信息
@@ -951,13 +940,13 @@ const antigravityTierLabel = computed(() => {
 const antigravityTierClass = computed(() => {
   switch (antigravityTier.value) {
     case 'free-tier':
-      return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+      return 'badge-gray'
     case 'g1-pro-tier':
-      return 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300'
+      return 'badge-primary'
     case 'g1-ultra-tier':
-      return 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300'
+      return 'badge-purple'
     default:
-      return ''
+      return 'badge-gray'
   }
 })
 

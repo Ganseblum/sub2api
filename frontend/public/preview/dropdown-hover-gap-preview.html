@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下拉列表 · Hover & 间距（已同步生产样式）</title>
+    <style>
+      /* tokens — sync with frontend/src/style.css */
+      :root {
+        --youc-bg: #f4f3ee;
+        --youc-paper: #ffffff;
+        --youc-ink: #111111;
+        --youc-line: #111111;
+        --youc-muted: #555555;
+        --youc-soft: #ecebe4;
+        --youc-shadow: 4px 4px 0 var(--youc-line);
+        --youc-dropdown-hover-bg: color-mix(in srgb, var(--youc-ink) 68%, var(--youc-paper));
+        --youc-dropdown-hover-fg: var(--youc-bg);
+        --youc-dropdown-selected-bg: var(--youc-ink);
+        --youc-dropdown-selected-fg: var(--youc-bg);
+      }
+
+      html.dark {
+        --youc-bg: #171713;
+        --youc-paper: #24241f;
+        --youc-ink: #f4f3ee;
+        --youc-line: #f4f3ee;
+        --youc-muted: #b8b4ab;
+        --youc-soft: #303029;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'PingFang SC', monospace;
+        background: #1c1c1a;
+        color: #f4f3ee;
+        line-height: 1.5;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 28px 20px 80px;
+      }
+
+      h1 { margin: 0 0 6px; font-size: 22px; font-weight: 800; }
+      .intro { margin: 0 0 8px; color: #b8b4ab; font-size: 13px; max-width: 720px; }
+      .note {
+        margin: 0 0 24px;
+        padding: 10px 12px;
+        border: 2px solid #5eead4;
+        color: #a7f3d0;
+        font-size: 12px;
+        max-width: 720px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+
+      .toolbar button {
+        cursor: pointer;
+        border: 2px solid #5eead4;
+        background: transparent;
+        color: #5eead4;
+        padding: 6px 12px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .toolbar button:hover { background: rgba(94, 234, 212, 0.12); }
+
+      .section { margin-bottom: 48px; }
+      .section-title {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #5eead4;
+      }
+      .section-desc { margin: 0 0 14px; font-size: 12px; color: #8f8b82; max-width: 820px; }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 820px) { .compare { grid-template-columns: 1fr; } }
+
+      .col-label {
+        margin-bottom: 8px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .col-label.before { color: #fca5a5; }
+      .col-label.after { color: #5eead4; }
+
+      .stage {
+        background: var(--youc-bg);
+        border: 2px solid #444;
+        padding: 20px 16px 24px;
+        min-height: 280px;
+      }
+
+      .issue-list {
+        margin: 16px 0 0;
+        padding-left: 18px;
+        font-size: 11px;
+        color: #fca5a5;
+      }
+      .issue-list.ok { color: #6ee7b7; }
+
+      /* ─── shared trigger ─── */
+      .trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font: inherit;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: 2.5px solid var(--youc-line);
+        border-radius: 0;
+        background: var(--youc-paper);
+        color: var(--youc-ink);
+        cursor: pointer;
+        box-shadow: none;
+      }
+      .trigger.open { position: relative; z-index: 2; }
+      .trigger .chev { font-size: 0.5rem; font-weight: 800; color: var(--youc-ink); }
+
+      .wrap { position: relative; width: 200px; }
+      .wrap.wide { width: 260px; }
+
+      /* ─── 现状：复刻 style.css 当前行为 ─── */
+      /* 面板贴边：YoucDropdown teleport 用 rect.bottom - 2.5px；select 也有 -2.5px 拼接 */
+      .current .panel {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        margin-top: -2.5px; /* 与触发器底边框重叠，视觉上无缝 */
+        z-index: 5;
+        overflow: hidden;
+        border: 2.5px solid var(--youc-line);
+        border-radius: 0;
+        background: var(--youc-paper);
+        box-shadow: 5px 5px 0 var(--youc-line);
+      }
+
+      .current .opt {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font: inherit;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--youc-ink);
+        background: var(--youc-paper);
+        border: none;
+        border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 16%, transparent);
+        cursor: pointer;
+        text-align: left;
+      }
+      .current .opt:last-child { border-bottom: none; }
+
+      /* style.css 1854-1859：hover 浅灰底 */
+      .current .opt.is-hover {
+        background: var(--youc-soft);
+        font-weight: 850;
+      }
+
+      /* style.css 1862-1873：选中白底黑字 */
+      .current .opt.is-selected {
+        background: var(--youc-paper);
+        color: var(--youc-ink);
+        font-weight: 850;
+      }
+
+      /* ─── 修改后：建议方案（仅预览，未改代码）─── */
+      .proposed .panel {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        margin-top: 6px; /* 触发器与列表分离，露出背景间隙 */
+        z-index: 5;
+        overflow: hidden;
+        border: 2.5px solid var(--youc-line);
+        border-radius: 0;
+        background: var(--youc-paper);
+        box-shadow: 5px 5px 0 var(--youc-line);
+      }
+
+      .proposed .opt {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font: inherit;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--youc-ink);
+        background: var(--youc-paper);
+        border: none;
+        border-bottom: 1px solid color-mix(in srgb, var(--youc-line) 16%, transparent);
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 120ms ease, color 120ms ease;
+      }
+      .proposed .opt:last-child { border-bottom: none; }
+
+      /* 建议：hover 深灰（略浅于选中纯黑） */
+      .proposed .opt.is-hover {
+        background: var(--youc-dropdown-hover-bg);
+        color: var(--youc-dropdown-hover-fg);
+        font-weight: 850;
+      }
+
+      /* 建议：选中纯黑底，比 hover 更深一档 */
+      .proposed .opt.is-selected {
+        background: var(--youc-dropdown-selected-bg);
+        color: var(--youc-dropdown-selected-fg);
+        font-weight: 850;
+      }
+
+      .legend {
+        margin-top: 12px;
+        font-size: 10px;
+        color: var(--youc-muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .swatch {
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid var(--youc-line);
+      }
+
+      .gap-diagram {
+        margin-top: 14px;
+        font-size: 10px;
+        color: var(--youc-muted);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .gap-diagram .gap-bar {
+        height: 6px;
+        margin: 4px 0;
+        background: repeating-linear-gradient(
+          90deg,
+          var(--youc-accent, #0f766e) 0 4px,
+          transparent 4px 8px
+        );
+        opacity: 0.55;
+      }
+      .gap-diagram .gap-bar.hidden {
+        height: 0;
+        margin: 0;
+        border-top: 2px dashed #ef4444;
+        background: none;
+        opacity: 1;
+      }
+
+      .locale-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 5.75rem;
+        padding: 0.5rem 1rem;
+        font: inherit;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: 2.5px solid var(--youc-line);
+        background: var(--youc-paper);
+        color: var(--youc-ink);
+        cursor: pointer;
+      }
+
+      .search-row {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 2px solid color-mix(in srgb, var(--youc-line) 25%, transparent);
+        font-size: 0.875rem;
+        color: var(--youc-muted);
+      }
+
+      .interactive-hint {
+        margin-top: 10px;
+        font-size: 10px;
+        color: #8f8b82;
+      }
+
+      code {
+        font-size: 0.95em;
+        color: #fde68a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>下拉列表 · Hover & 间距（已同步）</h1>
+      <p class="intro">
+        左侧为改前对照；右侧与 <code>style.css</code> + <code>YoucDropdown.vue</code> 当前生产样式一致：
+        6px 面板间距、hover 深灰反色、选中纯黑反色。
+      </p>
+      <p class="note">✅ 已写入源码。刷新应用即可看到实机效果。</p>
+
+      <div class="toolbar">
+        <button type="button" id="btn-dark">切换 Dark</button>
+        <button type="button" id="btn-hover-demo">演示 Hover（右侧）</button>
+      </div>
+
+      <!-- §1 语言切换 -->
+      <section class="section">
+        <h2 class="section-title">01 · 语言切换（LocaleSwitcher）</h2>
+        <p class="section-desc">
+          现状：面板与触发器边框重叠（<code>margin-top: -2.5px</code> 或 inline 虽有 6px 但被 detached 模式抵消）；
+          hover 为 <code>var(--youc-soft)</code> 浅灰。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">现状</div>
+            <div class="stage current">
+              <div class="wrap" style="width:auto">
+                <button type="button" class="locale-trigger open" tabindex="-1">
+                  中文 <span class="chev">▼</span>
+                </button>
+                <div class="panel" style="min-width:5.75rem;width:max-content">
+                  <button type="button" class="opt is-selected" tabindex="-1">中文 ✓</button>
+                  <button type="button" class="opt is-hover" tabindex="-1">English</button>
+                  <button type="button" class="opt" tabindex="-1">日本語</button>
+                </div>
+              </div>
+              <div class="gap-diagram">
+                触发器底边 ↔ 面板顶边
+                <div class="gap-bar hidden" title="重叠 2.5px"></div>
+                <span style="color:#ef4444">重叠，无可见间隙</span>
+              </div>
+              <ul class="issue-list">
+                <li>hover「English」：浅灰底 <code>#ecebe4</code>，不是黑底</li>
+                <li>选中「中文」：白底黑字，与 hover 区分弱</li>
+                <li>列表紧贴触发器，硬阴影被「吃掉」一部分</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">修改后（建议）</div>
+            <div class="stage proposed" id="demo-locale">
+              <div class="wrap" style="width:auto">
+                <button type="button" class="locale-trigger open" tabindex="-1">
+                  中文 <span class="chev">▼</span>
+                </button>
+                <div class="panel" style="min-width:5.75rem;width:max-content">
+                  <button type="button" class="opt is-selected js-hover-target" data-idx="0" tabindex="-1">中文 ✓</button>
+                  <button type="button" class="opt js-hover-target" data-idx="1" tabindex="-1">English</button>
+                  <button type="button" class="opt js-hover-target" data-idx="2" tabindex="-1">日本語</button>
+                </div>
+              </div>
+              <div class="gap-diagram">
+                触发器底边 ↔ 面板顶边
+                <div class="gap-bar"></div>
+                <span style="color:#5eead4">6px 间隙，面板独立浮动</span>
+              </div>
+              <ul class="issue-list ok">
+                <li>hover：深灰底（ink 68% 混 paper），比选中浅一档</li>
+                <li>选中：纯黑底 <code>var(--youc-ink)</code>，对比更清晰</li>
+                <li><code>margin-top: 6px</code> + 5px 硬阴影完整可见</li>
+              </ul>
+              <p class="interactive-hint">鼠标移入右侧选项可体验 hover</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- §2 Select 分组选择 -->
+      <section class="section">
+        <h2 class="section-title">02 · Select 分组选择（带搜索）</h2>
+        <p class="section-desc">
+          Portal 浮层定位目前用 <code>top: rect.bottom - 2.5px</code>，导致与触发器拼接；
+          全局 <code>!important</code> 规则也可能压过 hover 色。
+        </p>
+        <div class="compare">
+          <div>
+            <div class="col-label before">现状</div>
+            <div class="stage current">
+              <div class="wrap wide">
+                <button type="button" class="trigger open" tabindex="-1">
+                  claude-高倍 <span class="chev">▼</span>
+                </button>
+                <div class="panel">
+                  <div class="search-row">搜索…</div>
+                  <button type="button" class="opt" tabindex="-1">gpt-特惠</button>
+                  <button type="button" class="opt is-hover" tabindex="-1">claude-高倍 ✓</button>
+                  <button type="button" class="opt" tabindex="-1">全部模型</button>
+                </div>
+              </div>
+              <ul class="issue-list">
+                <li>hover 行：浅灰 <code>--youc-soft</code></li>
+                <li>选中行：仍是白底（当前代码），与 hover 几乎一样</li>
+                <li>搜索框与选项区整体贴住触发器</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="col-label after">修改后（建议）</div>
+            <div class="stage proposed" id="demo-select">
+              <div class="wrap wide">
+                <button type="button" class="trigger open" tabindex="-1">
+                  claude-高倍 <span class="chev">▼</span>
+                </button>
+                <div class="panel">
+                  <div class="search-row">搜索…</div>
+                  <button type="button" class="opt js-hover-target" data-idx="0" tabindex="-1">gpt-特惠</button>
+                  <button type="button" class="opt is-selected js-hover-target" data-idx="1" tabindex="-1">claude-高倍 ✓</button>
+                  <button type="button" class="opt js-hover-target" data-idx="2" tabindex="-1">全部模型</button>
+                </div>
+              </div>
+              <ul class="issue-list ok">
+                <li>未选中 hover → 深灰反色（略浅于选中）</li>
+                <li>已选中项 → 纯黑底，与 hover 可区分</li>
+                <li>面板整体下移 6px，与触发器视觉分离</li>
+              </ul>
+              <p class="interactive-hint">鼠标移入选项可体验 hover</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- §3 CSS diff 摘要 -->
+      <section class="section">
+        <h2 class="section-title">03 · 生产样式 token（已落地）</h2>
+        <p class="section-desc">以下规则已写入 <code>frontend/src/style.css</code> 与 <code>YoucDropdown.vue</code>。</p>
+        <div class="stage" style="min-height:auto;background:#24241f;border-color:#555">
+          <pre style="margin:0;font-size:11px;line-height:1.65;color:#d4d4d4;white-space:pre-wrap">/* style.css — tokens */
+--youc-dropdown-hover-bg: color-mix(in srgb, var(--youc-ink) 68%, var(--youc-paper));
+--youc-dropdown-hover-fg: var(--youc-bg);
+--youc-dropdown-selected-bg: var(--youc-ink);
+--youc-dropdown-selected-fg: var(--youc-bg);
+
+/* hover：深灰反色；selected：纯黑/纯白反色 */
+
+/* YoucDropdown.vue — 浮层定位 */
+style.top = `${rect.bottom + 6}px`</pre>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      document.getElementById('btn-dark').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // 右侧 interactive hover
+      document.querySelectorAll('.proposed .js-hover-target').forEach((btn) => {
+        btn.addEventListener('mouseenter', () => {
+          const panel = btn.closest('.panel');
+          panel.querySelectorAll('.js-hover-target').forEach((o) => {
+            if (!o.classList.contains('is-selected')) o.classList.remove('is-hover');
+          });
+          if (!btn.classList.contains('is-selected')) btn.classList.add('is-hover');
+        });
+        btn.addEventListener('mouseleave', () => {
+          if (!btn.classList.contains('is-selected')) btn.classList.remove('is-hover');
+        });
+      });
+
+      // 自动轮播 hover 演示
+      let demoTimer;
+      document.getElementById('btn-hover-demo').addEventListener('click', () => {
+        clearInterval(demoTimer);
+        const targets = document.querySelectorAll('#demo-locale .js-hover-target:not(.is-selected)');
+        let i = 0;
+        demoTimer = setInterval(() => {
+          targets.forEach((t) => t.classList.remove('is-hover'));
+          targets[i % targets.length].classList.add('is-hover');
+          i++;
+        }, 900);
+      });
+    </script>
+  </body>
+</html>

@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import Select, { type SelectOption } from '@/components/common/Select.vue'
 import { adminAPI } from '@/api'
@@ -575,14 +576,12 @@ function cancelDelete() {
       </div>
 
       <template #footer>
-        <div class="flex items-center justify-end gap-2">
-          <button class="btn btn-secondary" :disabled="saving" @click="showEditor = false">
-            {{ t('common.cancel') }}
-          </button>
-          <button class="btn btn-primary" :disabled="saving" @click="save">
-            {{ saving ? t('common.saving') : t('common.save') }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="saving"
+          :loading-text="t('common.saving')"
+          @cancel="showEditor = false"
+          @confirm="save"
+        />
       </template>
     </BaseDialog>
 

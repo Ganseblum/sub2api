@@ -1515,6 +1515,7 @@ const loadUsers = async () => {
   const currentAbortController = new AbortController()
   abortController = currentAbortController
   const { signal } = currentAbortController
+  ++secondaryDataSeq
   loading.value = true
   try {
     // Build attribute filters from active filters
@@ -1548,9 +1549,12 @@ const loadUsers = async () => {
     users.value = response.items
     pagination.total = response.total
     pagination.pages = response.pages
-    usageStats.value = {}
-    userAttributeValues.value = {}
-    platformQuotaStats.value = {}
+
+    if (response.items.length === 0) {
+      usageStats.value = {}
+      userAttributeValues.value = {}
+      platformQuotaStats.value = {}
+    }
 
     // Defer heavy secondary data so table can render first.
     if (response.items.length > 0) {

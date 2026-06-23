@@ -326,47 +326,29 @@
 
             <!-- Web Search Emulation (Anthropic only, hidden when global disabled) -->
             <div v-if="section.platform === 'anthropic' && webSearchGlobalEnabled" class="border-t border-gray-200 pt-3 dark:border-dark-600">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    {{ t('admin.channels.form.webSearchEmulation') }}
-                  </label>
-                  <p class="mt-0.5 text-[11px] text-red-500 dark:text-red-400">
-                    {{ t('admin.channels.form.webSearchEmulationHint') }}
-                  </p>
-                </div>
-                <Toggle v-model="section.web_search_emulation" />
-              </div>
+              <SettingToggleRow
+                v-model="section.web_search_emulation"
+                :label="t('admin.channels.form.webSearchEmulation')"
+                :hint="t('admin.channels.form.webSearchEmulationHint')"
+              />
             </div>
 
             <!-- Codex Image Generation Bridge (OpenAI only) -->
             <div v-if="section.platform === 'openai'" class="border-t border-gray-200 pt-3 dark:border-dark-600">
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    {{ t('admin.channels.form.codexImageGenerationBridge') }}
-                  </label>
-                  <p class="mt-0.5 text-[11px] text-amber-600 dark:text-amber-400">
-                    {{ t('admin.channels.form.codexImageGenerationBridgeHint') }}
-                  </p>
-                </div>
-                <Toggle v-model="section.codex_image_generation_bridge" />
-              </div>
+              <SettingToggleRow
+                v-model="section.codex_image_generation_bridge"
+                :label="t('admin.channels.form.codexImageGenerationBridge')"
+                :hint="t('admin.channels.form.codexImageGenerationBridgeHint')"
+              />
             </div>
 
             <!-- Bedrock CC Compatibility (Anthropic only) -->
             <div v-if="section.platform === 'anthropic'" class="border-t border-gray-200 pt-3 dark:border-dark-600">
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    {{ t('admin.channels.form.bedrockCCCompat') }}
-                  </label>
-                  <p class="mt-0.5 text-[11px] text-amber-600 dark:text-amber-400">
-                    {{ t('admin.channels.form.bedrockCCCompatHint') }}
-                  </p>
-                </div>
-                <Toggle v-model="section.bedrock_cc_compat" />
-              </div>
+              <SettingToggleRow
+                v-model="section.bedrock_cc_compat"
+                :label="t('admin.channels.form.bedrockCCCompat')"
+                :hint="t('admin.channels.form.bedrockCCCompatHint')"
+              />
             </div>
 
             <!-- Model Mapping -->
@@ -589,24 +571,13 @@
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button @click="closeDialog" type="button" class="btn btn-secondary">
-            {{ t('common.cancel', 'Cancel') }}
-          </button>
-          <button
-            type="submit"
-            form="channel-form"
-            :disabled="submitting"
-            class="btn btn-primary"
-          >
-            {{ submitting
-              ? t('common.submitting', 'Submitting...')
-              : editingChannel
-                ? t('common.update', 'Update')
-                : t('common.create', 'Create')
-            }}
-          </button>
-        </div>
+        <DialogFooter
+          :loading="submitting"
+          :loading-text="t('common.submitting', 'Submitting...')"
+          :confirm-text="editingChannel ? t('common.update', 'Update') : t('common.create', 'Create')"
+          confirm-form="channel-form"
+          @cancel="closeDialog"
+        />
       </template>
     </BaseDialog>
 
@@ -641,6 +612,7 @@ import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Select from '@/components/common/Select.vue'

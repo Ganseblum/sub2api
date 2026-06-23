@@ -4,8 +4,9 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { opsAPI } from '@/api/admin/ops'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Select from '@/components/common/Select.vue'
-import Toggle from '@/components/common/Toggle.vue'
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
 import type { OpsAlertRuntimeSettings, EmailNotificationConfig, AlertSeverity, OpsAdvancedSettings, OpsMetricThresholds } from '../types'
 
 const { t } = useI18n()
@@ -267,12 +268,10 @@ async function saveAllSettings() {
         <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.alertConfig') }}</h4>
 
         <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="font-medium text-gray-900 dark:text-white">{{ t('admin.ops.settings.enableAlert') }}</label>
-            </div>
-            <Toggle v-model="emailConfig.alert.enabled" />
-          </div>
+          <SettingToggleRow
+            v-model="emailConfig.alert.enabled"
+            :label="t('admin.ops.settings.enableAlert')"
+          />
 
           <div v-if="emailConfig.alert.enabled">
             <label class="input-label">{{ t('admin.ops.settings.alertRecipients') }}</label>
@@ -315,12 +314,10 @@ async function saveAllSettings() {
         <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ t('admin.ops.settings.reportConfig') }}</h4>
 
         <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <label class="font-medium text-gray-900 dark:text-white">{{ t('admin.ops.settings.enableReport') }}</label>
-            </div>
-            <Toggle v-model="emailConfig.report.enabled" />
-          </div>
+          <SettingToggleRow
+            v-model="emailConfig.report.enabled"
+            :label="t('admin.ops.settings.enableReport')"
+          />
 
           <div v-if="emailConfig.report.enabled">
             <label class="input-label">{{ t('admin.ops.settings.reportRecipients') }}</label>
@@ -352,17 +349,17 @@ async function saveAllSettings() {
           </div>
 
           <div v-if="emailConfig.report.enabled" class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.dailySummary') }}</label>
-              <Toggle v-model="emailConfig.report.daily_summary_enabled" />
-            </div>
+            <SettingToggleRow
+              v-model="emailConfig.report.daily_summary_enabled"
+              :label="t('admin.ops.settings.dailySummary')"
+            />
             <div v-if="emailConfig.report.daily_summary_enabled">
               <input v-model="emailConfig.report.daily_summary_schedule" type="text" class="input" placeholder="0 9 * * *" />
             </div>
-            <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.weeklySummary') }}</label>
-              <Toggle v-model="emailConfig.report.weekly_summary_enabled" />
-            </div>
+            <SettingToggleRow
+              v-model="emailConfig.report.weekly_summary_enabled"
+              :label="t('admin.ops.settings.weeklySummary')"
+            />
             <div v-if="emailConfig.report.weekly_summary_enabled">
               <input v-model="emailConfig.report.weekly_summary_schedule" type="text" class="input" placeholder="0 9 * * 1" />
             </div>
@@ -440,10 +437,10 @@ async function saveAllSettings() {
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.dataRetention') }}</h5>
 
-            <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.enableCleanup') }}</label>
-              <Toggle v-model="advancedSettings.data_retention.cleanup_enabled" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.data_retention.cleanup_enabled"
+              :label="t('admin.ops.settings.enableCleanup')"
+            />
 
             <div v-if="advancedSettings.data_retention.cleanup_enabled">
               <label class="input-label">{{ t('admin.ops.settings.cleanupSchedule') }}</label>
@@ -495,13 +492,11 @@ async function saveAllSettings() {
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.aggregation') }}</h5>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.enableAggregation') }}</label>
-                <p class="mt-1 text-xs text-gray-500">{{ t('admin.ops.settings.aggregationHint') }}</p>
-              </div>
-              <Toggle v-model="advancedSettings.aggregation.aggregation_enabled" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.aggregation.aggregation_enabled"
+              :label="t('admin.ops.settings.enableAggregation')"
+              :hint="t('admin.ops.settings.aggregationHint')"
+            />
           </div>
 
           <!-- OpenAI 账号配额自动暂停（全局默认阈值） -->
@@ -542,70 +537,50 @@ async function saveAllSettings() {
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.errorFiltering') }}</h5>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.ignoreCountTokensErrors') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.ignoreCountTokensErrorsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.ignore_count_tokens_errors" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.ignore_count_tokens_errors"
+              :label="t('admin.ops.settings.ignoreCountTokensErrors')"
+              :hint="t('admin.ops.settings.ignoreCountTokensErrorsHint')"
+            />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.ignoreContextCanceled') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.ignoreContextCanceledHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.ignore_context_canceled" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.ignore_context_canceled"
+              :label="t('admin.ops.settings.ignoreContextCanceled')"
+              :hint="t('admin.ops.settings.ignoreContextCanceledHint')"
+              bordered
+            />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.ignoreNoAvailableAccounts') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.ignoreNoAvailableAccountsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.ignore_no_available_accounts" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.ignore_no_available_accounts"
+              :label="t('admin.ops.settings.ignoreNoAvailableAccounts')"
+              :hint="t('admin.ops.settings.ignoreNoAvailableAccountsHint')"
+              bordered
+            />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.ignoreInvalidApiKeyErrors') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.ignoreInvalidApiKeyErrorsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.ignore_invalid_api_key_errors" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.ignore_invalid_api_key_errors"
+              :label="t('admin.ops.settings.ignoreInvalidApiKeyErrors')"
+              :hint="t('admin.ops.settings.ignoreInvalidApiKeyErrorsHint')"
+              bordered
+            />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.ignoreInsufficientBalanceErrors') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.ignoreInsufficientBalanceErrorsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.ignore_insufficient_balance_errors" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.ignore_insufficient_balance_errors"
+              :label="t('admin.ops.settings.ignoreInsufficientBalanceErrors')"
+              :hint="t('admin.ops.settings.ignoreInsufficientBalanceErrorsHint')"
+              bordered
+            />
           </div>
 
           <!-- Auto Refresh -->
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.autoRefresh') }}</h5>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.enableAutoRefresh') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.enableAutoRefreshHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.auto_refresh_enabled" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.auto_refresh_enabled"
+              :label="t('admin.ops.settings.enableAutoRefresh')"
+              :hint="t('admin.ops.settings.enableAutoRefreshHint')"
+            />
 
             <div v-if="advancedSettings.auto_refresh_enabled">
               <label class="input-label">{{ t('admin.ops.settings.refreshInterval') }}</label>
@@ -624,37 +599,31 @@ async function saveAllSettings() {
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.dashboardCards') }}</h5>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.displayAlertEvents') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.displayAlertEventsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.display_alert_events" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.display_alert_events"
+              :label="t('admin.ops.settings.displayAlertEvents')"
+              :hint="t('admin.ops.settings.displayAlertEventsHint')"
+            />
 
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('admin.ops.settings.displayOpenAITokenStats') }}</label>
-                <p class="mt-1 text-xs text-gray-500">
-                  {{ t('admin.ops.settings.displayOpenAITokenStatsHint') }}
-                </p>
-              </div>
-              <Toggle v-model="advancedSettings.display_openai_token_stats" />
-            </div>
+            <SettingToggleRow
+              v-model="advancedSettings.display_openai_token_stats"
+              :label="t('admin.ops.settings.displayOpenAITokenStats')"
+              :hint="t('admin.ops.settings.displayOpenAITokenStatsHint')"
+              bordered
+            />
           </div>
         </div>
       </details>
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <button class="btn btn-secondary" @click="emit('close')">{{ t('common.cancel') }}</button>
-        <button class="btn btn-primary" :disabled="saving || !validation.valid" @click="saveAllSettings">
-          {{ saving ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="saving"
+        :loading-text="t('common.saving')"
+        :confirm-disabled="!validation.valid"
+        @cancel="emit('close')"
+        @confirm="saveAllSettings"
+      />
     </template>
   </BaseDialog>
 </template>

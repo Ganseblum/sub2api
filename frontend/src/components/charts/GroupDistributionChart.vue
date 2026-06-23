@@ -4,26 +4,19 @@
       <h3 class="text-sm font-semibold text-gray-900 dark:text-white">
         {{ t('admin.dashboard.groupDistribution') }}
       </h3>
-      <div
-        v-if="showMetricToggle"
-        class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-700 dark:bg-dark-800"
-      >
+      <div v-if="showMetricToggle" class="seg-control">
         <button
           type="button"
-          class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-          :class="metric === 'tokens'
-            ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+          class="seg-control-btn"
+          :class="metric === 'tokens' && 'seg-control-btn-active'"
           @click="emit('update:metric', 'tokens')"
         >
           {{ t('admin.dashboard.metricTokens') }}
         </button>
         <button
           type="button"
-          class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-          :class="metric === 'actual_cost'
-            ? 'bg-white text-gray-900 shadow-sm dark:bg-dark-700 dark:text-white'
-            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
+          class="seg-control-btn"
+          :class="metric === 'actual_cost' && 'seg-control-btn-active'"
           @click="emit('update:metric', 'actual_cost')"
         >
           {{ t('admin.dashboard.metricActualCost') }}
@@ -38,7 +31,7 @@
         <Doughnut :data="chartData" :options="doughnutOptions" />
       </div>
       <div class="max-h-48 flex-1 overflow-y-auto">
-        <table class="w-full text-xs">
+        <table class="chart-inner-table w-full text-xs">
           <thead>
             <tr class="text-gray-500 dark:text-gray-400">
               <th class="pb-2 text-left">{{ t('admin.dashboard.group') }}</th>

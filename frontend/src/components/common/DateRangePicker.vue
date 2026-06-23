@@ -1,10 +1,11 @@
 <template>
-  <div class="relative" ref="containerRef">
-    <button
-      type="button"
-      @click="toggle"
-      :class="['date-picker-trigger', isOpen && 'date-picker-trigger-open']"
-    >
+  <YoucDropdown
+    v-model:open="isOpen"
+    panel-width="lg"
+    trigger-class="date-picker-trigger"
+    panel-class="date-picker-dropdown"
+  >
+    <template #trigger>
       <span class="date-picker-icon">
         <Icon name="calendar" size="sm" />
       </span>
@@ -18,67 +19,62 @@
           :class="['transition-transform duration-200', isOpen && 'rotate-180']"
         />
       </span>
-    </button>
+    </template>
 
-    <Transition name="date-picker-dropdown">
-      <div v-if="isOpen" class="date-picker-dropdown">
-        <!-- Quick presets -->
-        <div class="date-picker-presets">
-          <button
-            v-for="preset in presets"
-            :key="preset.value"
-            @click="selectPreset(preset)"
-            :class="['date-picker-preset', isPresetActive(preset) && 'date-picker-preset-active']"
-          >
-            {{ t(preset.labelKey) }}
-          </button>
-        </div>
+    <div class="date-picker-presets">
+      <button
+        v-for="preset in presets"
+        :key="preset.value"
+        type="button"
+        @click="selectPreset(preset)"
+        :class="['date-picker-preset', isPresetActive(preset) && 'date-picker-preset-active']"
+      >
+        {{ t(preset.labelKey) }}
+      </button>
+    </div>
 
-        <div class="date-picker-divider"></div>
+    <div class="date-picker-divider"></div>
 
-        <!-- Custom date range inputs -->
-        <div class="date-picker-custom">
-          <div class="date-picker-field">
-            <label class="date-picker-label">{{ t('dates.startDate') }}</label>
-            <input
-              type="date"
-              v-model="localStartDate"
-              :max="localEndDate || tomorrow"
-              class="date-picker-input"
-              @change="onDateChange"
-            />
-          </div>
-          <div class="date-picker-separator">
-            <Icon name="arrowRight" size="sm" class="text-gray-400" />
-          </div>
-          <div class="date-picker-field">
-            <label class="date-picker-label">{{ t('dates.endDate') }}</label>
-            <input
-              type="date"
-              v-model="localEndDate"
-              :min="localStartDate"
-              :max="tomorrow"
-              class="date-picker-input"
-              @change="onDateChange"
-            />
-          </div>
-        </div>
-
-        <!-- Apply button -->
-        <div class="date-picker-actions">
-          <button @click="apply" class="date-picker-apply">
-            {{ t('dates.apply') }}
-          </button>
-        </div>
+    <div class="date-picker-custom">
+      <div class="date-picker-field">
+        <label class="date-picker-label">{{ t('dates.startDate') }}</label>
+        <input
+          type="date"
+          v-model="localStartDate"
+          :max="localEndDate || tomorrow"
+          class="date-picker-input"
+          @change="onDateChange"
+        />
       </div>
-    </Transition>
-  </div>
+      <div class="date-picker-separator">
+        <Icon name="arrowRight" size="sm" class="date-picker-separator" />
+      </div>
+      <div class="date-picker-field">
+        <label class="date-picker-label">{{ t('dates.endDate') }}</label>
+        <input
+          type="date"
+          v-model="localEndDate"
+          :min="localStartDate"
+          :max="tomorrow"
+          class="date-picker-input"
+          @change="onDateChange"
+        />
+      </div>
+    </div>
+
+    <div class="date-picker-actions">
+      <button type="button" @click="apply" class="date-picker-apply">
+        {{ t('dates.apply') }}
+      </button>
+    </div>
+  </YoucDropdown>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/components/icons/Icon.vue'
+import YoucDropdown from '@/components/common/YoucDropdown.vue'
 
 interface DatePreset {
   labelKey: string
@@ -103,13 +99,11 @@ const emit = defineEmits<Emits>()
 const { t, locale } = useI18n()
 
 const isOpen = ref(false)
-const containerRef = ref<HTMLElement | null>(null)
 const localStartDate = ref(props.startDate)
 const localEndDate = ref(props.endDate)
 const activePreset = ref<string | null>('last24Hours')
 
 const today = computed(() => {
-  // Use local timezone to avoid UTC timezone issues
   const now = new Date()
   const year = now.getFullYear()
   const month = String(now.getMonth() + 1).padStart(2, '0')
@@ -117,15 +111,12 @@ const today = computed(() => {
   return `${year}-${month}-${day}`
 })
 
-// Tomorrow's date - used for max date to handle timezone differences
-// When user is in a timezone behind the server, "today" on server might be "tomorrow" locally
 const tomorrow = computed(() => {
   const d = new Date()
   d.setDate(d.getDate() + 1)
   return formatDateToString(d)
 })
 
-// Helper function to format date to YYYY-MM-DD using local timezone
 const formatDateToString = (date: Date): string => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -252,7 +243,6 @@ const selectPreset = (preset: DatePreset) => {
 }
 
 const onDateChange = () => {
-  // Check if current dates match any preset
   activePreset.value = null
   for (const preset of presets) {
     const range = preset.getRange()
@@ -261,10 +251,6 @@ const onDateChange = () => {
       break
     }
   }
-}
-
-const toggle = () => {
-  isOpen.value = !isOpen.value
 }
 
 const apply = () => {
@@ -278,19 +264,6 @@ const apply = () => {
   isOpen.value = false
 }
 
-const handleClickOutside = (event: MouseEvent) => {
-  if (containerRef.value && !containerRef.value.contains(event.target as Node)) {
-    isOpen.value = false
-  }
-}
-
-const handleEscape = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && isOpen.value) {
-    isOpen.value = false
-  }
-}
-
-// Sync local state with props
 watch(
   () => props.startDate,
   (val) => {
@@ -307,131 +280,135 @@ watch(
   }
 )
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  document.addEventListener('keydown', handleEscape)
-  // Initialize active preset detection
-  onDateChange()
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  document.removeEventListener('keydown', handleEscape)
-})
+onDateChange()
 </script>
 
-<style scoped>
+<style>
 .date-picker-trigger {
-  @apply flex items-center gap-2;
-  @apply rounded-lg px-3 py-2 text-sm;
-  @apply bg-white dark:bg-dark-800;
-  @apply border border-gray-200 dark:border-dark-600;
-  @apply text-gray-700 dark:text-gray-300;
-  @apply transition-all duration-200;
-  @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
-  @apply hover:border-gray-300 dark:hover:border-dark-500;
-  @apply cursor-pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-.date-picker-trigger-open {
-  @apply border-primary-500 ring-2 ring-primary-500/30;
-}
-
-.date-picker-icon {
-  @apply text-gray-400 dark:text-dark-400;
+.date-picker-icon,
+.date-picker-chevron {
+  color: var(--youc-muted);
 }
 
 .date-picker-value {
-  @apply font-medium;
-}
-
-.date-picker-chevron {
-  @apply text-gray-400 dark:text-dark-400;
+  font-weight: 700;
 }
 
 .date-picker-dropdown {
-  @apply absolute left-0 z-[100] mt-2;
-  @apply bg-white dark:bg-dark-800;
-  @apply rounded-xl;
-  @apply border border-gray-200 dark:border-dark-700;
-  @apply shadow-lg shadow-black/10 dark:shadow-black/30;
-  @apply overflow-hidden;
-  @apply min-w-[320px];
+  min-width: 320px;
 }
 
 .date-picker-presets {
-  @apply grid grid-cols-2 gap-1 p-2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.5rem;
 }
 
 .date-picker-preset {
-  @apply rounded-md px-3 py-1.5 text-xs font-medium;
-  @apply text-gray-600 dark:text-gray-400;
-  @apply hover:bg-gray-100 dark:hover:bg-dark-700;
-  @apply transition-colors duration-150;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--youc-muted);
+  border: 2px solid transparent;
+  background: transparent;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.date-picker-preset:hover {
+  background: var(--youc-soft);
+  color: var(--youc-ink);
 }
 
 .date-picker-preset-active {
-  @apply bg-primary-100 dark:bg-primary-900/30;
-  @apply text-primary-700 dark:text-primary-300;
+  background: var(--youc-ink);
+  color: var(--youc-bg);
+  border-color: var(--youc-line);
 }
 
 .date-picker-divider {
-  @apply border-t border-gray-100 dark:border-dark-700;
+  border-top: 2px solid var(--youc-line);
 }
 
 .date-picker-custom {
-  @apply flex items-end gap-2 p-3;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem;
 }
 
 .date-picker-field {
-  @apply flex-1;
+  flex: 1;
 }
 
 .date-picker-label {
-  @apply mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400;
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--youc-muted);
 }
 
 .date-picker-input {
-  @apply w-full rounded-md px-2 py-1.5 text-sm;
-  @apply bg-gray-50 dark:bg-dark-700;
-  @apply border border-gray-200 dark:border-dark-600;
-  @apply text-gray-900 dark:text-gray-100;
-  @apply focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 2px solid var(--youc-line);
+  border-radius: 0;
+  background: var(--youc-paper);
+  color: var(--youc-ink);
 }
 
-.date-picker-input::-webkit-calendar-picker-indicator {
-  @apply cursor-pointer opacity-60 hover:opacity-100;
-  filter: invert(0.5);
-}
-
-.dark .date-picker-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
+.date-picker-input:focus {
+  outline: none;
+  box-shadow: var(--youc-shadow);
 }
 
 .date-picker-separator {
-  @apply flex items-center justify-center pb-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.25rem;
+  color: var(--youc-muted);
 }
 
 .date-picker-actions {
-  @apply flex justify-end p-2 pt-0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  padding-top: 0;
 }
 
 .date-picker-apply {
-  @apply rounded-lg px-4 py-1.5 text-sm font-medium;
-  @apply bg-primary-600 text-white;
-  @apply hover:bg-primary-700;
-  @apply transition-colors duration-150;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 2.5px solid var(--youc-line);
+  background: var(--youc-ink);
+  color: var(--youc-bg);
+  box-shadow: var(--youc-shadow);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-/* Dropdown animation */
-.date-picker-dropdown-enter-active,
-.date-picker-dropdown-leave-active {
-  transition: all 0.2s ease;
-}
-
-.date-picker-dropdown-enter-from,
-.date-picker-dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
+.date-picker-apply:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--youc-line);
 }
 </style>

@@ -6,10 +6,9 @@
     @close="$emit('close')"
   >
     <form v-if="user" id="edit-user-form" @submit.prevent="handleUpdateUser" class="space-y-5">
-      <div>
-        <label class="input-label">{{ t('admin.users.email') }}</label>
+      <FormField :label="t('admin.users.email')">
         <input v-model="form.email" type="email" class="input" />
-      </div>
+      </FormField>
       <div>
         <label class="input-label">{{ t('admin.users.password') }}</label>
         <div class="flex gap-2">
@@ -25,20 +24,19 @@
           </button>
         </div>
       </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.username') }}</label>
+      <FormField :label="t('admin.users.username')">
         <input v-model="form.username" type="text" class="input" />
-      </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.notes') }}</label>
+      </FormField>
+      <FormField :label="t('admin.users.notes')">
         <textarea v-model="form.notes" rows="3" class="input"></textarea>
-      </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.columns.concurrency') }}</label>
+      </FormField>
+      <FormField :label="t('admin.users.columns.concurrency')">
         <input v-model.number="form.concurrency" type="number" class="input" />
-      </div>
-      <div>
-        <label class="input-label">{{ t('admin.users.form.rpmLimit') }}</label>
+      </FormField>
+      <FormField
+        :label="t('admin.users.form.rpmLimit')"
+        :hint="t('admin.users.form.rpmLimitHint')"
+      >
         <input
           v-model.number="form.rpm_limit"
           type="number"
@@ -47,17 +45,17 @@
           class="input"
           :placeholder="t('admin.users.form.rpmLimitPlaceholder')"
         />
-        <p class="input-hint">{{ t('admin.users.form.rpmLimitHint') }}</p>
-      </div>
+      </FormField>
       <UserAttributeForm v-model="form.customAttributes" :user-id="user?.id" />
     </form>
     <template #footer>
-      <div class="flex justify-end gap-3">
-        <button @click="$emit('close')" type="button" class="btn btn-secondary">{{ t('common.cancel') }}</button>
-        <button type="submit" form="edit-user-form" :disabled="submitting" class="btn btn-primary">
-          {{ submitting ? t('admin.users.updating') : t('common.update') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="submitting"
+        :loading-text="t('admin.users.updating')"
+        :confirm-text="t('common.update')"
+        confirm-form="edit-user-form"
+        @cancel="$emit('close')"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -70,6 +68,8 @@ import { useClipboard } from '@/composables/useClipboard'
 import { adminAPI } from '@/api/admin'
 import type { AdminUser, UserAttributeValuesMap } from '@/types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
+import FormField from '@/components/common/FormField.vue'
 import UserAttributeForm from '@/components/user/UserAttributeForm.vue'
 import Icon from '@/components/icons/Icon.vue'
 

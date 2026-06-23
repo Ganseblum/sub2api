@@ -62,9 +62,11 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end">
-        <button type="button" class="btn btn-secondary" @click="handleClose">{{ t('common.close') }}</button>
-      </div>
+      <DialogFooter
+        :show-confirm="false"
+        :cancel-text="t('common.close')"
+        @cancel="handleClose"
+      />
     </template>
   </BaseDialog>
 </template>
@@ -80,6 +82,7 @@ import type { Column } from '@/components/common/types'
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import Icon from '@/components/icons/Icon.vue'

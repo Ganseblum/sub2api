@@ -1,23 +1,21 @@
 <template>
-  <div
-    class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 dark:border-dark-700 dark:bg-dark-800 sm:px-6"
-  >
+  <div class="pagination-bar flex items-center justify-between px-4 py-3 sm:px-6">
     <div class="flex flex-1 items-center justify-between sm:hidden">
       <!-- Mobile pagination -->
       <button
         @click="goToPage(page - 1)"
         :disabled="page === 1"
-        class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-200 dark:hover:bg-dark-600"
+        class="btn btn-secondary btn-sm"
       >
         {{ t('pagination.previous') }}
       </button>
-      <span class="text-sm text-gray-700 dark:text-gray-300">
+      <span class="text-sm font-medium" style="color: var(--youc-ink)">
         {{ t('pagination.pageOf', { page, total: totalPages }) }}
       </span>
       <button
         @click="goToPage(page + 1)"
         :disabled="page === totalPages"
-        class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-200 dark:hover:bg-dark-600"
+        class="btn btn-secondary btn-sm"
       >
         {{ t('pagination.next') }}
       </button>
@@ -68,15 +66,12 @@
       </div>
 
       <!-- Desktop pagination buttons -->
-      <nav
-        class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-        aria-label="Pagination"
-      >
+      <nav class="pagination-nav relative z-0 inline-flex" aria-label="Pagination">
         <!-- Previous button -->
         <button
           @click="goToPage(page - 1)"
           :disabled="page === 1"
-          class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-400 dark:hover:bg-dark-600"
+          class="pagination-edge-btn pagination-edge-btn-prev"
           :aria-label="t('pagination.previous')"
         >
           <Icon name="chevronLeft" size="md" />
@@ -89,11 +84,9 @@
           @click="typeof pageNum === 'number' && goToPage(pageNum)"
           :disabled="typeof pageNum !== 'number'"
           :class="[
-            'relative inline-flex items-center border px-4 py-2 text-sm font-medium',
-            pageNum === page
-              ? 'z-10 border-primary-500 bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400'
-              : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-300 dark:hover:bg-dark-600',
-            typeof pageNum !== 'number' && 'cursor-default'
+            'pagination-page-btn',
+            pageNum === page && 'pagination-page-btn-active',
+            typeof pageNum !== 'number' && 'pagination-page-btn-ellipsis'
           ]"
           :aria-label="
             typeof pageNum === 'number' ? t('pagination.goToPage', { page: pageNum }) : undefined
@@ -107,7 +100,7 @@
         <button
           @click="goToPage(page + 1)"
           :disabled="page === totalPages"
-          class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-400 dark:hover:bg-dark-600"
+          class="pagination-edge-btn pagination-edge-btn-next"
           :aria-label="t('pagination.next')"
         >
           <Icon name="chevronRight" size="md" />
@@ -242,6 +235,57 @@ const submitJump = () => {
 
 <style scoped>
 .page-size-select :deep(.select-trigger) {
-  @apply px-3 py-1.5 text-sm;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.pagination-nav {
+  border: 2.5px solid var(--youc-line);
+  box-shadow: var(--youc-shadow);
+}
+
+.pagination-edge-btn,
+.pagination-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: none;
+  border-right: 2px solid var(--youc-line);
+  background: var(--youc-paper);
+  color: var(--youc-ink);
+  transition: background-color 120ms ease;
+}
+
+.pagination-edge-btn:hover:not(:disabled),
+.pagination-page-btn:hover:not(:disabled):not(.pagination-page-btn-ellipsis) {
+  background: var(--youc-soft);
+}
+
+.pagination-edge-btn:disabled,
+.pagination-page-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.pagination-page-btn-active {
+  background: var(--youc-ink);
+  color: var(--youc-bg);
+}
+
+.pagination-page-btn-active:hover {
+  background: var(--youc-ink);
+}
+
+.pagination-edge-btn-next,
+.pagination-page-btn:last-child {
+  border-right: none;
+}
+
+.pagination-page-btn-ellipsis {
+  cursor: default;
 }
 </style>

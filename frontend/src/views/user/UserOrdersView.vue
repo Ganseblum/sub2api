@@ -45,10 +45,14 @@
     <BaseDialog :show="!!cancelTargetId" :title="t('payment.orders.cancel')" width="narrow" @close="cancelTargetId = null">
       <p class="text-sm text-gray-600 dark:text-gray-300">{{ t('payment.confirmCancel') }}</p>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button class="btn btn-secondary" @click="cancelTargetId = null">{{ t('common.cancel') }}</button>
-          <button class="btn btn-danger" :disabled="actionLoading" @click="confirmCancel">{{ actionLoading ? t('common.processing') : t('payment.orders.cancel') }}</button>
-        </div>
+        <DialogFooter
+          variant="danger"
+          :confirm-text="t('payment.orders.cancel')"
+          :loading="actionLoading"
+          :loading-text="t('common.processing')"
+          @cancel="cancelTargetId = null"
+          @confirm="confirmCancel"
+        />
       </template>
     </BaseDialog>
 
@@ -71,10 +75,14 @@
         </div>
       </div>
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button class="btn btn-secondary" @click="refundTarget = null">{{ t('common.cancel') }}</button>
-          <button class="btn btn-primary" :disabled="actionLoading || !refundReason.trim()" @click="confirmRefund">{{ actionLoading ? t('common.processing') : t('payment.orders.requestRefund') }}</button>
-        </div>
+        <DialogFooter
+          :confirm-text="t('payment.orders.requestRefund')"
+          :loading="actionLoading"
+          :loading-text="t('common.processing')"
+          :confirm-disabled="!refundReason.trim()"
+          @cancel="refundTarget = null"
+          @confirm="confirmRefund"
+        />
       </template>
     </BaseDialog>
   </AppLayout>
@@ -91,6 +99,7 @@ import type { PaymentOrder } from '@/types/payment'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Select from '@/components/common/Select.vue'
 import Icon from '@/components/icons/Icon.vue'
 import OrderTable from '@/components/payment/OrderTable.vue'

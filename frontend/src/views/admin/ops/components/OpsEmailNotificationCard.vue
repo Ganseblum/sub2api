@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { opsAPI } from '@/api/admin/ops'
 import type { EmailNotificationConfig, AlertSeverity } from '../types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import Select from '@/components/common/Select.vue'
 
 const { t } = useI18n()
@@ -430,12 +431,13 @@ onMounted(() => {
       </div>
     </div>
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <button class="btn btn-secondary" @click="showEditor = false">{{ t('common.cancel') }}</button>
-        <button class="btn btn-primary" :disabled="saving || !editorValidation.valid" @click="saveConfig">
-          {{ saving ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <DialogFooter
+        :loading="saving"
+        :loading-text="t('common.saving')"
+        :confirm-disabled="!editorValidation.valid"
+        @cancel="showEditor = false"
+        @confirm="saveConfig"
+      />
     </template>
   </BaseDialog>
 </template>

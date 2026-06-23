@@ -161,20 +161,11 @@
                 </div>
               </td>
               <td class="px-3 py-2">
-                <button
-                  @click="toggleEnabled(rule)"
-                  :class="[
-                    'relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-                    rule.enabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-                  ]"
-                >
-                  <span
-                    :class="[
-                      'pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                      rule.enabled ? 'translate-x-3' : 'translate-x-0'
-                    ]"
-                  />
-                </button>
+                <Toggle
+                  :model-value="rule.enabled"
+                  sm
+                  @update:model-value="toggleEnabled(rule)"
+                />
               </td>
               <td class="px-3 py-2">
                 <div class="flex items-center gap-1">
@@ -403,15 +394,12 @@
       </form>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button @click="closeFormModal" type="button" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button @click="handleSubmit" :disabled="submitting" class="btn btn-primary">
-            <Icon v-if="submitting" name="refresh" size="sm" class="mr-1 animate-spin" />
-            {{ showEditModal ? t('common.update') : t('common.create') }}
-          </button>
-        </div>
+        <DialogFooter
+          :confirm-text="showEditModal ? t('common.update') : t('common.create')"
+          :loading="submitting"
+          @cancel="closeFormModal"
+          @confirm="handleSubmit"
+        />
       </template>
     </BaseDialog>
 
@@ -436,7 +424,9 @@ import { useAppStore } from '@/stores/app'
 import { adminAPI } from '@/api/admin'
 import type { ErrorPassthroughRule } from '@/api/admin/errorPassthrough'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import Toggle from '@/components/common/Toggle.vue'
 import Icon from '@/components/icons/Icon.vue'
 
 const props = defineProps<{

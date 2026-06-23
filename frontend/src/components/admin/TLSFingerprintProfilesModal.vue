@@ -113,11 +113,7 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end">
-        <button @click="$emit('close')" class="btn btn-secondary">
-          {{ t('common.close') }}
-        </button>
-      </div>
+      <DialogFooter :show-cancel="false" :confirm-text="t('common.close')" @confirm="$emit('close')" />
     </template>
 
     <!-- Create/Edit Modal -->
@@ -175,32 +171,11 @@
           </div>
         </div>
 
-        <!-- GREASE Toggle -->
-        <div class="flex items-center gap-3">
-          <button
-            type="button"
-            @click="form.enable_grease = !form.enable_grease"
-            :class="[
-              'relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
-              form.enable_grease ? 'bg-primary-600' : 'bg-gray-200 dark:bg-dark-600'
-            ]"
-          >
-            <span
-              :class="[
-                'pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                form.enable_grease ? 'translate-x-4' : 'translate-x-0'
-              ]"
-            />
-          </button>
-          <div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ t('admin.tlsFingerprintProfiles.form.enableGrease') }}
-            </span>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              {{ t('admin.tlsFingerprintProfiles.form.enableGreaseHint') }}
-            </p>
-          </div>
-        </div>
+        <SettingToggleRow
+          v-model="form.enable_grease"
+          :label="t('admin.tlsFingerprintProfiles.form.enableGrease')"
+          :hint="t('admin.tlsFingerprintProfiles.form.enableGreaseHint')"
+        />
 
         <!-- TLS Array Fields - 2 column grid -->
         <div class="grid grid-cols-2 gap-4">
@@ -300,15 +275,12 @@
       </form>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
-          <button @click="closeFormModal" type="button" class="btn btn-secondary">
-            {{ t('common.cancel') }}
-          </button>
-          <button @click="handleSubmit" :disabled="submitting" class="btn btn-primary">
-            <Icon v-if="submitting" name="refresh" size="sm" class="mr-1 animate-spin" />
-            {{ showEditModal ? t('common.update') : t('common.create') }}
-          </button>
-        </div>
+        <DialogFooter
+          :confirm-text="showEditModal ? t('common.update') : t('common.create')"
+          :loading="submitting"
+          @cancel="closeFormModal"
+          @confirm="handleSubmit"
+        />
       </template>
     </BaseDialog>
 
@@ -333,7 +305,9 @@ import { useAppStore } from '@/stores/app'
 import { adminAPI } from '@/api/admin'
 import type { TLSFingerprintProfile } from '@/api/admin/tlsFingerprintProfile'
 import BaseDialog from '@/components/common/BaseDialog.vue'
+import DialogFooter from '@/components/common/DialogFooter.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import SettingToggleRow from '@/components/common/SettingToggleRow.vue'
 import Icon from '@/components/icons/Icon.vue'
 
 const props = defineProps<{

@@ -22,6 +22,16 @@ export const resolveUsageRequestType = (value: UsageRequestTypeLike): UsageReque
   return value.stream ? 'stream' : 'sync'
 }
 
+export function getRequestTypeBadgeClass(requestType: UsageRequestType): string {
+  switch (requestType) {
+    case 'cyber': return 'badge-danger'
+    case 'ws_v2': return 'badge-purple'
+    case 'stream': return 'badge-primary'
+    case 'sync': return 'badge-gray'
+    default: return 'badge-warning'
+  }
+}
+
 export const requestTypeToLegacyStream = (requestType?: UsageRequestType | null): boolean | null | undefined => {
   // cyber 与 stream 正交（cyber 可发生在 stream 或非 stream 请求），不映射到 legacy stream 维度。
   if (!requestType || requestType === 'unknown' || requestType === 'cyber') {

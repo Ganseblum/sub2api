@@ -1,5 +1,7 @@
 import { i18n } from '@/i18n'
 import { normalizeBrandName } from '@/config/brand'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
+import type { CustomMenuItem } from '@/types'
 
 const legalDocumentTitles: Record<string, string> = {
   terms: '服务条款',
@@ -40,4 +42,23 @@ export function resolveDocumentTitle(
   }
 
   return normalizedSiteName
+}
+
+export function resolveRouteDocumentTitle(
+  route: Pick<RouteLocationNormalizedLoaded, 'name' | 'params' | 'meta'>,
+  siteName: string | undefined,
+  customMenuItems: CustomMenuItem[] = [],
+): string {
+  const id = typeof route.params.id === 'string' ? route.params.id : ''
+  const menuItem = route.name === 'CustomPage' && id
+    ? customMenuItems.find((item) => item.id === id)
+    : undefined
+  const menuTitle = menuItem?.label.trim()
+
+  return resolveDocumentTitle(
+    menuTitle || route.meta.title,
+    siteName,
+    menuTitle ? undefined : (route.meta.titleKey as string),
+    route.params as Record<string, unknown>,
+  )
 }

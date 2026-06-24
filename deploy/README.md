@@ -23,6 +23,10 @@ This directory contains files for deploying Sub2API on Linux servers.
 | `sub2api.service` | Systemd service unit file |
 | `sub2api-datamanagementd.service` | datamanagementd systemd service unit file |
 | `DATAMANAGEMENTD_CN.md` | datamanagementd 部署与联动说明（中文） |
+| `REDEPLOY_CN.md` | Git 源码重新部署指南（中文） |
+| `TODO_CN.md` | 待办清单（Compose V2、UI 重构等） |
+| `docker-compose.build.yml` | 从 git 源码构建 sub2api（叠加主 compose 使用） |
+| `upgrade.sh` | 日常更新脚本（git pull + rebuild） |
 | `config.example.yaml` | Example configuration file |
 
 ---

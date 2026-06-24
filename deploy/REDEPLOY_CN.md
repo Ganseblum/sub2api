@@ -85,7 +85,7 @@ docker-compose -f docker-compose.yml -f docker-compose.build.yml logs --tail=50 
 - 三个容器均为 `Up` 或 `healthy`
 - 镜像名为 `sub2api:latest`（不是 `weishaw/sub2api:latest`）
 
-### 3.2 使用 Compose V2（推荐，见第 6 节待办）
+### 3.2 使用 Compose V2（推荐，详见 [TODO_CN.md](./TODO_CN.md)）
 
 ```bash
 cd /opt/sub2api-new/sub2api
@@ -139,6 +139,45 @@ docker compose up -d --build sub2api
 ```
 
 **说明：** 只更新 sub2api 容器；postgres / redis 及其命名卷 **不会被删除或重建**。
+
+### 4.1 是否需要停机维护 / 删除旧容器？
+
+**不需要整站停机维护，也无需日常删除旧 Docker 容器。**
+
+| 问题 | 答案 |
+|------|------|
+| 要 `docker rm` / `down` 再更新吗？ | **日常不用**。直接 `up -d --build sub2api` 即可 |
+| 数据库会丢吗？ | **不会**（只要不执行 `down -v`） |
+| postgres / redis 要停吗？ | **不用**，只重建 sub2api |
+| 用户会完全访问不了吗？ | **不会长时间中断**；换 sub2api 容器时有 **短暂中断**（通常几十秒～2 分钟） |
+| 需要发停机公告吗？ | 一般 **不用**；建议低峰更新 |
+
+**更新过程中各阶段：**
+
+| 阶段 | 服务状态 |
+|------|----------|
+| `git pull` | 正常 |
+| `docker build`（编译镜像） | 旧 sub2api **仍在服务**，用户一般无感 |
+| 替换 sub2api 容器（停旧 → 启新） | API / Web **短暂不可用** |
+| healthcheck 通过 | 恢复正常 |
+
+**推荐：先 build 再切换**（缩短不可用时间）：
+
+```bash
+cd /opt/sub2api-new/sub2api/deploy
+
+# 老版 compose
+docker-compose -f docker-compose.yml -f docker-compose.build.yml build sub2api
+docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d sub2api
+
+# Compose V2（升级后）
+docker compose build sub2api
+docker compose up -d sub2api
+```
+
+**只有**遇到老版 `docker-compose` 的 `ContainerConfig` 报错时，才需要先删残留容器再 `up`（见第 7.2 节）。**仍不要加 `-v`。**
+
+**真正零停机**（替换容器时用户完全无感）需要多实例 + 负载均衡；当前单容器 compose **做不到**完全零中断，但无需「停机维护窗口」。
 
 ---
 
@@ -229,7 +268,7 @@ docker-compose -f docker-compose.yml -f docker-compose.build.yml down --remove-o
 docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 ```
 
-**永久处理：** 见第 8 节 Compose V2 升级待办。
+**永久处理：** 升级 Compose V2，步骤见 [TODO_CN.md](./TODO_CN.md) 第 1.1 节。
 
 ### 7.3 容器名带 hash 前缀（如 `4be4ea0d6c16_sub2api-postgres`）
 
@@ -251,55 +290,12 @@ docker images | grep sub2api
 
 ---
 
-## 8. 待办：升级 Docker Compose V2
+## 8. 待办事项
 
-> **状态：待完成**  
-> 当前服务器若仍为 `docker-compose` 1.29.2，建议尽快升级，以永久解决 `ContainerConfig` 等问题。
+部署与 UI 重构等待办见 **[TODO_CN.md](./TODO_CN.md)**，其中包括：
 
-### 8.1 检查当前版本
-
-```bash
-docker compose version    # V2（期望有输出）
-docker-compose --version  # 老版（如 1.29.2）
-```
-
-### 8.2 手动安装 V2 插件
-
-```bash
-sudo mkdir -p /usr/local/lib/docker/cli-plugins
-
-sudo curl -SL "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64" \
-  -o /usr/local/lib/docker/cli-plugins/docker-compose
-
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
-docker compose version
-```
-
-ARM 服务器将 URL 中的 `x86_64` 改为 `aarch64`（先执行 `uname -m` 确认）。
-
-### 8.3 可选：让 `docker-compose` 命令也走 V2
-
-```bash
-sudo apt-get remove -y docker-compose 2>/dev/null || true
-echo 'docker compose "$@"' | sudo tee /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-```
-
-### 8.4 升级后部署命令变更
-
-| 老版 | V2 |
-|------|-----|
-| `docker-compose` | `docker compose`（空格） |
-| `-f a.yml -f b.yml` | 相同，或在 `.env` 设 `COMPOSE_FILE` |
-| `./upgrade.sh` | 直接使用（脚本内为 `docker compose`） |
-
-升级完成后，日常更新：
-
-```bash
-cd /opt/sub2api-new/sub2api/deploy
-./upgrade.sh
-```
+- Docker Compose V2 升级（服务器）
+- 设置页 / 其它页面 UI 重构收尾
 
 ---
 
@@ -312,7 +308,11 @@ docker-compose -f docker-compose.yml -f docker-compose.build.yml down --remove-o
 docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
 docker-compose -f docker-compose.yml -f docker-compose.build.yml ps
 
-# 仅更新 sub2api
+# 仅更新 sub2api（日常推荐，无需删旧容器）
+docker-compose -f docker-compose.yml -f docker-compose.build.yml build sub2api
+docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d sub2api
+
+# 或一行
 docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d --build sub2api
 
 # 查看日志
@@ -331,5 +331,6 @@ docker-compose -f docker-compose.yml -f docker-compose.build.yml restart sub2api
 | `deploy/docker-compose.yml` | 主 compose（可与上游合并） |
 | `deploy/docker-compose.build.yml` | git 源码构建覆盖层 |
 | `deploy/upgrade.sh` | V2 日常更新脚本 |
+| `deploy/TODO_CN.md` | 待办清单 |
 | `deploy/.env.example` | 环境变量模板（勿直接覆盖已有 `.env`） |
 | `deploy/README.md` | 通用部署说明 |

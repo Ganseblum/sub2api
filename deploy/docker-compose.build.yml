@@ -1,0 +1,17 @@
+# =============================================================================
+# Build sub2api from local git source (instead of weishaw/sub2api:latest)
+# =============================================================================
+# Usage (either):
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+#   ./upgrade.sh
+#
+# Or add to deploy/.env (one-time, survives git pull):
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.build.yml
+# =============================================================================
+
+services:
+  sub2api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: sub2api:latest

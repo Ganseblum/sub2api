@@ -4125,7 +4125,6 @@
                   </div>
                 </div>
               </div>
-            </div>
           </SectionCard>
 
           <!-- Web Search Test Dialog -->

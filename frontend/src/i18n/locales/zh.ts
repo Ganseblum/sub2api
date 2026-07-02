@@ -3990,6 +3990,8 @@ export default {
       loadFactorHint: '提高负载因子可以提高对账号的调度频率',
       priority: '优先级',
       priorityHint: '优先级越小的账号优先使用',
+      groupPriorities: '分组内优先级',
+      groupPrioritiesHint: '同一个账号可以在不同分组里设置不同优先级，数值越小越优先',
       billingRateMultiplier: '账号计费倍率',
       billingRateMultiplierHint: '0 表示不计费，仅影响账号计费',
       expiresAt: '过期时间',

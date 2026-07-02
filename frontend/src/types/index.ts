@@ -852,6 +852,7 @@ export interface Account {
   proxy?: Proxy
   group_ids?: number[] // Groups this account belongs to
   groups?: Group[] // Preloaded group objects
+  account_groups?: AccountGroup[]
 
   // Rate limit & scheduling fields
   schedulable: boolean
@@ -918,6 +919,13 @@ export interface Account {
   current_window_cost?: number | null // 当前窗口费用
   active_sessions?: number | null // 当前活跃会话数
   current_rpm?: number | null // 当前分钟 RPM 计数
+}
+
+export interface AccountGroup {
+  account_id: number
+  group_id: number
+  priority: number
+  created_at: string
 }
 
 // Account Usage types
@@ -1032,6 +1040,7 @@ export interface CreateAccountRequest {
   concurrency?: number
   load_factor?: number | null
   priority?: number
+  group_priorities?: Record<number, number>
   rate_multiplier?: number // Account billing multiplier (>=0, 0 means free)
   group_ids?: number[]
   expires_at?: number | null
@@ -1049,6 +1058,7 @@ export interface UpdateAccountRequest {
   concurrency?: number
   load_factor?: number | null
   priority?: number
+  group_priorities?: Record<number, number>
   rate_multiplier?: number // Account billing multiplier (>=0, 0 means free)
   schedulable?: boolean
   status?: 'active' | 'inactive' | 'error'
@@ -1161,6 +1171,7 @@ export interface CodexSessionImportRequest {
   name?: string
   notes?: string | null
   group_ids?: number[]
+  group_priorities?: Record<number, number>
   proxy_id?: number | null
   concurrency?: number
   priority?: number

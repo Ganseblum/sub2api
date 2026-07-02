@@ -288,6 +288,7 @@ type CreateAccountInput struct {
 	RateMultiplier     *float64 // 账号计费倍率（>=0，允许 0）
 	LoadFactor         *int
 	GroupIDs           []int64
+	GroupPriorities    map[int64]int
 	ExpiresAt          *int64
 	AutoPauseOnExpired *bool
 	// SkipDefaultGroupBind prevents auto-binding to platform default group when GroupIDs is empty.
@@ -310,6 +311,7 @@ type UpdateAccountInput struct {
 	LoadFactor            *int
 	Status                string
 	GroupIDs              *[]int64
+	GroupPriorities       map[int64]int
 	ExpiresAt             *int64
 	AutoPauseOnExpired    *bool
 	SkipMixedChannelCheck bool // 跳过混合渠道检查（用户已确认风险）
@@ -2644,6 +2646,9 @@ func (s *adminServiceImpl) CreateAccount(ctx context.Context, input *CreateAccou
 		if err := s.accountRepo.BindGroups(ctx, account.ID, groupIDs); err != nil {
 			return nil, err
 		}
+		if err := s.updateAccountGroupPriorities(ctx, account.ID, input.GroupPriorities); err != nil {
+			return nil, err
+		}
 	}
 
 	// OAuth 账号：创建后异步设置隐私。
@@ -2794,6 +2799,9 @@ func (s *adminServiceImpl) UpdateAccount(ctx context.Context, id int64, input *U
 			return nil, err
 		}
 	}
+	if err := s.updateAccountGroupPriorities(ctx, account.ID, input.GroupPriorities); err != nil {
+		return nil, err
+	}
 
 	// 重新查询以确保返回完整数据（包括正确的 Proxy 关联对象）
 	updated, err := s.accountRepo.GetByID(ctx, id)
@@ -2801,6 +2809,21 @@ func (s *adminServiceImpl) UpdateAccount(ctx context.Context, id int64, input *U
 		return nil, err
 	}
 	return updated, nil
+}
+
+type accountGroupPriorityUpdater interface {
+	UpdateAccountGroupPriorities(ctx context.Context, accountID int64, priorities map[int64]int) error
+}
+
+func (s *adminServiceImpl) updateAccountGroupPriorities(ctx context.Context, accountID int64, priorities map[int64]int) error {
+	if len(priorities) == 0 {
+		return nil
+	}
+	updater, ok := s.accountRepo.(accountGroupPriorityUpdater)
+	if !ok {
+		return nil
+	}
+	return updater.UpdateAccountGroupPriorities(ctx, accountID, priorities)
 }
 
 // UpdateAccountExtra 仅对 Extra JSONB 做 key 级合并，避免覆盖其它运行态键

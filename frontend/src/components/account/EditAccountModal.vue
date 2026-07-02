@@ -1982,6 +1982,29 @@
         data-tour="account-form-groups"
       />
 
+      <div v-if="!authStore.isSimpleMode && selectedPriorityGroups.length > 0" class="space-y-2">
+        <div>
+          <label class="input-label mb-1">{{ t('admin.accounts.groupPriorities') }}</label>
+          <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('admin.accounts.groupPrioritiesHint') }}</p>
+        </div>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <label
+            v-for="group in selectedPriorityGroups"
+            :key="group.id"
+            class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-dark-600 dark:bg-dark-800"
+          >
+            <span class="min-w-0 truncate text-sm font-medium text-gray-700 dark:text-gray-200">{{ group.name }}</span>
+            <input
+              v-model.number="groupPriorities[group.id]"
+              type="number"
+              min="1"
+              class="input h-8 w-20 shrink-0 py-1 text-sm"
+              @input="groupPriorities[group.id] = normalizePriority(groupPriorities[group.id])"
+            />
+          </label>
+        </div>
+      </div>
+
     </form>
 
     <template #footer>
@@ -2505,6 +2528,26 @@ const form = reactive({
   expires_at: null as number | null
 })
 
+const groupPriorities = reactive<Record<number, number>>({})
+
+const normalizePriority = (value: number) => {
+  if (!Number.isFinite(value) || value < 1) return 1
+  return Math.trunc(value)
+}
+
+const selectedPriorityGroups = computed(() => {
+  const selected = new Set(form.group_ids)
+  return props.groups.filter((group) => selected.has(group.id))
+})
+
+const buildGroupPrioritiesPayload = () => {
+  const payload: Record<number, number> = {}
+  for (const groupID of form.group_ids) {
+    payload[groupID] = normalizePriority(groupPriorities[groupID] ?? form.priority)
+  }
+  return payload
+}
+
 const statusOptions = computed(() => {
   const options = [
     { value: 'active', label: t('common.active') },
@@ -2572,6 +2615,14 @@ const syncFormFromAccount = (newAccount: Account | null) => {
     : 'active'
   form.group_ids = newAccount.group_ids || []
   form.expires_at = newAccount.expires_at ?? null
+
+  for (const key of Object.keys(groupPriorities)) {
+    delete groupPriorities[Number(key)]
+  }
+  const priorities = new Map((newAccount.account_groups || []).map((ag) => [ag.group_id, ag.priority]))
+  for (const groupID of form.group_ids) {
+    groupPriorities[groupID] = normalizePriority(priorities.get(groupID) ?? form.priority)
+  }
 
   // Load intercept warmup requests setting (applies to all account types)
   const credentials = newAccount.credentials as Record<string, unknown> | undefined
@@ -2847,6 +2898,22 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => [...form.group_ids],
+  (groupIDs) => {
+    const selected = new Set(groupIDs)
+    for (const key of Object.keys(groupPriorities)) {
+      const groupID = Number(key)
+      if (!selected.has(groupID)) delete groupPriorities[groupID]
+    }
+    for (const groupID of groupIDs) {
+      if (groupPriorities[groupID] == null) {
+        groupPriorities[groupID] = normalizePriority(form.priority)
+      }
+    }
+  }
 )
 
 // Model mapping helpers
@@ -3320,6 +3387,7 @@ const handleSubmit = async () => {
       updatePayload.load_factor = 0
     }
     updatePayload.auto_pause_on_expired = autoPauseOnExpired.value
+    updatePayload.group_priorities = buildGroupPrioritiesPayload()
 
     // For apikey type, handle credentials update
     if (props.account.type === 'apikey') {

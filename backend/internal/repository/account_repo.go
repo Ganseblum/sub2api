@@ -581,7 +581,21 @@ func (r *accountRepository) ListWithFilters(ctx context.Context, params paginati
 	if err != nil {
 		return nil, nil, err
 	}
+	if groupID > 0 {
+		applyAccountGroupPriority(outAccounts, groupID)
+	}
 	return outAccounts, paginationResultFromTotal(int64(total), params), nil
+}
+
+func applyAccountGroupPriority(accounts []service.Account, groupID int64) {
+	for i := range accounts {
+		for _, accountGroup := range accounts[i].AccountGroups {
+			if accountGroup.GroupID == groupID {
+				accounts[i].Priority = accountGroup.Priority
+				break
+			}
+		}
+	}
 }
 
 func accountListOrder(params pagination.PaginationParams) []func(*entsql.Selector) {
@@ -978,6 +992,41 @@ func (r *accountRepository) BindGroups(ctx context.Context, accountID int64, gro
 	if err := enqueueSchedulerOutbox(ctx, r.sql, service.SchedulerOutboxEventAccountGroupsChanged, &accountID, nil, payload); err != nil {
 		logger.LegacyPrintf("repository.account", "[SchedulerOutbox] enqueue bind groups failed: account=%d err=%v", accountID, err)
 	}
+	return nil
+}
+
+func (r *accountRepository) UpdateAccountGroupPriorities(ctx context.Context, accountID int64, priorities map[int64]int) error {
+	if len(priorities) == 0 {
+		return nil
+	}
+	client := clientFromContext(ctx, r.client)
+	changedGroupIDs := make([]int64, 0, len(priorities))
+	for groupID, priority := range priorities {
+		if groupID <= 0 {
+			continue
+		}
+		if priority < 1 {
+			priority = 1
+		}
+		if _, err := client.AccountGroup.Update().
+			Where(
+				dbaccountgroup.AccountIDEQ(accountID),
+				dbaccountgroup.GroupIDEQ(groupID),
+			).
+			SetPriority(priority).
+			Save(ctx); err != nil {
+			return err
+		}
+		changedGroupIDs = append(changedGroupIDs, groupID)
+	}
+	if len(changedGroupIDs) == 0 {
+		return nil
+	}
+	payload := buildSchedulerGroupPayload(changedGroupIDs)
+	if err := enqueueSchedulerOutbox(ctx, r.sql, service.SchedulerOutboxEventAccountGroupsChanged, &accountID, nil, payload); err != nil {
+		logger.LegacyPrintf("repository.account", "[SchedulerOutbox] enqueue group priority update failed: account=%d err=%v", accountID, err)
+	}
+	r.syncSchedulerAccountSnapshot(ctx, accountID)
 	return nil
 }
 
@@ -1627,6 +1676,7 @@ func (r *accountRepository) queryAccountsByGroup(ctx context.Context, groupID in
 
 	orderedIDs := make([]int64, 0, len(groups))
 	accountMap := make(map[int64]*dbent.Account, len(groups))
+	priorityByAccountID := make(map[int64]int, len(groups))
 	for _, ag := range groups {
 		if ag.Edges.Account == nil {
 			continue
@@ -1635,6 +1685,7 @@ func (r *accountRepository) queryAccountsByGroup(ctx context.Context, groupID in
 			continue
 		}
 		accountMap[ag.AccountID] = ag.Edges.Account
+		priorityByAccountID[ag.AccountID] = ag.Priority
 		orderedIDs = append(orderedIDs, ag.AccountID)
 	}
 
@@ -1645,7 +1696,16 @@ func (r *accountRepository) queryAccountsByGroup(ctx context.Context, groupID in
 		}
 	}
 
-	return r.accountsToService(ctx, accounts)
+	out, err := r.accountsToService(ctx, accounts)
+	if err != nil {
+		return nil, err
+	}
+	for i := range out {
+		if priority, ok := priorityByAccountID[out[i].ID]; ok {
+			out[i].Priority = priority
+		}
+	}
+	return out, nil
 }
 
 func (r *accountRepository) accountsToService(ctx context.Context, accounts []*dbent.Account) ([]service.Account, error) {

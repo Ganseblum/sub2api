@@ -56,22 +56,13 @@ var modelMarketSpecs = []modelMarketSpec{
 	{ID: "claude-sonnet-4-6", DisplayName: "Claude Sonnet 4.6", DisplayOrder: 2300, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-haiku-4-5", DisplayName: "Claude Haiku 4.5", DisplayOrder: 2200, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 
-	// Gemini — newest first
+	// Gemini — newest first (only 3.5 / 3.1 series)
 	{ID: "gemini-3.5-flash", DisplayName: "Gemini 3.5 Flash", DisplayOrder: 2150, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
 	{ID: "gemini-3.5-flash-low", DisplayName: "Gemini 3.5 Flash Low", DisplayOrder: 2125, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.5-flash"},
 	{ID: "gemini-3.1-pro-preview", DisplayName: "Gemini 3.1 Pro Preview", DisplayOrder: 2100, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
 	{ID: "gemini-3.1-pro-preview-thinking-128", DisplayName: "Gemini 3.1 Pro Preview Thinking 128K", DisplayOrder: 2050, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-pro-preview"},
 	{ID: "gemini-3.1-flash", DisplayName: "Gemini 3.1 Flash", DisplayOrder: 2000, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-flash-lite"},
 	{ID: "gemini-3.1-flash-image", DisplayName: "Gemini 3.1 Flash Image", DisplayOrder: 1950, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash", DisplayName: "Gemini 3 Flash", DisplayOrder: 1900, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash-thinking-128", DisplayName: "Gemini 3 Flash Thinking 128K", DisplayOrder: 1850, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-flash"},
-	{ID: "gemini-3-pro", DisplayName: "Gemini 3 Pro", DisplayOrder: 1800, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-pro-preview"},
-	{ID: "gemini-3-pro-preview", DisplayName: "Gemini 3 Pro Preview", DisplayOrder: 1750, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-2.5-pro", DisplayName: "Gemini 2.5 Pro", DisplayOrder: 1500, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-2.5-flash", DisplayName: "Gemini 2.5 Flash", DisplayOrder: 1450, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-2.5-flash-lite", DisplayName: "Gemini 2.5 Flash Lite", DisplayOrder: 1400, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "mini", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-2.0-flash", DisplayName: "Gemini 2.0 Flash", DisplayOrder: 1000, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-2.0-flash-lite", DisplayName: "Gemini 2.0 Flash Lite", DisplayOrder: 950, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "mini", GroupPlatforms: []string{service.PlatformGemini}},
 
 	// OpenAI GPT
 	{ID: "gpt-5.6-sol", DisplayName: "GPT-5.6 Sol", DisplayOrder: 900, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},

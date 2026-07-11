@@ -206,6 +206,7 @@ export default {
     processing: 'Processing...',
     continue: 'Continue',
     rememberMe: 'Remember me',
+    termsAgreement: 'I have read and agree to the Terms of Service and Privacy Policy',
     dontHaveAccount: "Don't have an account?",
     alreadyHaveAccount: 'Already have an account?',
     registrationDisabled: 'Registration is currently disabled. Please contact the administrator.',

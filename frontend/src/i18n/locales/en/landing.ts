@@ -109,8 +109,221 @@ export default {
       description: 'Sign up now and get free trial credits to experience seamless AI access',
       button: 'Sign Up Free'
     },
+    // v3 Redesign additions
+    nav: {
+      howItWorks: 'How it works',
+      features: 'Features',
+      models: 'Models',
+      pricing: 'Pricing',
+      faq: 'FAQ'
+    },
+    hero: {
+      kicker: 'AI API Gateway · Subscription redistribution',
+      title: 'One key, access ',
+      titleHighlight: 'all models',
+      description: 'Stop juggling Claude, GPT and Gemini subscriptions separately. YOUC unifies them into a standard OpenAI-format API with smart routing, pay-as-you-go billing and a 5-minute integration.',
+      terminal: {
+        comment: '# Swap the BaseURL, keep one key',
+        routeComment: '# Route / balance / bill'
+      },
+      badge: 'Cut costs by 90%+'
+    },
+    stats: {
+      availability: { value: '99.9%', label: 'Uptime' },
+      models: { value: '100+', label: 'Available models' },
+      latency: { value: '<800ms', label: 'Avg latency' }
+    },
+    trustStrip: {
+      title: 'Compatible with official SDKs and mainstream frameworks',
+      items: 'OpenAI SDK,LangChain,Dify,LlamaIndex,cURL'
+    },
+    howItWorks: {
+      label: 'How it works',
+      title: 'Start calling in three steps',
+      subtitle: 'No changes to your existing code. Compatible with official SDKs. Integrate in 5 minutes.',
+      secondaryCta: 'Learn how it works',
+      step1: {
+        title: 'Create account',
+        desc: 'Create a YOUC account, bind your upstream subscriptions, or use the hosted account pool directly.'
+      },
+      step2: {
+        title: 'Get API key',
+        desc: 'Generate an API Key in the dashboard and configure quotas and limits per team member.'
+      },
+      step3: {
+        title: 'Replace BaseURL',
+        desc: 'Point your requests to the YOUC gateway and keep your existing SDK calls—one line to switch.'
+      }
+    },
+    featuresV3: {
+      label: 'Capabilities',
+      title: 'Built for stability and cost optimization',
+      subtitle: 'Covering the full AI API lifecycle from integration to operations',
+      unifiedAccess: {
+        title: 'Unified access',
+        desc: 'One API key for every connected AI model. No separate applications, top-ups or maintenance per vendor.'
+      },
+      stableReliable: {
+        title: 'Stable and reliable',
+        desc: 'Smart scheduling across multiple upstream accounts with automatic failover and load balancing.'
+      },
+      transparentBilling: {
+        title: 'Transparent billing',
+        desc: 'Pay precisely for actual token usage with no minimums. Team quotas and cost analytics at a glance.'
+      },
+      sessionPersistence: {
+        title: 'Session persistence',
+        desc: 'Sticky sessions keep a conversation pinned to the same upstream, giving smoother multi-turn chats.'
+      },
+      concurrency: {
+        title: 'Concurrency and rate limits',
+        desc: 'Configure concurrency and rate limits per user and per account to protect upstreams and ensure fair use.'
+      },
+      adminPanel: {
+        title: 'Admin dashboard',
+        desc: 'Visualize usage, orders and account health. Supports iframe embedding for integration with your existing systems.'
+      }
+    },
+    comparisonV3: {
+      label: 'Comparison',
+      title: 'Why choose YOUC',
+      pricing: {
+        feature: 'Pricing',
+        official: 'Fixed monthly fee, pay even if unused',
+        us: 'Pay only for what you use'
+      },
+      models: {
+        feature: 'Model selection',
+        official: 'Single provider',
+        us: 'Switch between vendors freely'
+      },
+      management: {
+        feature: 'Account management',
+        official: 'Manage each service separately',
+        us: 'Unified key, one dashboard'
+      },
+      stability: {
+        feature: 'Stability',
+        official: 'Single account hits rate limits easily',
+        us: 'Multi-account scheduling with auto-failover'
+      },
+      visibility: {
+        feature: 'Usage visibility',
+        official: 'Fragmented and hard to track',
+        us: 'Real-time metering and cost analytics'
+      }
+    },
+    modelsV3: {
+      label: 'Models',
+      title: 'Leading vendors, one gateway',
+      subtitle: 'OpenAI, Anthropic, Gemini and more leading providers are supported, with new vendors added continuously.',
+      viewAll: 'View full model list',
+      status: {
+        connected: 'Connected',
+        soon: 'Soon'
+      },
+      openai: {
+        name: 'OpenAI'
+      },
+      claude: {
+        name: 'Anthropic'
+      },
+      gemini: {
+        name: 'Gemini'
+      },
+      more: {
+        name: 'More vendors'
+      }
+    },
+    pricing: {
+      label: 'Pricing',
+      title: 'Start free, scale as needed',
+      free: {
+        name: 'Free',
+        price: '¥0',
+        period: '/ month',
+        desc: 'For personal exploration and getting started',
+        cta: 'Start free',
+        features: {
+          0: '1 API key',
+          1: 'Basic model access',
+          2: 'Community docs support',
+          3: 'Usage dashboard'
+        }
+      },
+      pro: {
+        name: 'Pro',
+        price: 'Pay-as-you-',
+        period: 'go',
+        desc: 'Best for teams that want flexibility',
+        badge: 'Recommended',
+        cta: 'Get started',
+        features: {
+          0: 'Unlimited API keys',
+          1: 'All models + multi-account scheduling',
+          2: 'Session persistence / rate limits',
+          3: 'Team quotas and cost analytics'
+        }
+      },
+      enterprise: {
+        name: 'Enterprise',
+        price: 'Custom',
+        period: 'plan',
+        desc: 'Private deployment and custom integrations',
+        cta: 'Contact us',
+        features: {
+          0: 'Private / dedicated resources',
+          1: 'SLA and dedicated support',
+          2: 'External iframe integration',
+          3: 'Audit and access controls'
+        }
+      }
+    },
+    faqV3: {
+      label: 'FAQ',
+      title: 'Questions? Start here',
+      q1: {
+        question: 'What is YOUC?',
+        answer: 'An AI API gateway that redistributes and manages AI subscription quotas. Users access upstream AI services through a platform-generated API Key while YOUC handles authentication, billing, load balancing and request forwarding.'
+      },
+      q2: {
+        question: 'Do I need to change my existing code?',
+        answer: 'Almost nothing. YOUC is compatible with official SDKs. Just point the BaseURL to the gateway and replace the key to start calling.'
+      },
+      q3: {
+        question: 'Which model vendors are supported?',
+        answer: 'OpenAI GPT, Anthropic Claude, Google Gemini and other mainstream LLMs are currently supported, with more vendors on the way.'
+      },
+      q4: {
+        question: 'How is billing calculated?',
+        answer: 'Billing is based on actual token usage. You can set quotas and limits for team members and view real-time cost analytics in the dashboard.'
+      }
+    },
+    ctaBanner: {
+      title: 'Ready for the next-generation AI API?',
+      description: 'Sign up to get trial credits, integrate in 5 minutes, and connect frameworks like OpenAI SDK, LangChain and Dify.',
+      primary: 'Sign up free',
+      secondary: 'View docs'
+    },
     footer: {
-      allRightsReserved: 'All rights reserved.'
+      copyrightSuffix: 'AI API Gateway',
+      tagline: 'An AI API gateway that turns AI subscriptions into distributable, metered and controllable API capabilities.',
+      product: {
+        title: 'Product',
+        features: 'Features',
+        pricing: 'Pricing',
+        models: 'Models',
+        dashboard: 'Dashboard'
+      },
+      resources: {
+        title: 'Resources',
+        faq: 'FAQ'
+      },
+      about: {
+        title: 'About',
+        terms: 'Terms of Service',
+        usagePolicy: 'Usage Policy'
+      }
     }
   },
 

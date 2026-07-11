@@ -206,6 +206,7 @@ export default {
     processing: '处理中...',
     continue: '继续',
     rememberMe: '记住我',
+    termsAgreement: '我已阅读并同意服务条款和隐私政策',
     dontHaveAccount: '还没有账户？',
     alreadyHaveAccount: '已有账户？',
     registrationDisabled: '注册功能暂时关闭，请联系管理员。',

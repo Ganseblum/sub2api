@@ -109,8 +109,221 @@ export default {
       description: '注册即可获得免费试用额度，体验一站式 AI 服务',
       button: '免费注册'
     },
+    // v3 Redesign additions
+    nav: {
+      howItWorks: '流程',
+      features: '功能',
+      models: '支持模型',
+      pricing: '定价',
+      faq: 'FAQ'
+    },
+    hero: {
+      kicker: 'AI API 网关 · 订阅额度分发',
+      title: '一个密钥，调用',
+      titleHighlight: '所有模型',
+      description: '不再为 Claude、GPT、Gemini 分别订阅和管理账号。YOUC 把它们统一成标准 OpenAI 格式 API，智能调度、按量计费、5 分钟接入。',
+      terminal: {
+        comment: '# 替换 BaseURL，统一密钥',
+        routeComment: '# 路由 / 均衡 / 计费'
+      },
+      badge: '成本降低 90%+'
+    },
+    stats: {
+      availability: { value: '99.9%', label: '服务可用性' },
+      models: { value: '100+', label: '可用模型' },
+      latency: { value: '<800ms', label: '平均延迟' }
+    },
+    trustStrip: {
+      title: '兼容官方 SDK 与主流框架',
+      items: 'OpenAI SDK,LangChain,Dify,LlamaIndex,cURL'
+    },
+    howItWorks: {
+      label: '使用流程',
+      title: '三步开始调用',
+      subtitle: '无需改动现有业务代码，兼容官方 SDK，5 分钟即可接入',
+      secondaryCta: '了解如何工作',
+      step1: {
+        title: '注册账号',
+        desc: '创建 YOUC 账号，绑定你的上游订阅，或直接使用平台托管的账号池。'
+      },
+      step2: {
+        title: '获取 API 密钥',
+        desc: '在控制台一键生成 API Key，并按团队成员配置额度与使用限额。'
+      },
+      step3: {
+        title: '替换 BaseURL',
+        desc: '把请求地址指向 YOUC 网关，保留原有 SDK 调用方式，一行代码即可切换。'
+      }
+    },
+    featuresV3: {
+      label: '核心能力',
+      title: '为稳定与成本优化而生',
+      subtitle: '从接入到运维，覆盖 AI API 调用全流程的关键能力',
+      unifiedAccess: {
+        title: '统一接入',
+        desc: '一把 API 密钥调用所有已接入的 AI 模型，无需为每个厂商单独申请、充值和维护。'
+      },
+      stableReliable: {
+        title: '稳定可靠',
+        desc: '智能调度多个上游账号，自动切换与负载均衡，显著降低限流、封号与请求失败。'
+      },
+      transparentBilling: {
+        title: '透明计费',
+        desc: '按实际 Token 用量精准计费，无最低消费；团队额度、成本分析一目了然。'
+      },
+      sessionPersistence: {
+        title: '会话保持',
+        desc: 'Sticky Session 让同一会话稳定命中同一上游，多轮对话上下文更连贯、结果更稳定。'
+      },
+      concurrency: {
+        title: '并发与限流',
+        desc: '按用户、按账号粒度配置并发与速率限制，保护上游、保障团队公平使用。'
+      },
+      adminPanel: {
+        title: '管理后台',
+        desc: '可视化监控用量、订单与账号健康；支持 iframe 嵌入，方便与现有系统整合。'
+      }
+    },
+    comparisonV3: {
+      label: '方案对比',
+      title: '为什么选 YOUC',
+      pricing: {
+        feature: '付费方式',
+        official: '固定月费，用不完也付',
+        us: '按量付费，多用多付'
+      },
+      models: {
+        feature: '模型选择',
+        official: '单一服务商',
+        us: '多厂商任意切换'
+      },
+      management: {
+        feature: '账号管理',
+        official: '各自分散管理',
+        us: '统一密钥一站管理'
+      },
+      stability: {
+        feature: '稳定性',
+        official: '单账号易触发限流',
+        us: '多账号调度自动容错'
+      },
+      visibility: {
+        feature: '用量可视',
+        official: '分散、难统计',
+        us: '实时计量与成本分析'
+      }
+    },
+    modelsV3: {
+      label: '支持模型',
+      title: '主流厂商，一站接入',
+      subtitle: '已支持 OpenAI、Anthropic、Gemini 等主流厂商，更多厂商持续接入中',
+      viewAll: '查看完整模型列表',
+      status: {
+        connected: '已接入',
+        soon: '即将'
+      },
+      openai: {
+        name: 'OpenAI'
+      },
+      claude: {
+        name: 'Anthropic'
+      },
+      gemini: {
+        name: 'Gemini'
+      },
+      more: {
+        name: '更多厂商'
+      }
+    },
+    pricing: {
+      label: '定价方案',
+      title: '灵活起步，按需扩展',
+      free: {
+        name: '免费版',
+        price: '¥0',
+        period: '/ 月',
+        desc: '个人体验，零门槛起步',
+        cta: '免费开始',
+        features: {
+          0: '1 个 API 密钥',
+          1: '基础模型访问',
+          2: '社区文档支持',
+          3: '用量看板'
+        }
+      },
+      pro: {
+        name: '专业版',
+        price: '按量',
+        period: '付费',
+        desc: '团队首选，用多少付多少',
+        badge: '推荐',
+        cta: '立即开通',
+        features: {
+          0: '无限 API 密钥',
+          1: '全部模型 + 多账号调度',
+          2: '会话保持 / 并发限流',
+          3: '成员额度与成本分析'
+        }
+      },
+      enterprise: {
+        name: '企业版',
+        price: '定制',
+        period: '方案',
+        desc: '私有部署与定制集成',
+        cta: '联系我们',
+        features: {
+          0: '私有化 / 独享资源',
+          1: 'SLA 与专属支持',
+          2: '外部系统 iframe 集成',
+          3: '审计与权限管控'
+        }
+      }
+    },
+    faqV3: {
+      label: '常见问题',
+      title: '有疑问？先看这里',
+      q1: {
+        question: 'YOUC 是什么？',
+        answer: '一个 AI API 网关平台，把 AI 产品的订阅额度统一分发与管理。用户通过平台生成的 API Key 访问上游 AI 服务，平台负责鉴权、计费、负载均衡与请求转发。'
+      },
+      q2: {
+        question: '需要改动现有代码吗？',
+        answer: '几乎不需要。兼容官方 SDK，只要把请求的 BaseURL 指向网关、替换为平台密钥即可开始调用。'
+      },
+      q3: {
+        question: '支持哪些模型厂商？',
+        answer: '当前已支持 OpenAI GPT、Anthropic Claude、Google Gemini 等主流大模型，更多厂商持续接入中。'
+      },
+      q4: {
+        question: '计费方式是怎样的？',
+        answer: '按实际 Token 用量精准计费，多用多付；可为团队成员配置额度与限额，并在后台查看实时成本分析。'
+      }
+    },
+    ctaBanner: {
+      title: '准备好接入下一代 AI API 了吗？',
+      description: '注册即送体验额度，5 分钟完成接入，支持 OpenAI SDK、LangChain、Dify 等主流框架。',
+      primary: '免费注册',
+      secondary: '查看文档'
+    },
     footer: {
-      allRightsReserved: '保留所有权利。'
+      copyrightSuffix: 'AI API 网关',
+      tagline: 'AI API 网关平台，把 AI 订阅额度变成可分发、可计量、可管控的 API 能力。',
+      product: {
+        title: '产品',
+        features: '功能',
+        pricing: '定价',
+        models: '支持模型',
+        dashboard: '控制台'
+      },
+      resources: {
+        title: '资源',
+        faq: '问题'
+      },
+      about: {
+        title: '关于',
+        terms: '服务条款',
+        usagePolicy: '使用政策'
+      }
     }
   },
 

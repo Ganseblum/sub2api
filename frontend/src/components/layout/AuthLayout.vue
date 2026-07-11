@@ -45,7 +45,7 @@
       </div>
 
       <!-- Card Container -->
-      <div class="card-glass rounded-2xl p-8 shadow-glass">
+      <div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-soft dark:border-dark-700/50 dark:bg-dark-800/80">
         <slot />
       </div>
 

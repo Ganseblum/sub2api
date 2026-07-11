@@ -193,6 +193,15 @@
           />
         </div>
 
+        <!-- Terms Agreement -->
+        <div class="flex items-start gap-2 text-sm text-gray-600 dark:text-dark-300">
+          <input
+            type="checkbox"
+            class="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-800"
+          />
+          <span>{{ t('auth.termsAgreement') }}</span>
+        </div>
+
         <LoginAgreementPrompt
           v-if="loginAgreementEnabled"
           :accepted="agreementAccepted"
@@ -240,7 +249,6 @@
                 : t('auth.createAccount')
           }}
         </button>
-
       </form>
 
       <div v-if="showOAuthLogin" class="space-y-3 pt-1">
@@ -288,7 +296,7 @@
         {{ t('auth.alreadyHaveAccount') }}
         <router-link
           to="/login"
-          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
         >
           {{ t('auth.signIn') }}
         </router-link>

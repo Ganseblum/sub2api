@@ -36,6 +36,7 @@ export interface ModelMarketModel {
   id: string
   name: string
   display_order: number
+  release_date: string
   family: 'gpt' | 'claude' | 'gemini'
   provider: string
   display_provider: string

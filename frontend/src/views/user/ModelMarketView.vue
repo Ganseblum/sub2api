@@ -147,6 +147,15 @@
                       <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
                       <span v-if="row.source === 'fallback'" class="badge badge-gray">{{ t('modelMarket.source.fallback') }}</span>
                     </div>
+                    <button
+                      type="button"
+                      class="mt-1 inline-flex w-fit max-w-full items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-left text-xs font-mono text-gray-600 transition-colors hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-300 dark:hover:bg-dark-600"
+                      :title="t('modelMarket.actions.copyModel')"
+                      @click="copyModelId(row.id)"
+                    >
+                      <span class="truncate">{{ row.id }}</span>
+                      <Icon name="copy" size="xs" />
+                    </button>
                   </div>
                 </td>
                 <td class="align-top">
@@ -206,6 +215,15 @@
                     <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
                   </div>
                   <h2 class="break-words text-lg font-bold leading-tight text-gray-900 dark:text-white">{{ row.name }}</h2>
+                  <button
+                    type="button"
+                    class="mt-2 inline-flex w-fit max-w-full items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-left text-xs font-mono text-gray-600 transition-colors hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-300 dark:hover:bg-dark-600"
+                    :title="t('modelMarket.actions.copyModel')"
+                    @click="copyModelId(row.id)"
+                  >
+                    <span class="truncate">{{ row.id }}</span>
+                    <Icon name="copy" size="xs" />
+                  </button>
                   <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     {{ platformList(row.group_platforms) }} · {{ t('modelMarket.groupCount', { count: displayGroupCount(row) }) }}
                   </p>
@@ -291,6 +309,15 @@
                 <span class="badge badge-primary">{{ detailRow.mode }}</span>
                 <span class="badge badge-gray">{{ t('modelMarket.groupCount', { count: detailRow.groups.length }) }}</span>
               </div>
+              <button
+                type="button"
+                class="mt-3 inline-flex w-fit max-w-full items-center gap-1 rounded-md bg-gray-100 px-2 py-1 text-left text-sm font-mono text-gray-600 transition-colors hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-300 dark:hover:bg-dark-600"
+                :title="t('modelMarket.actions.copyModel')"
+                @click="copyDetailModelId()"
+              >
+                <span class="truncate">{{ detailRow.id }}</span>
+                <Icon name="copy" size="xs" />
+              </button>
               <p class="mt-4 text-sm leading-6 text-gray-700 dark:text-gray-300">
                 {{ t('modelMarket.detail.descriptionText', {
                   family: detailRow.display_provider,
@@ -378,7 +405,7 @@
       <template #footer>
         <DialogFooter :show-cancel="false" :show-confirm="false">
           <template #actions>
-            <button type="button" class="btn btn-secondary" @click="copyDetailModelName">
+            <button type="button" class="btn btn-secondary" @click="copyDetailModelId">
               <Icon name="copy" size="sm" />
               <span>{{ t('modelMarket.actions.copyModel') }}</span>
             </button>
@@ -442,33 +469,32 @@ const groupFilter = ref('all')
 const sortKey = ref<SortKey>('newest')
 const viewMode = ref<ViewMode>('cards')
 const page = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(100)
 const detailRow = ref<ModelMarketModel | null>(null)
 
 const staticModelSpecs: ModelMarketModel[] = [
-  makeStaticModel('claude-opus-4-6-thinking', 'Claude Opus 4.6 Thinking', 2600, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-6', 'Claude Opus 4.6', 2550, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-7', 'Claude Opus 4.7', 2500, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-8', 'Claude Opus 4.8', 2450, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-fable-5', 'Claude Code (Fable 5)', 2400, 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-sonnet-5', 'Claude Sonnet 5', 2350, 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-sonnet-4-6', 'Claude Sonnet 4.6', 2300, 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
-  makeStaticModel('claude-haiku-4-5', 'Claude Haiku 4.5', 2200, 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
-  makeStaticModel('gemini-3.5-flash', 'Gemini 3.5 Flash', 2150, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3.5-flash-low', 'Gemini 3.5 Flash Low', 2125, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 2100, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
-  makeStaticModel('gemini-3.1-pro-preview-thinking-128', 'Gemini 3.1 Pro Preview Thinking 128K', 2050, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
-  makeStaticModel('gemini-3.1-flash', 'Gemini 3.1 Flash', 2000, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.25, output: 1.5, cacheRead: 0.025 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
-  makeStaticModel('gemini-3.1-flash-image', 'Gemini 3.1 Flash Image', 1950, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 65_536, output: 32_768, total: 32_768 }),
-  makeStaticModel('gemini-3-flash', 'Gemini 3 Flash', 1900, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-flash-thinking-128', 'Gemini 3 Flash Thinking 128K', 1850, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-pro', 'Gemini 3 Pro', 1800, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-pro-preview', 'Gemini 3 Pro Preview', 1750, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gpt-5.6-sol', 'GPT-5.6 Sol', 900, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-terra', 'GPT-5.6 Terra', 850, 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-luna', 'GPT-5.6 Luna', 800, 'gpt', 'OpenAI', 'mini', ['openai'], { input: 1, output: 6, cacheRead: 0.1 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.5', 'GPT-5.5', 700, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.4', 'GPT-5.4', 600, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-6', 'Claude Opus 4.6', 2550, '2026-02-05', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-7', 'Claude Opus 4.7', 2500, '2026-04-16', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-8', 'Claude Opus 4.8', 2450, '2026-06-01', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-fable-5', 'Claude Code (Fable 5)', 2400, '2026-07-01', 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-sonnet-5', 'Claude Sonnet 5', 2350, '2026-07-15', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-sonnet-4-6', 'Claude Sonnet 4.6', 2300, '2026-02-01', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
+  makeStaticModel('claude-haiku-4-5', 'Claude Haiku 4.5', 2200, '2025-10-01', 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
+  makeStaticModel('gemini-3.5-flash', 'Gemini 3.5 Flash', 2150, '2026-05-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3.5-flash-low', 'Gemini 3.5 Flash Low', 2125, '2026-05-05', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 2100, '2026-04-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-pro-preview-thinking-128', 'Gemini 3.1 Pro Preview Thinking 128K', 2050, '2026-04-05', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-flash', 'Gemini 3.1 Flash', 2000, '2026-03-15', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.25, output: 1.5, cacheRead: 0.025 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-flash-image', 'Gemini 3.1 Flash Image', 1950, '2026-03-20', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 65_536, output: 32_768, total: 32_768 }),
+  makeStaticModel('gemini-3-flash', 'Gemini 3 Flash', 1900, '2026-03-01', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-flash-thinking-128', 'Gemini 3 Flash Thinking 128K', 1850, '2026-03-05', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-pro', 'Gemini 3 Pro', 1800, '2026-02-15', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-pro-preview', 'Gemini 3 Pro Preview', 1750, '2026-02-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gpt-5.6-sol', 'GPT-5.6 Sol', 900, '2026-06-01', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-terra', 'GPT-5.6 Terra', 850, '2026-05-20', 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-luna', 'GPT-5.6 Luna', 800, '2026-05-15', 'gpt', 'OpenAI', 'mini', ['openai'], { input: 1, output: 6, cacheRead: 0.1 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.5', 'GPT-5.5', 700, '2026-04-23', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.4', 'GPT-5.4', 600, '2026-03-05', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
 ]
 
 const PriceLines = defineComponent({
@@ -573,7 +599,7 @@ const filteredRows = computed(() => {
   result = [...result].sort((a, b) => {
     switch (sortKey.value) {
       case 'newest':
-        return b.display_order - a.display_order || a.name.localeCompare(b.name)
+        return compareReleaseDate(a, b) || a.name.localeCompare(b.name)
       case 'lowest_input':
         return nullableSort(displayActualPricing(a)?.input_per_1m ?? null, displayActualPricing(b)?.input_per_1m ?? null) || a.name.localeCompare(b.name)
       case 'lowest_output':
@@ -692,6 +718,7 @@ function makeStaticModel(
   id: string,
   displayName: string,
   displayOrder: number,
+  releaseDate: string,
   family: ModelFamily,
   displayProvider: string,
   tier: string,
@@ -704,6 +731,7 @@ function makeStaticModel(
     id,
     name: displayName,
     display_order: displayOrder,
+    release_date: releaseDate,
     family,
     provider,
     display_provider: displayProvider,
@@ -782,6 +810,16 @@ function nullableSort(a: number | null, b: number | null): number {
   if (a == null) return 1
   if (b == null) return -1
   return a - b
+}
+
+function compareReleaseDate(a: ModelMarketModel, b: ModelMarketModel): number {
+  const aDate = a.release_date
+  const bDate = b.release_date
+  if (aDate && bDate) {
+    return bDate.localeCompare(aDate)
+  }
+  // Fallback for old backend responses or malformed data: use display_order.
+  return b.display_order - a.display_order
 }
 
 function formatRate(value: number | null | undefined): string {
@@ -886,14 +924,18 @@ function openDetail(row: ModelMarketModel) {
   detailRow.value = row
 }
 
-async function copyDetailModelName() {
-  if (!detailRow.value) return
+async function copyModelId(id: string) {
   try {
-    await navigator.clipboard.writeText(detailRow.value.name)
+    await navigator.clipboard.writeText(id)
     appStore.showSuccess(t('modelMarket.actions.copied'))
   } catch {
     appStore.showError(t('modelMarket.actions.copyFailed'))
   }
+}
+
+async function copyDetailModelId() {
+  if (!detailRow.value) return
+  await copyModelId(detailRow.value.id)
 }
 
 onMounted(loadModels)

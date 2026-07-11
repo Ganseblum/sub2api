@@ -94,8 +94,8 @@ export default {
   },
   actions: {
     viewDetail: "View Details",
-    copyModel: "Copy Model",
-    copied: "Model name copied",
+    copyModel: "Copy Model ID",
+    copied: "Model ID copied",
     copyFailed: "Copy failed"
   },
   detail: {

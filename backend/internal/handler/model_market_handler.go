@@ -29,6 +29,7 @@ type modelMarketSpec struct {
 	ID              string
 	DisplayName     string
 	DisplayOrder    int
+	ReleaseDate     string
 	Family          string
 	Provider        string
 	DisplayProvider string
@@ -43,37 +44,36 @@ type modelMarketSpec struct {
 
 // modelMarketSpecs is the curated model list for the market page. Keep it in
 // one place so it can be moved to runtime settings later without touching the
-// response shape or frontend. Higher DisplayOrder means newer/recommended and
-// is surfaced first by default.
+// response shape or frontend. ReleaseDate is the ISO 8601 launch date and is
+// used to sort newest-first by default.
 var modelMarketSpecs = []modelMarketSpec{
 	// Claude — newest first
-	{ID: "claude-opus-4-6-thinking", DisplayName: "Claude Opus 4.6 Thinking", DisplayOrder: 2600, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-6", DisplayName: "Claude Opus 4.6", DisplayOrder: 2550, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-7", DisplayName: "Claude Opus 4.7", DisplayOrder: 2500, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-8", DisplayName: "Claude Opus 4.8", DisplayOrder: 2450, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-fable-5", DisplayName: "Claude Code (Fable 5)", DisplayOrder: 2400, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-sonnet-5", DisplayName: "Claude Sonnet 5", DisplayOrder: 2350, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-sonnet-4-6", DisplayName: "Claude Sonnet 4.6", DisplayOrder: 2300, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-haiku-4-5", DisplayName: "Claude Haiku 4.5", DisplayOrder: 2200, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-6", DisplayName: "Claude Opus 4.6", DisplayOrder: 2550, ReleaseDate: "2026-02-05", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-7", DisplayName: "Claude Opus 4.7", DisplayOrder: 2500, ReleaseDate: "2026-04-16", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-8", DisplayName: "Claude Opus 4.8", DisplayOrder: 2450, ReleaseDate: "2026-06-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-fable-5", DisplayName: "Claude Code (Fable 5)", DisplayOrder: 2400, ReleaseDate: "2026-07-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-sonnet-5", DisplayName: "Claude Sonnet 5", DisplayOrder: 2350, ReleaseDate: "2026-07-15", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-sonnet-4-6", DisplayName: "Claude Sonnet 4.6", DisplayOrder: 2300, ReleaseDate: "2026-02-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-haiku-4-5", DisplayName: "Claude Haiku 4.5", DisplayOrder: 2200, ReleaseDate: "2025-10-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 
 	// Gemini — newest first (3.5 / 3.1 / 3.0 series)
-	{ID: "gemini-3.5-flash", DisplayName: "Gemini 3.5 Flash", DisplayOrder: 2150, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3.5-flash-low", DisplayName: "Gemini 3.5 Flash Low", DisplayOrder: 2125, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.5-flash"},
-	{ID: "gemini-3.1-pro-preview", DisplayName: "Gemini 3.1 Pro Preview", DisplayOrder: 2100, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3.1-pro-preview-thinking-128", DisplayName: "Gemini 3.1 Pro Preview Thinking 128K", DisplayOrder: 2050, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-pro-preview"},
-	{ID: "gemini-3.1-flash", DisplayName: "Gemini 3.1 Flash", DisplayOrder: 2000, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-flash-lite"},
-	{ID: "gemini-3.1-flash-image", DisplayName: "Gemini 3.1 Flash Image", DisplayOrder: 1950, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash", DisplayName: "Gemini 3 Flash", DisplayOrder: 1900, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash-thinking-128", DisplayName: "Gemini 3 Flash Thinking 128K", DisplayOrder: 1850, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-flash"},
-	{ID: "gemini-3-pro", DisplayName: "Gemini 3 Pro", DisplayOrder: 1800, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-pro-preview"},
-	{ID: "gemini-3-pro-preview", DisplayName: "Gemini 3 Pro Preview", DisplayOrder: 1750, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3.5-flash", DisplayName: "Gemini 3.5 Flash", DisplayOrder: 2150, ReleaseDate: "2026-05-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3.5-flash-low", DisplayName: "Gemini 3.5 Flash Low", DisplayOrder: 2125, ReleaseDate: "2026-05-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.5-flash"},
+	{ID: "gemini-3.1-pro-preview", DisplayName: "Gemini 3.1 Pro Preview", DisplayOrder: 2100, ReleaseDate: "2026-04-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3.1-pro-preview-thinking-128", DisplayName: "Gemini 3.1 Pro Preview Thinking 128K", DisplayOrder: 2050, ReleaseDate: "2026-04-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-pro-preview"},
+	{ID: "gemini-3.1-flash", DisplayName: "Gemini 3.1 Flash", DisplayOrder: 2000, ReleaseDate: "2026-03-15", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-flash-lite"},
+	{ID: "gemini-3.1-flash-image", DisplayName: "Gemini 3.1 Flash Image", DisplayOrder: 1950, ReleaseDate: "2026-03-20", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3-flash", DisplayName: "Gemini 3 Flash", DisplayOrder: 1900, ReleaseDate: "2026-03-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3-flash-thinking-128", DisplayName: "Gemini 3 Flash Thinking 128K", DisplayOrder: 1850, ReleaseDate: "2026-03-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-flash"},
+	{ID: "gemini-3-pro", DisplayName: "Gemini 3 Pro", DisplayOrder: 1800, ReleaseDate: "2026-02-15", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-pro-preview"},
+	{ID: "gemini-3-pro-preview", DisplayName: "Gemini 3 Pro Preview", DisplayOrder: 1750, ReleaseDate: "2026-02-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
 
 	// OpenAI GPT
-	{ID: "gpt-5.6-sol", DisplayName: "GPT-5.6 Sol", DisplayOrder: 900, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.6-terra", DisplayName: "GPT-5.6 Terra", DisplayOrder: 850, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "standard", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.6-luna", DisplayName: "GPT-5.6 Luna", DisplayOrder: 800, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "mini", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.5", DisplayName: "GPT-5.5", DisplayOrder: 700, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.4", DisplayName: "GPT-5.4", DisplayOrder: 600, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.6-sol", DisplayName: "GPT-5.6 Sol", DisplayOrder: 900, ReleaseDate: "2026-06-01", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.6-terra", DisplayName: "GPT-5.6 Terra", DisplayOrder: 850, ReleaseDate: "2026-05-20", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "standard", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.6-luna", DisplayName: "GPT-5.6 Luna", DisplayOrder: 800, ReleaseDate: "2026-05-15", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "mini", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.5", DisplayName: "GPT-5.5", DisplayOrder: 700, ReleaseDate: "2026-04-23", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.4", DisplayName: "GPT-5.4", DisplayOrder: 600, ReleaseDate: "2026-03-05", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
 }
 
 type modelMarketResponse struct {
@@ -91,6 +91,7 @@ type modelMarketModelDTO struct {
 	ID              string                     `json:"id"`
 	Name            string                     `json:"name"`
 	DisplayOrder    int                        `json:"display_order"`
+	ReleaseDate     string                     `json:"release_date"`
 	Family          string                     `json:"family"`
 	Provider        string                     `json:"provider"`
 	DisplayProvider string                     `json:"display_provider"`
@@ -187,6 +188,7 @@ func (h *ModelMarketHandler) List(c *gin.Context) {
 			ID:              spec.ID,
 			Name:            spec.DisplayName,
 			DisplayOrder:    spec.DisplayOrder,
+			ReleaseDate:     spec.ReleaseDate,
 			Family:          spec.Family,
 			Provider:        firstNonEmpty(strings.ToLower(pricing.LiteLLMProvider), spec.Provider),
 			DisplayProvider: spec.DisplayProvider,
@@ -211,7 +213,7 @@ func (h *ModelMarketHandler) List(c *gin.Context) {
 	}
 
 	sort.SliceStable(models, func(i, j int) bool {
-		return models[i].DisplayOrder > models[j].DisplayOrder
+		return models[i].ReleaseDate > models[j].ReleaseDate
 	})
 
 	response.Success(c, modelMarketResponse{

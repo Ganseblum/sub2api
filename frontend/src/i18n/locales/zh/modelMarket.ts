@@ -94,8 +94,8 @@ export default {
   },
   actions: {
     viewDetail: "查看详情",
-    copyModel: "复制模型",
-    copied: "模型名称已复制",
+    copyModel: "复制模型 ID",
+    copied: "模型 ID 已复制",
     copyFailed: "复制失败"
   },
   detail: {

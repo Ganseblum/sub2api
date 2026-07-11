@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="model-market-page">
+    <div class="space-y-6">
       <section class="page-heading">
         <div class="min-w-0">
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('modelMarket.title') }}</h1>
@@ -12,26 +12,26 @@
         </button>
       </section>
 
-      <section class="stats-grid">
-        <div class="metric-card">
-          <span>{{ t('modelMarket.stats.models') }}</span>
-          <strong>{{ filteredRows.length }}</strong>
-          <small>{{ t('modelMarket.stats.modelsHint') }}</small>
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="card p-4">
+          <span class="block text-xs font-semibold uppercase text-gray-500 dark:text-dark-400">{{ t('modelMarket.stats.models') }}</span>
+          <strong class="mt-2 block min-h-[30px] break-words text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ filteredRows.length }}</strong>
+          <small class="mt-1 block truncate text-xs text-gray-500 dark:text-gray-400">{{ t('modelMarket.stats.modelsHint') }}</small>
         </div>
-        <div class="metric-card">
-          <span>{{ t('modelMarket.stats.lowestRate') }}</span>
-          <strong>{{ formatRate(summary.lowestRate) }}</strong>
-          <small>{{ summary.lowestGroupName || t('modelMarket.noGroup') }}</small>
+        <div class="card p-4">
+          <span class="block text-xs font-semibold uppercase text-gray-500 dark:text-dark-400">{{ t('modelMarket.stats.lowestRate') }}</span>
+          <strong class="mt-2 block min-h-[30px] break-words text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ formatRate(summary.lowestRate) }}</strong>
+          <small class="mt-1 block truncate text-xs text-gray-500 dark:text-gray-400">{{ summary.lowestGroupName || t('modelMarket.noGroup') }}</small>
         </div>
-        <div class="metric-card">
-          <span>{{ t('modelMarket.stats.lowestInput') }}</span>
-          <strong>{{ formatPrice(summary.lowestInput, '/1M token') }}</strong>
-          <small>{{ t('modelMarket.stats.lowestInputHint') }}</small>
+        <div class="card p-4">
+          <span class="block text-xs font-semibold uppercase text-gray-500 dark:text-dark-400">{{ t('modelMarket.stats.lowestInput') }}</span>
+          <strong class="mt-2 block min-h-[30px] break-words text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ formatPrice(summary.lowestInput, '/1M token') }}</strong>
+          <small class="mt-1 block truncate text-xs text-gray-500 dark:text-gray-400">{{ t('modelMarket.stats.lowestInputHint') }}</small>
         </div>
-        <div class="metric-card">
-          <span>{{ t('modelMarket.stats.groups') }}</span>
-          <strong>{{ groupOptions.length }}</strong>
-          <small>{{ t('modelMarket.stats.groupsHint') }}</small>
+        <div class="card p-4">
+          <span class="block text-xs font-semibold uppercase text-gray-500 dark:text-dark-400">{{ t('modelMarket.stats.groups') }}</span>
+          <strong class="mt-2 block min-h-[30px] break-words text-2xl font-bold tabular-nums text-gray-900 dark:text-white">{{ groupOptions.length }}</strong>
+          <small class="mt-1 block truncate text-xs text-gray-500 dark:text-gray-400">{{ t('modelMarket.stats.groupsHint') }}</small>
         </div>
       </section>
 
@@ -106,63 +106,62 @@
       </section>
 
       <section v-else-if="viewMode === 'table'" class="card overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="market-table">
+        <div class="table-container">
+          <table class="table min-w-[1180px]">
             <thead>
               <tr>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.model') }}</th>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.platform') }}</th>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.context') }}</th>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.basePrice') }}</th>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.lowestRate') }}</th>
-                <th class="px-4 py-3 text-left">{{ t('modelMarket.table.lowestActualPrice') }}</th>
-                <th class="px-4 py-3 text-center">{{ t('modelMarket.table.groups') }}</th>
-                <th class="px-4 py-3 text-right">{{ t('common.actions') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.model') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.platform') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.context') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.basePrice') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.lowestRate') }}</th>
+                <th class="text-left">{{ t('modelMarket.table.lowestActualPrice') }}</th>
+                <th class="text-center">{{ t('modelMarket.table.groups') }}</th>
+                <th class="text-right">{{ t('common.actions') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="row in pagedRows"
                 :key="row.id"
-                class="border-t border-gray-100 transition-colors hover:bg-gray-50/70 dark:border-dark-700 dark:hover:bg-dark-800/60"
               >
-                <td class="px-4 py-4 align-top">
+                <td class="align-top">
                   <div class="model-name-block">
                     <span class="break-words font-semibold text-gray-900 dark:text-white">{{ row.name }}</span>
                     <div class="flex flex-wrap gap-1.5">
-                      <span class="tier-chip">{{ tierLabel(row.tier) }}</span>
-                      <span v-if="row.source === 'fallback'" class="source-chip">{{ t('modelMarket.source.fallback') }}</span>
+                      <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
+                      <span v-if="row.source === 'fallback'" class="badge badge-gray">{{ t('modelMarket.source.fallback') }}</span>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-4 align-top">
-                  <span :class="['platform-chip', row.family === 'gpt' ? 'platform-chip-openai' : 'platform-chip-claude']">
+                <td class="align-top">
+                  <span :class="['badge', row.family === 'gpt' ? 'badge-success' : 'badge-warning']">
                     {{ row.display_provider }}
                   </span>
                   <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ platformList(row.group_platforms) }}</p>
                 </td>
-                <td class="px-4 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                <td class="align-top text-sm text-gray-700 dark:text-gray-300">
                   <div class="space-y-1 whitespace-nowrap">
                     <div>{{ t('modelMarket.detail.maxInput') }}: {{ formatTokens(row.context.max_input_tokens) }}</div>
                     <div>{{ t('modelMarket.detail.maxOutput') }}: {{ formatTokens(row.context.max_output_tokens) }}</div>
                   </div>
                 </td>
-                <td class="px-4 py-4 align-top">
+                <td class="align-top">
                   <PriceLines :pricing="row.pricing" />
                 </td>
-                <td class="px-4 py-4 align-top">
+                <td class="align-top">
                   <div class="font-semibold text-gray-900 dark:text-white">{{ formatRate(displayLowestRate(row)) }}</div>
                   <div class="mt-1 max-w-[180px] truncate text-xs text-gray-500 dark:text-gray-400">
                     {{ displayLowestGroup(row)?.group.name || t('modelMarket.noGroup') }}
                   </div>
                 </td>
-                <td class="px-4 py-4 align-top">
+                <td class="align-top">
                   <PriceLines :pricing="displayActualPricing(row)" />
                 </td>
-                <td class="px-4 py-4 text-center align-top font-semibold text-gray-900 dark:text-white">
+                <td class="text-center align-top font-semibold text-gray-900 dark:text-white">
                   {{ displayGroupCount(row) }}
                 </td>
-                <td class="px-4 py-4 text-right align-top">
+                <td class="text-right align-top">
                   <button class="btn btn-ghost btn-sm whitespace-nowrap" @click="openDetail(row)">
                     {{ t('modelMarket.actions.viewDetail') }}
                   </button>
@@ -174,21 +173,21 @@
       </section>
 
       <section v-else class="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-        <article v-for="row in pagedRows" :key="row.id" class="model-card">
+        <article v-for="row in pagedRows" :key="row.id" class="card card-hover p-5">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="mb-3 flex flex-wrap gap-2">
-                <span :class="['platform-chip', row.family === 'gpt' ? 'platform-chip-openai' : 'platform-chip-claude']">
+                <span :class="['badge', row.family === 'gpt' ? 'badge-success' : 'badge-warning']">
                   {{ row.display_provider }}
                 </span>
-                <span class="tier-chip">{{ tierLabel(row.tier) }}</span>
+                <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
               </div>
               <h2 class="break-words text-lg font-bold leading-tight text-gray-900 dark:text-white">{{ row.name }}</h2>
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 {{ platformList(row.group_platforms) }} · {{ t('modelMarket.groupCount', { count: displayGroupCount(row) }) }}
               </p>
             </div>
-            <button class="icon-action" :title="t('modelMarket.actions.viewDetail')" @click="openDetail(row)">
+            <button class="btn btn-ghost btn-icon shrink-0" :title="t('modelMarket.actions.viewDetail')" @click="openDetail(row)">
               <Icon name="arrowRight" size="md" />
             </button>
           </div>
@@ -260,12 +259,12 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span :class="['platform-chip', detailRow.family === 'gpt' ? 'platform-chip-openai' : 'platform-chip-claude']">
+                <span :class="['badge', detailRow.family === 'gpt' ? 'badge-success' : 'badge-warning']">
                   {{ detailRow.display_provider }}
                 </span>
-                <span class="tier-chip">{{ tierLabel(detailRow.tier) }}</span>
-                <span class="mode-chip">{{ detailRow.mode }}</span>
-                <span class="mode-chip">{{ t('modelMarket.groupCount', { count: detailRow.groups.length }) }}</span>
+                <span class="badge badge-purple">{{ tierLabel(detailRow.tier) }}</span>
+                <span class="badge badge-primary">{{ detailRow.mode }}</span>
+                <span class="badge badge-gray">{{ t('modelMarket.groupCount', { count: detailRow.groups.length }) }}</span>
               </div>
               <p class="mt-4 text-sm leading-6 text-gray-700 dark:text-gray-300">
                 {{ t('modelMarket.detail.descriptionText', {
@@ -304,25 +303,24 @@
 
           <section>
             <h3 class="detail-heading">{{ t('modelMarket.detail.groupPricing') }}</h3>
-            <div class="mt-3 overflow-x-auto rounded-md border border-gray-200 dark:border-dark-700">
-              <table class="w-full min-w-[960px] border-collapse text-sm">
-                <thead class="bg-gray-50 text-xs font-medium uppercase dark:bg-dark-800/70">
+            <div class="table-container mt-3">
+              <table class="table min-w-[960px]">
+                <thead>
                   <tr>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.detail.group') }}</th>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.table.platform') }}</th>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.detail.defaultRate') }}</th>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.detail.userRate') }}</th>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.detail.effectiveRate') }}</th>
-                    <th class="px-4 py-3 text-left">{{ t('modelMarket.detail.finalPrice') }}</th>
+                    <th class="text-left">{{ t('modelMarket.detail.group') }}</th>
+                    <th class="text-left">{{ t('modelMarket.table.platform') }}</th>
+                    <th class="text-left">{{ t('modelMarket.detail.defaultRate') }}</th>
+                    <th class="text-left">{{ t('modelMarket.detail.userRate') }}</th>
+                    <th class="text-left">{{ t('modelMarket.detail.effectiveRate') }}</th>
+                    <th class="text-left">{{ t('modelMarket.detail.finalPrice') }}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="offer in detailRow.groups"
                     :key="`${detailRow.id}-${offer.group.id}`"
-                    class="border-t border-gray-100 dark:border-dark-700"
                   >
-                    <td class="px-4 py-4">
+                    <td>
                       <GroupBadge
                         :name="offer.group.name"
                         :platform="offer.group.platform as any"
@@ -332,16 +330,16 @@
                         always-show-rate
                       />
                     </td>
-                    <td class="px-4 py-4 text-gray-700 dark:text-gray-300">{{ platformLabel(offer.group.platform) }}</td>
-                    <td class="px-4 py-4">{{ formatRate(offer.group.rate_multiplier) }}</td>
-                    <td class="px-4 py-4">{{ offer.group.user_rate_multiplier == null ? '-' : formatRate(offer.group.user_rate_multiplier) }}</td>
-                    <td class="px-4 py-4 font-semibold text-gray-900 dark:text-white">{{ formatRate(offer.group.effective_rate) }}</td>
-                    <td class="px-4 py-4">
+                    <td class="text-gray-700 dark:text-gray-300">{{ platformLabel(offer.group.platform) }}</td>
+                    <td>{{ formatRate(offer.group.rate_multiplier) }}</td>
+                    <td>{{ offer.group.user_rate_multiplier == null ? '-' : formatRate(offer.group.user_rate_multiplier) }}</td>
+                    <td class="font-semibold text-gray-900 dark:text-white">{{ formatRate(offer.group.effective_rate) }}</td>
+                    <td>
                       <PriceLines :pricing="offer.pricing" />
                     </td>
                   </tr>
                   <tr v-if="detailRow.groups.length === 0">
-                    <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <td colspan="6" class="py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                       {{ t('modelMarket.noGroup') }}
                     </td>
                   </tr>
@@ -805,44 +803,12 @@ onMounted(loadModels)
 </script>
 
 <style scoped>
-.model-market-page {
-  @apply space-y-4;
-}
-
 .page-heading {
   @apply flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between;
 }
 
-.stats-grid {
-  @apply grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4;
-}
-
-.metric-card {
-  @apply rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-dark-700 dark:bg-dark-800;
-}
-
-.metric-card span {
-  @apply block text-xs font-semibold uppercase text-gray-500 dark:text-dark-400;
-}
-
-.metric-card strong {
-  @apply mt-2 block min-h-[30px] break-words text-2xl font-bold tabular-nums text-gray-900 dark:text-white;
-}
-
-.metric-card small {
-  @apply mt-1 block truncate text-xs text-gray-500 dark:text-gray-400;
-}
-
 .market-toolbar {
   @apply grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(260px,2fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(220px,1.2fr)_minmax(170px,1fr)_auto] xl:items-center;
-}
-
-.market-table {
-  @apply w-full min-w-[1180px] border-collapse text-sm;
-}
-
-.market-table thead {
-  @apply bg-gray-50 text-xs font-medium uppercase text-gray-500 dark:bg-dark-800/70 dark:text-dark-400;
 }
 
 .model-name-block {
@@ -865,43 +831,8 @@ onMounted(loadModels)
   @apply inline-flex h-full min-h-[2rem] w-9 items-center justify-center;
 }
 
-.platform-chip,
-.mode-chip,
-.tier-chip,
-.source-chip {
-  @apply inline-flex max-w-full items-center rounded-md px-2 py-0.5 text-xs font-semibold;
-}
-
-.platform-chip-openai {
-  @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300;
-}
-
-.platform-chip-claude {
-  @apply bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300;
-}
-
-.mode-chip {
-  @apply bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300;
-}
-
-.tier-chip {
-  @apply bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300;
-}
-
-.source-chip {
-  @apply bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300;
-}
-
-.model-card {
-  @apply rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-dark-700 dark:bg-dark-800;
-}
-
-.icon-action {
-  @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gray-50 text-gray-700 shadow-sm transition-colors hover:bg-gray-100 dark:bg-dark-700 dark:text-dark-200 dark:hover:bg-dark-600;
-}
-
 .price-panel {
-  @apply grid grid-cols-1 gap-2 rounded-md bg-gray-50 p-3 dark:bg-dark-700/60;
+  @apply grid grid-cols-1 gap-2 rounded-md bg-gray-50 p-3 dark:bg-dark-800/50;
 }
 
 .price-panel div {
@@ -917,7 +848,7 @@ onMounted(loadModels)
 }
 
 .actual-tile {
-  @apply rounded-md bg-gray-50 p-3 dark:bg-dark-700/60;
+  @apply rounded-md bg-gray-50 p-3 dark:bg-dark-800/50;
 }
 
 .actual-tile span {
@@ -929,7 +860,7 @@ onMounted(loadModels)
 }
 
 .no-group-panel {
-  @apply rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-6 text-center text-sm text-gray-500 dark:border-dark-600 dark:bg-dark-700/60 dark:text-dark-300;
+  @apply rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-6 text-center text-sm text-gray-500 dark:border-dark-600 dark:bg-dark-800/50 dark:text-dark-300;
 }
 
 .price-lines {
@@ -953,7 +884,7 @@ onMounted(loadModels)
 }
 
 .detail-hero {
-  @apply flex flex-col gap-4 rounded-lg bg-gray-50 p-4 dark:bg-dark-700/60 sm:flex-row;
+  @apply flex flex-col gap-4 rounded-lg bg-gray-50 p-4 dark:bg-dark-800/50 sm:flex-row;
 }
 
 .model-mark {
@@ -969,7 +900,7 @@ onMounted(loadModels)
 }
 
 .detail-stat {
-  @apply rounded-lg bg-gray-50 p-4 dark:bg-dark-700/60;
+  @apply rounded-lg bg-gray-50 p-4 dark:bg-dark-800/50;
 }
 
 .detail-stat span {

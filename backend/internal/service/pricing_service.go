@@ -125,6 +125,16 @@ type LiteLLMModelPricing struct {
 	SupportsPromptCaching               bool    `json:"supports_prompt_caching"`
 	OutputCostPerImage                  float64 `json:"output_cost_per_image"`       // 图片生成模型每张图片价格
 	OutputCostPerImageToken             float64 `json:"output_cost_per_image_token"` // 图片输出 token 价格
+	MaxInputTokens                      int     `json:"max_input_tokens,omitempty"`
+	MaxOutputTokens                     int     `json:"max_output_tokens,omitempty"`
+	MaxTokens                           int     `json:"max_tokens,omitempty"`
+	SupportsReasoning                   bool    `json:"supports_reasoning"`
+	SupportsVision                      bool    `json:"supports_vision"`
+	SupportsFunctionCalling             bool    `json:"supports_function_calling"`
+	SupportsToolChoice                  bool    `json:"supports_tool_choice"`
+	SupportsWebSearch                   bool    `json:"supports_web_search"`
+	SupportsPDFInput                    bool    `json:"supports_pdf_input"`
+	SupportsComputerUse                 bool    `json:"supports_computer_use"`
 
 	// TokenPricingAbsent 表示源数据中 input/output token 价格均缺失（仅有图片价）。
 	// 此类条目只可用于图片计费，token 计费必须回退到 fallback 或 fail-closed，
@@ -158,6 +168,16 @@ type LiteLLMRawEntry struct {
 	SupportsPromptCaching               bool     `json:"supports_prompt_caching"`
 	OutputCostPerImage                  *float64 `json:"output_cost_per_image"`
 	OutputCostPerImageToken             *float64 `json:"output_cost_per_image_token"`
+	MaxInputTokens                      int      `json:"max_input_tokens"`
+	MaxOutputTokens                     int      `json:"max_output_tokens"`
+	MaxTokens                           int      `json:"max_tokens"`
+	SupportsReasoning                   bool     `json:"supports_reasoning"`
+	SupportsVision                      bool     `json:"supports_vision"`
+	SupportsFunctionCalling             bool     `json:"supports_function_calling"`
+	SupportsToolChoice                  bool     `json:"supports_tool_choice"`
+	SupportsWebSearch                   bool     `json:"supports_web_search"`
+	SupportsPDFInput                    bool     `json:"supports_pdf_input"`
+	SupportsComputerUse                 bool     `json:"supports_computer_use"`
 }
 
 // PricingService 动态价格服务
@@ -440,11 +460,21 @@ func (s *PricingService) parsePricingData(body []byte) (map[string]*LiteLLMModel
 		}
 
 		pricing := &LiteLLMModelPricing{
-			LiteLLMProvider:       entry.LiteLLMProvider,
-			Mode:                  entry.Mode,
-			SupportsPromptCaching: entry.SupportsPromptCaching,
-			SupportsServiceTier:   entry.SupportsServiceTier,
-			TokenPricingAbsent:    entry.InputCostPerToken == nil && entry.OutputCostPerToken == nil,
+			LiteLLMProvider:         entry.LiteLLMProvider,
+			Mode:                    entry.Mode,
+			SupportsPromptCaching:   entry.SupportsPromptCaching,
+			SupportsServiceTier:     entry.SupportsServiceTier,
+			TokenPricingAbsent:      entry.InputCostPerToken == nil && entry.OutputCostPerToken == nil,
+			MaxInputTokens:          entry.MaxInputTokens,
+			MaxOutputTokens:         entry.MaxOutputTokens,
+			MaxTokens:               entry.MaxTokens,
+			SupportsReasoning:       entry.SupportsReasoning,
+			SupportsVision:          entry.SupportsVision,
+			SupportsFunctionCalling: entry.SupportsFunctionCalling,
+			SupportsToolChoice:      entry.SupportsToolChoice,
+			SupportsWebSearch:       entry.SupportsWebSearch,
+			SupportsPDFInput:        entry.SupportsPDFInput,
+			SupportsComputerUse:     entry.SupportsComputerUse,
 		}
 
 		if entry.InputCostPerToken != nil {
@@ -682,6 +712,30 @@ func (s *PricingService) GetModelPricing(modelName string) *LiteLLMModelPricing 
 	}
 
 	return nil
+}
+
+// HasExactModelPricing reports whether the normalized model name has an exact
+// entry in the pricing catalog, without falling back to fuzzy family matching.
+func (s *PricingService) HasExactModelPricing(modelName string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if modelName == "" {
+		return false
+	}
+
+	modelLower := strings.ToLower(strings.TrimSpace(modelName))
+	lookupCandidates := s.buildModelLookupCandidates(modelLower)
+
+	for _, candidate := range lookupCandidates {
+		if candidate == "" {
+			continue
+		}
+		if _, ok := s.pricingData[candidate]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *PricingService) buildModelLookupCandidates(modelLower string) []string {

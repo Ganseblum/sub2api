@@ -4,6 +4,7 @@ import dashboard from './dashboard'
 import admin from './admin'
 import misc from './misc'
 import helpCenter from './helpCenter'
+import modelMarket from './modelMarket'
 
 export default {
   ...landing,
@@ -12,4 +13,5 @@ export default {
   admin,
   ...misc,
   helpCenter,
+  modelMarket,
 }

@@ -123,5 +123,11 @@ func RegisterUserRoutes(
 			monitors.GET("", h.ChannelMonitor.List)
 			monitors.GET("/:id/status", h.ChannelMonitor.GetStatus)
 		}
+
+		// 模型市场
+		modelMarket := authenticated.Group("/model-market")
+		{
+			modelMarket.GET("", h.ModelMarket.List)
+		}
 	}
 }

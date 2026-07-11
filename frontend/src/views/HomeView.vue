@@ -47,12 +47,10 @@
             class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30"
           >
             <img
-              v-if="siteLogo"
-              :src="siteLogo"
+              :src="siteLogo || '/logo.png'"
               alt="Logo"
               class="h-full w-full object-contain"
             />
-            <Icon v-else name="bolt" size="md" class="text-white" :stroke-width="2.5" />
           </div>
           <span class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
             {{ siteName }}
@@ -668,12 +666,10 @@
                 class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white"
               >
                 <img
-                  v-if="siteLogo"
-                  :src="siteLogo"
+                  :src="siteLogo || '/logo.png'"
                   alt="Logo"
                   class="h-full w-full object-contain"
                 />
-                <Icon v-else name="bolt" size="md" class="text-white" :stroke-width="2.5" />
               </div>
               <span class="text-lg font-bold text-gray-900 dark:text-white">
                 {{ siteName }}

@@ -1,6 +1,6 @@
 export default {
   title: "Model Market",
-  description: "Current ChatGPT / OpenAI and Claude / Claude Code models available to you, with base prices and group-adjusted pricing",
+  description: "Current GPT, Claude and Gemini models available to you, with base prices and group-adjusted pricing",
   searchPlaceholder: "Search models, platforms, or groups...",
   empty: "No matching models",
   loadError: "Failed to load model market",
@@ -8,7 +8,7 @@ export default {
   noGroup: "No available group",
   stats: {
     models: "Visible Models",
-    modelsHint: "Only GPT / Claude models available to you",
+    modelsHint: "Only GPT / Claude / Gemini models available to you",
     lowestRate: "Lowest Rate",
     lowestRateHint: "From your accessible groups",
     lowestInput: "Lowest Input",
@@ -19,7 +19,7 @@ export default {
   filters: {
     platform: "Platform",
     allPlatforms: "All Platforms",
-    claude: "Claude / Claude Code",
+    claude: "Claude",
     billingMode: "Billing Mode",
     allBillingModes: "All Billing Modes",
     tier: "Model Tier",
@@ -30,6 +30,7 @@ export default {
     tokenOnly: "Token models only"
   },
   sort: {
+    newest: "Newest First",
     platformName: "Platform / Name",
     lowestInput: "Lowest Input",
     lowestOutput: "Lowest Output",

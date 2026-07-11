@@ -73,7 +73,7 @@
           </div>
 
           <div ref="articleBody" class="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
-            <div class="max-w-3xl">
+            <div class="max-w-5xl">
               <h1 class="text-2xl md:text-3xl font-extrabold mb-2 tracking-tight text-gray-900 dark:text-white">{{ currentArticle?.title }}</h1>
               <p class="text-sm text-gray-500 dark:text-dark-400 mb-8">{{ t('helpCenter.lastUpdated') }}: {{ currentArticle?.updatedAt }}</p>
 
@@ -355,6 +355,8 @@ if (typeof window !== 'undefined') {
   border-radius: 12px;
   margin: 16px 0;
   position: relative;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .help-content :deep(pre code) {

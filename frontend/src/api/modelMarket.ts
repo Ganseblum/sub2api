@@ -35,7 +35,8 @@ export interface ModelMarketGroupPrice {
 export interface ModelMarketModel {
   id: string
   name: string
-  family: 'gpt' | 'claude'
+  display_order: number
+  family: 'gpt' | 'claude' | 'gemini'
   provider: string
   display_provider: string
   tier: string

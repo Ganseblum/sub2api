@@ -27,29 +27,58 @@ func NewModelMarketHandler(pricingService *service.PricingService, apiKeyService
 
 type modelMarketSpec struct {
 	ID              string
+	DisplayName     string
+	DisplayOrder    int
 	Family          string
 	Provider        string
 	DisplayProvider string
 	Tier            string
 	GroupPlatforms  []string
+	// PricingID is the model ID used to look up pricing when the canonical ID
+	// is not present in the catalog. The response still uses ID/DisplayName so
+	// users see the exact model name while prices are shown from the closest
+	// available entry.
+	PricingID string
 }
 
 // modelMarketSpecs is the curated model list for the market page. Keep it in
 // one place so it can be moved to runtime settings later without touching the
-// response shape or frontend.
+// response shape or frontend. Higher DisplayOrder means newer/recommended and
+// is surfaced first by default.
 var modelMarketSpecs = []modelMarketSpec{
-	{ID: "gpt-5.6-sol", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.6-terra", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "standard", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.6-luna", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "mini", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.5", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.4", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "claude-fable-5", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-8", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-7", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-opus-4-6", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-sonnet-5", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-sonnet-4-6", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-haiku-4-5", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	// Claude — newest first
+	{ID: "claude-opus-4-6-thinking", DisplayName: "Claude Opus 4.6 Thinking", DisplayOrder: 2600, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-6", DisplayName: "Claude Opus 4.6", DisplayOrder: 2550, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-7", DisplayName: "Claude Opus 4.7", DisplayOrder: 2500, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-opus-4-8", DisplayName: "Claude Opus 4.8", DisplayOrder: 2450, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-fable-5", DisplayName: "Claude Code (Fable 5)", DisplayOrder: 2400, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-sonnet-5", DisplayName: "Claude Sonnet 5", DisplayOrder: 2350, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-sonnet-4-6", DisplayName: "Claude Sonnet 4.6", DisplayOrder: 2300, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-haiku-4-5", DisplayName: "Claude Haiku 4.5", DisplayOrder: 2200, Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+
+	// Gemini — newest first
+	{ID: "gemini-3.5-flash", DisplayName: "Gemini 3.5 Flash", DisplayOrder: 2150, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3.5-flash-low", DisplayName: "Gemini 3.5 Flash Low", DisplayOrder: 2125, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.5-flash"},
+	{ID: "gemini-3.1-pro-preview", DisplayName: "Gemini 3.1 Pro Preview", DisplayOrder: 2100, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3.1-pro-preview-thinking-128", DisplayName: "Gemini 3.1 Pro Preview Thinking 128K", DisplayOrder: 2050, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-pro-preview"},
+	{ID: "gemini-3.1-flash", DisplayName: "Gemini 3.1 Flash", DisplayOrder: 2000, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-flash-lite"},
+	{ID: "gemini-3.1-flash-image", DisplayName: "Gemini 3.1 Flash Image", DisplayOrder: 1950, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3-flash", DisplayName: "Gemini 3 Flash", DisplayOrder: 1900, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3-flash-thinking-128", DisplayName: "Gemini 3 Flash Thinking 128K", DisplayOrder: 1850, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-flash"},
+	{ID: "gemini-3-pro", DisplayName: "Gemini 3 Pro", DisplayOrder: 1800, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-pro-preview"},
+	{ID: "gemini-3-pro-preview", DisplayName: "Gemini 3 Pro Preview", DisplayOrder: 1750, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-2.5-pro", DisplayName: "Gemini 2.5 Pro", DisplayOrder: 1500, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-2.5-flash", DisplayName: "Gemini 2.5 Flash", DisplayOrder: 1450, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-2.5-flash-lite", DisplayName: "Gemini 2.5 Flash Lite", DisplayOrder: 1400, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "mini", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-2.0-flash", DisplayName: "Gemini 2.0 Flash", DisplayOrder: 1000, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-2.0-flash-lite", DisplayName: "Gemini 2.0 Flash Lite", DisplayOrder: 950, Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "mini", GroupPlatforms: []string{service.PlatformGemini}},
+
+	// OpenAI GPT
+	{ID: "gpt-5.6-sol", DisplayName: "GPT-5.6 Sol", DisplayOrder: 900, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.6-terra", DisplayName: "GPT-5.6 Terra", DisplayOrder: 850, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "standard", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.6-luna", DisplayName: "GPT-5.6 Luna", DisplayOrder: 800, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "mini", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.5", DisplayName: "GPT-5.5", DisplayOrder: 700, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
+	{ID: "gpt-5.4", DisplayName: "GPT-5.4", DisplayOrder: 600, Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
 }
 
 type modelMarketResponse struct {
@@ -66,6 +95,7 @@ type modelMarketMetaDTO struct {
 type modelMarketModelDTO struct {
 	ID              string                     `json:"id"`
 	Name            string                     `json:"name"`
+	DisplayOrder    int                        `json:"display_order"`
 	Family          string                     `json:"family"`
 	Provider        string                     `json:"provider"`
 	DisplayProvider string                     `json:"display_provider"`
@@ -112,7 +142,7 @@ type modelMarketGroupPriceDTO struct {
 	Pricing modelMarketPricingDTO `json:"pricing"`
 }
 
-// List returns curated GPT and Claude model pricing for the current user.
+// List returns curated OpenAI GPT, Claude and Gemini model pricing for the current user.
 // GET /api/v1/model-market
 func (h *ModelMarketHandler) List(c *gin.Context) {
 	subject, ok := middleware.GetAuthSubjectFromContext(c)
@@ -143,7 +173,11 @@ func (h *ModelMarketHandler) List(c *gin.Context) {
 	marketGroups := toModelMarketGroups(groups, userRates)
 	models := make([]modelMarketModelDTO, 0, len(modelMarketSpecs))
 	for _, spec := range modelMarketSpecs {
-		pricing := h.pricingService.GetModelPricing(spec.ID)
+		pricingID := spec.PricingID
+		if pricingID == "" {
+			pricingID = spec.ID
+		}
+		pricing := h.pricingService.GetModelPricing(pricingID)
 		if pricing == nil {
 			continue
 		}
@@ -156,7 +190,8 @@ func (h *ModelMarketHandler) List(c *gin.Context) {
 		groupPrices := groupPricesForModel(basePricing, marketGroups, spec.GroupPlatforms)
 		model := modelMarketModelDTO{
 			ID:              spec.ID,
-			Name:            spec.ID,
+			Name:            spec.DisplayName,
+			DisplayOrder:    spec.DisplayOrder,
 			Family:          spec.Family,
 			Provider:        firstNonEmpty(strings.ToLower(pricing.LiteLLMProvider), spec.Provider),
 			DisplayProvider: spec.DisplayProvider,
@@ -179,6 +214,10 @@ func (h *ModelMarketHandler) List(c *gin.Context) {
 		}
 		models = append(models, model)
 	}
+
+	sort.SliceStable(models, func(i, j int) bool {
+		return models[i].DisplayOrder > models[j].DisplayOrder
+	})
 
 	response.Success(c, modelMarketResponse{
 		Models: models,

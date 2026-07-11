@@ -55,6 +55,14 @@ export default {
           {
             name: "Output Price",
             desc: "Price per output token for the model"
+          },
+          {
+            name: "Cache Read Price",
+            desc: "Price per cache read token for models that support cache billing"
+          },
+          {
+            name: "Cache Creation Price",
+            desc: "Price per cache creation token for models that support cache write"
           }
         ]
       },

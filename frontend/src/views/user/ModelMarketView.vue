@@ -36,6 +36,21 @@
       </section>
 
       <section class="card p-4">
+        <div class="mb-4 flex flex-wrap gap-2">
+          <button
+            v-for="option in familyOptions"
+            :key="option.value"
+            type="button"
+            class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+            :class="familyFilter === option.value
+              ? 'bg-primary-600 text-white shadow-sm'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-300 dark:hover:bg-dark-600'"
+            @click="familyFilter = option.value as FamilyFilter"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+
         <div class="market-toolbar">
           <div class="relative min-w-0 xl:col-span-2">
             <Icon
@@ -135,7 +150,7 @@
                   </div>
                 </td>
                 <td class="align-top">
-                  <span :class="['badge', row.family === 'gpt' ? 'badge-success' : 'badge-warning']">
+                  <span :class="['badge', providerBadgeClass(row.family)]">
                     {{ row.display_provider }}
                   </span>
                   <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ platformList(row.group_platforms) }}</p>
@@ -172,69 +187,79 @@
         </div>
       </section>
 
-      <section v-else class="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-        <article v-for="row in pagedRows" :key="row.id" class="card card-hover p-5">
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="mb-3 flex flex-wrap gap-2">
-                <span :class="['badge', row.family === 'gpt' ? 'badge-success' : 'badge-warning']">
-                  {{ row.display_provider }}
-                </span>
-                <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
+      <section v-else class="space-y-8">
+        <div v-for="group in pagedGroupedRows" :key="group.family" class="space-y-4">
+          <h3 class="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-black" :class="providerMarkClass(group.family)">
+              {{ providerMarkText(group.family) }}
+            </span>
+            {{ group.label }}
+          </h3>
+          <div class="grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+            <article v-for="row in group.rows" :key="row.id" class="card card-hover p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="mb-3 flex flex-wrap gap-2">
+                    <span :class="['badge', providerBadgeClass(row.family)]">
+                      {{ row.display_provider }}
+                    </span>
+                    <span class="badge badge-purple">{{ tierLabel(row.tier) }}</span>
+                  </div>
+                  <h2 class="break-words text-lg font-bold leading-tight text-gray-900 dark:text-white">{{ row.name }}</h2>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {{ platformList(row.group_platforms) }} · {{ t('modelMarket.groupCount', { count: displayGroupCount(row) }) }}
+                  </p>
+                </div>
+                <button class="btn btn-ghost btn-icon shrink-0" :title="t('modelMarket.actions.viewDetail')" @click="openDetail(row)">
+                  <Icon name="arrowRight" size="md" />
+                </button>
               </div>
-              <h2 class="break-words text-lg font-bold leading-tight text-gray-900 dark:text-white">{{ row.name }}</h2>
-              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                {{ platformList(row.group_platforms) }} · {{ t('modelMarket.groupCount', { count: displayGroupCount(row) }) }}
-              </p>
-            </div>
-            <button class="btn btn-ghost btn-icon shrink-0" :title="t('modelMarket.actions.viewDetail')" @click="openDetail(row)">
-              <Icon name="arrowRight" size="md" />
-            </button>
-          </div>
 
-          <div class="price-panel mt-5">
-            <div>
-              <span>{{ t('modelMarket.price.input') }}</span>
-              <strong>{{ formatPrice(row.pricing.input_per_1m, '/1M token') }}</strong>
-            </div>
-            <div>
-              <span>{{ t('modelMarket.price.output') }}</span>
-              <strong>{{ formatPrice(row.pricing.output_per_1m, '/1M token') }}</strong>
-            </div>
-            <div>
-              <span>{{ t('modelMarket.price.cacheRead') }}</span>
-              <strong>{{ formatPrice(row.pricing.cache_read_per_1m, '/1M token') }}</strong>
-            </div>
-          </div>
+              <div class="price-panel mt-5">
+                <div>
+                  <span>{{ t('modelMarket.price.input') }}</span>
+                  <strong>{{ formatPrice(row.pricing.input_per_1m, '/1M token') }}</strong>
+                </div>
+                <div>
+                  <span>{{ t('modelMarket.price.output') }}</span>
+                  <strong>{{ formatPrice(row.pricing.output_per_1m, '/1M token') }}</strong>
+                </div>
+                <div>
+                  <span>{{ t('modelMarket.price.cacheRead') }}</span>
+                  <strong>{{ formatPrice(row.pricing.cache_read_per_1m, '/1M token') }}</strong>
+                </div>
+              </div>
 
-          <div class="mt-5 border-t border-gray-100 pt-4 dark:border-dark-700">
-            <div class="mb-2 flex items-center justify-between gap-3">
-              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{{ t('modelMarket.card.lowestActual') }}</span>
-              <span class="max-w-[190px] truncate text-xs text-gray-500 dark:text-gray-400">
-                {{ lowestGroupSummary(row) }}
-              </span>
-            </div>
-            <div v-if="displayLowestGroup(row)" class="grid grid-cols-2 gap-1.5">
-              <div class="actual-tile">
-                <span>{{ t('modelMarket.price.rate') }}</span>
-                <strong>{{ formatRate(displayLowestRate(row)) }}</strong>
+              <div class="mt-5 border-t border-gray-100 pt-4 dark:border-dark-700">
+                <div class="mb-2 flex items-center justify-between gap-3">
+                  <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{{ t('modelMarket.card.lowestActual') }}</span>
+                  <span class="max-w-[190px] truncate text-xs text-gray-500 dark:text-gray-400">
+                    {{ lowestGroupSummary(row) }}
+                  </span>
+                </div>
+                <div v-if="displayLowestGroup(row)" class="grid grid-cols-2 gap-1.5">
+                  <div class="actual-tile">
+                    <span>{{ t('modelMarket.price.rate') }}</span>
+                    <strong>{{ formatRate(displayLowestRate(row)) }}</strong>
+                  </div>
+                  <div class="actual-tile">
+                    <span>{{ t('modelMarket.price.input') }}</span>
+                    <strong>{{ formatPrice(displayActualPricing(row)?.input_per_1m, '/1M token') }}</strong>
+                  </div>
+                  <div class="actual-tile">
+                    <span>{{ t('modelMarket.price.output') }}</span>
+                    <strong>{{ formatPrice(displayActualPricing(row)?.output_per_1m, '/1M token') }}</strong>
+                  </div>
+                  <div class="actual-tile">
+                    <span>{{ t('modelMarket.price.cacheReadShort') }}</span>
+                    <strong>{{ formatPrice(displayActualPricing(row)?.cache_read_per_1m, '/1M token') }}</strong>
+                  </div>
+                </div>
+                <div v-else class="no-group-panel">{{ t('modelMarket.noGroup') }}</div>
               </div>
-              <div class="actual-tile">
-                <span>{{ t('modelMarket.price.input') }}</span>
-                <strong>{{ formatPrice(displayActualPricing(row)?.input_per_1m, '/1M token') }}</strong>
-              </div>
-              <div class="actual-tile">
-                <span>{{ t('modelMarket.price.output') }}</span>
-                <strong>{{ formatPrice(displayActualPricing(row)?.output_per_1m, '/1M token') }}</strong>
-              </div>
-              <div class="actual-tile">
-                <span>{{ t('modelMarket.price.cacheReadShort') }}</span>
-                <strong>{{ formatPrice(displayActualPricing(row)?.cache_read_per_1m, '/1M token') }}</strong>
-              </div>
-            </div>
-            <div v-else class="no-group-panel">{{ t('modelMarket.noGroup') }}</div>
+            </article>
           </div>
-        </article>
+        </div>
       </section>
 
       <Pagination
@@ -254,12 +279,12 @@
       <template v-if="detailRow">
         <div class="space-y-6">
           <section class="detail-hero">
-            <div class="model-mark" :class="detailRow.family === 'gpt' ? 'model-mark-openai' : 'model-mark-claude'">
-              {{ detailRow.family === 'gpt' ? 'GPT' : 'C' }}
+            <div class="model-mark" :class="providerMarkClass(detailRow.family)">
+              {{ providerMarkText(detailRow.family) }}
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span :class="['badge', detailRow.family === 'gpt' ? 'badge-success' : 'badge-warning']">
+                <span :class="['badge', providerBadgeClass(detailRow.family)]">
                   {{ detailRow.display_provider }}
                 </span>
                 <span class="badge badge-purple">{{ tierLabel(detailRow.tier) }}</span>
@@ -389,10 +414,10 @@ import { useAppStore } from '@/stores/app'
 import { extractApiErrorMessage } from '@/utils/apiError'
 import type { Group } from '@/types'
 
-type ModelFamily = 'gpt' | 'claude'
+type ModelFamily = 'gpt' | 'claude' | 'gemini'
 type FamilyFilter = 'all' | ModelFamily
 type ViewMode = 'table' | 'cards'
-type SortKey = 'family_name' | 'lowest_input' | 'lowest_output' | 'lowest_rate'
+type SortKey = 'newest' | 'family_name' | 'lowest_input' | 'lowest_output' | 'lowest_rate'
 
 interface SummaryStats {
   lowestRate: number | null
@@ -414,25 +439,41 @@ const searchQuery = ref('')
 const familyFilter = ref<FamilyFilter>('all')
 const tierFilter = ref('all')
 const groupFilter = ref('all')
-const sortKey = ref<SortKey>('family_name')
+const sortKey = ref<SortKey>('newest')
 const viewMode = ref<ViewMode>('cards')
 const page = ref(1)
 const pageSize = ref(20)
 const detailRow = ref<ModelMarketModel | null>(null)
 
 const staticModelSpecs: ModelMarketModel[] = [
-  makeStaticModel('gpt-5.6-sol', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-terra', 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-luna', 'gpt', 'OpenAI', 'mini', ['openai'], { input: 1, output: 6, cacheRead: 0.1 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.5', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.4', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-fable-5', 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-8', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-7', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-opus-4-6', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-sonnet-5', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-sonnet-4-6', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
-  makeStaticModel('claude-haiku-4-5', 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
+  makeStaticModel('claude-opus-4-6-thinking', 'Claude Opus 4.6 Thinking', 2600, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-6', 'Claude Opus 4.6', 2550, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-7', 'Claude Opus 4.7', 2500, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-opus-4-8', 'Claude Opus 4.8', 2450, 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-fable-5', 'Claude Code (Fable 5)', 2400, 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-sonnet-5', 'Claude Sonnet 5', 2350, 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-sonnet-4-6', 'Claude Sonnet 4.6', 2300, 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
+  makeStaticModel('claude-haiku-4-5', 'Claude Haiku 4.5', 2200, 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
+  makeStaticModel('gemini-3.5-flash', 'Gemini 3.5 Flash', 2150, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3.5-flash-low', 'Gemini 3.5 Flash Low', 2125, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 2100, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-pro-preview-thinking-128', 'Gemini 3.1 Pro Preview Thinking 128K', 2050, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-flash', 'Gemini 3.1 Flash', 2000, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.25, output: 1.5, cacheRead: 0.025 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-flash-image', 'Gemini 3.1 Flash Image', 1950, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 65_536, output: 32_768, total: 32_768 }),
+  makeStaticModel('gemini-3-flash', 'Gemini 3 Flash', 1900, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-flash-thinking-128', 'Gemini 3 Flash Thinking 128K', 1850, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-pro', 'Gemini 3 Pro', 1800, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-3-pro-preview', 'Gemini 3 Pro Preview', 1750, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-2.5-pro', 'Gemini 2.5 Pro', 1500, 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.25, output: 10, cacheRead: 0.125 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-2.5-flash', 'Gemini 2.5 Flash', 1450, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.3, output: 2.5, cacheRead: 0.03 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-2.5-flash-lite', 'Gemini 2.5 Flash Lite', 1400, 'gemini', 'Gemini', 'mini', ['gemini'], { input: 0.1, output: 0.4, cacheRead: 0.01 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gemini-2.0-flash', 'Gemini 2.0 Flash', 1000, 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.1, output: 0.4, cacheRead: 0.025 }, { input: 1_048_576, output: 8_192, total: 8_192 }),
+  makeStaticModel('gemini-2.0-flash-lite', 'Gemini 2.0 Flash Lite', 950, 'gemini', 'Gemini', 'mini', ['gemini'], { input: 0.075, output: 0.3, cacheRead: 0.01875 }, { input: 1_048_576, output: 8_192, total: 8_192 }),
+  makeStaticModel('gpt-5.6-sol', 'GPT-5.6 Sol', 900, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-terra', 'GPT-5.6 Terra', 850, 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-luna', 'GPT-5.6 Luna', 800, 'gpt', 'OpenAI', 'mini', ['openai'], { input: 1, output: 6, cacheRead: 0.1 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.5', 'GPT-5.5', 700, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.4', 'GPT-5.4', 600, 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
 ]
 
 const PriceLines = defineComponent({
@@ -487,8 +528,9 @@ const tierOptions = computed(() => {
 
 const familyOptions = computed<FilterOption[]>(() => [
   { value: 'all', label: t('modelMarket.filters.allPlatforms') },
-  { value: 'gpt', label: 'OpenAI GPT' },
+  { value: 'gpt', label: 'GPT' },
   { value: 'claude', label: t('modelMarket.filters.claude') },
+  { value: 'gemini', label: 'Gemini' },
 ])
 
 const tierFilterOptions = computed<FilterOption[]>(() => [
@@ -505,6 +547,7 @@ const groupFilterOptions = computed<FilterOption[]>(() => [
 ])
 
 const sortOptions = computed<FilterOption[]>(() => [
+  { value: 'newest', label: t('modelMarket.sort.newest') },
   { value: 'family_name', label: t('modelMarket.sort.platformName') },
   { value: 'lowest_input', label: t('modelMarket.sort.lowestInput') },
   { value: 'lowest_output', label: t('modelMarket.sort.lowestOutput') },
@@ -534,6 +577,8 @@ const filteredRows = computed(() => {
 
   result = [...result].sort((a, b) => {
     switch (sortKey.value) {
+      case 'newest':
+        return b.display_order - a.display_order || a.name.localeCompare(b.name)
       case 'lowest_input':
         return nullableSort(displayActualPricing(a)?.input_per_1m ?? null, displayActualPricing(b)?.input_per_1m ?? null) || a.name.localeCompare(b.name)
       case 'lowest_output':
@@ -650,6 +695,8 @@ function attachGroupsToStaticModel(model: ModelMarketModel, groups: ModelMarketG
 
 function makeStaticModel(
   id: string,
+  displayName: string,
+  displayOrder: number,
   family: ModelFamily,
   displayProvider: string,
   tier: string,
@@ -657,10 +704,11 @@ function makeStaticModel(
   prices: { input: number; output: number; cacheRead?: number; cacheWrite?: number; cacheWrite1h?: number },
   context: { input: number; output: number; total: number },
 ): ModelMarketModel {
-  const provider = family === 'gpt' ? 'openai' : 'anthropic'
+  const provider = family === 'gpt' ? 'openai' : family === 'gemini' ? 'gemini' : 'anthropic'
   return {
     id,
-    name: id,
+    name: displayName,
+    display_order: displayOrder,
     family,
     provider,
     display_provider: displayProvider,
@@ -770,10 +818,64 @@ function platformLabel(platform: string): string {
       return 'Anthropic'
     case 'antigravity':
       return 'Claude Code'
+    case 'gemini':
+      return 'Gemini'
     default:
       return platform || '-'
   }
 }
+
+function providerBadgeClass(family: ModelFamily): string {
+  switch (family) {
+    case 'gpt':
+      return 'badge-success'
+    case 'gemini':
+      return 'badge-primary'
+    default:
+      return 'badge-warning'
+  }
+}
+
+function providerMarkClass(family: ModelFamily): string {
+  switch (family) {
+    case 'gpt':
+      return 'model-mark-openai'
+    case 'gemini':
+      return 'model-mark-gemini'
+    default:
+      return 'model-mark-claude'
+  }
+}
+
+function providerMarkText(family: ModelFamily): string {
+  switch (family) {
+    case 'gpt':
+      return 'GPT'
+    case 'gemini':
+      return 'G'
+    default:
+      return 'C'
+  }
+}
+
+const familyDisplayOrder: ModelFamily[] = ['gpt', 'claude', 'gemini']
+
+const pagedGroupedRows = computed(() => {
+  const groups = new Map<ModelFamily, { family: ModelFamily; label: string; rows: ModelMarketModel[] }>()
+  for (const row of pagedRows.value) {
+    const family = row.family as ModelFamily
+    const existing = groups.get(family)
+    if (existing) {
+      existing.rows.push(row)
+    } else {
+      const label = familyOptions.value.find((o) => o.value === family)?.label || family.toUpperCase()
+      groups.set(family, { family, label, rows: [row] })
+    }
+  }
+  return familyDisplayOrder
+    .map((family) => groups.get(family))
+    .filter((g): g is { family: ModelFamily; label: string; rows: ModelMarketModel[] } => Boolean(g && g.rows.length > 0))
+})
 
 function platformList(platforms: string[]): string {
   return platforms.map(platformLabel).join(' / ')
@@ -897,6 +999,10 @@ onMounted(loadModels)
 
 .model-mark-claude {
   @apply bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-200;
+}
+
+.model-mark-gemini {
+  @apply bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200;
 }
 
 .detail-stat {

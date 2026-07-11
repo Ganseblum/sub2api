@@ -1,6 +1,6 @@
 export default {
   title: "模型市场",
-  description: "当前可用的 ChatGPT / OpenAI 和 Claude / Claude Code 模型，包含基础价格和分组调整后的价格",
+  description: "当前可用的 GPT、Claude 和 Gemini 模型，包含基础价格和分组调整后的价格",
   searchPlaceholder: "搜索模型、平台或分组...",
   empty: "没有匹配的模型",
   loadError: "加载模型市场失败",
@@ -8,7 +8,7 @@ export default {
   noGroup: "无可用分组",
   stats: {
     models: "可见模型",
-    modelsHint: "仅显示你可用的 GPT / Claude 模型",
+    modelsHint: "仅显示你可用的 GPT / Claude / Gemini 模型",
     lowestRate: "最低倍率",
     lowestRateHint: "来自你可访问的分组",
     lowestInput: "最低输入价格",
@@ -19,7 +19,7 @@ export default {
   filters: {
     platform: "平台",
     allPlatforms: "全部平台",
-    claude: "Claude / Claude Code",
+    claude: "Claude",
     billingMode: "计费模式",
     allBillingModes: "全部计费模式",
     tier: "模型档位",
@@ -30,6 +30,7 @@ export default {
     tokenOnly: "仅 Token 模型"
   },
   sort: {
+    newest: "最新优先",
     platformName: "平台 / 名称",
     lowestInput: "最低输入价格",
     lowestOutput: "最低输出价格",

@@ -252,19 +252,16 @@ nano .env
 
 ### 4.4 启动服务
 
-使用 `docker-compose.local.yml`（本地目录挂载，便于备份迁移）：
+使用 `docker-compose.local.yml`（本地源码构建 + 本地目录挂载，便于备份迁移）：
 
 ```bash
 cd /opt/sub2api/deploy
 
-# 如果你克隆了完整 Git 仓库并希望从源码构建：
+# 构建并启动（会从 /opt/sub2api/Dockerfile 构建你自己的代码）
 docker compose -f docker-compose.local.yml up -d --build
-
-# 如果你只想使用官方预编译镜像（不需要构建）：
-docker compose -f docker-compose.local.yml up -d
 ```
 
-> 说明：`docker-compose.local.yml` 默认使用官方镜像 `weishaw/sub2api:latest`；在完整 Git 仓库中加上 `--build` 会从本地 `Dockerfile` 构建 `sub2api:local` 镜像。
+> 说明：`docker-compose.local.yml` 会从当前 Git 工作区构建 `sub2api:local` 镜像，不会拉取上游官方镜像。如果你不想构建、只想用上游官方镜像，请使用 `docker-compose.yml`。
 
 查看启动日志：
 

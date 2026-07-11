@@ -13,9 +13,11 @@ This directory contains files for deploying Sub2API on Linux servers.
 
 | File | Description |
 |------|-------------|
-| `docker-compose.yml` | Docker Compose configuration (named volumes) |
-| `docker-compose.local.yml` | Docker Compose configuration (local directories, easy migration) |
-| `docker-deploy.sh` | **One-click Docker deployment script (recommended)** |
+| `docker-compose.yml` | Docker Compose configuration with named volumes (pulls official pre-built image) |
+| `docker-compose.local.yml` | **Source build + local directories** (for forked deployments, builds from local Dockerfile) |
+| `docker-compose.dev.yml` | Docker Compose configuration for development/debugging |
+| `docker-compose.standalone.yml` | Standalone Sub2API without bundled PostgreSQL/Redis |
+| `docker-deploy.sh` | **One-click Docker deployment script (recommended for quick start)** |
 | `.env.example` | Docker environment variables template |
 | `DOCKER.md` | Docker Hub documentation |
 | `install.sh` | One-click binary installation script |
@@ -99,12 +101,14 @@ docker compose -f docker-compose.local.yml logs -f sub2api
 
 ### Deployment Version Comparison
 
-| Version | Data Storage | Migration | Best For |
-|---------|-------------|-----------|----------|
-| **docker-compose.local.yml** | Local directories (./data, ./postgres_data, ./redis_data) | ✅ Easy (tar entire directory) | Production, need frequent backups/migration |
-| **docker-compose.yml** | Named volumes (/var/lib/docker/volumes/) | ⚠️ Requires docker commands | Simple setup, don't need migration |
+| Version | Image Source | Data Storage | Migration | Best For |
+|---------|-------------|--------------|-----------|----------|
+| **docker-compose.yml** | Pulls `weishaw/sub2api:latest` | Named volumes (/var/lib/docker/volumes/) | ⚠️ Requires docker commands | Quick start via `docker-deploy.sh`, no source changes |
+| **docker-compose.local.yml** | Builds from local `Dockerfile` | Local directories (./data, ./postgres_data, ./redis_data) | ✅ Easy (tar entire directory) | Forked deployments, custom code, production with backups |
 
-**Recommendation:** Use `docker-compose.local.yml` (deployed by `docker-deploy.sh`) for easier data management and migration.
+**Recommendation:**
+- Use `docker-compose.yml` if you just want to run Sub2API without modifying code (via `docker-deploy.sh`).
+- Use `docker-compose.local.yml` if you have your own fork/clone and want to deploy your modified code.
 
 ### How Auto-Setup Works
 

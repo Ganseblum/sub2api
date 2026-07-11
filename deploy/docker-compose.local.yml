@@ -21,13 +21,9 @@
 
 services:
   # ===========================================================================
-  # Sub2API Application
-  #   - 默认使用官方预编译镜像 weishaw/sub2api:latest
-  #   - 在完整 Git 仓库中执行 `docker compose -f docker-compose.local.yml up -d --build`
-  #     可从本地 Dockerfile 源码构建 sub2api:local 镜像
+  # Sub2API Application (built from local source)
   # ===========================================================================
   sub2api:
-    image: weishaw/sub2api:latest
     build:
       context: ..
       dockerfile: Dockerfile
@@ -35,6 +31,8 @@ services:
         - VERSION=${VERSION:-}
         - COMMIT=${COMMIT:-docker}
         - DATE=${DATE:-}
+    image: sub2api:local
+    pull_policy: never
     container_name: sub2api
     restart: unless-stopped
     ulimits:

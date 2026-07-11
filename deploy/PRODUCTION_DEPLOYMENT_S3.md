@@ -256,8 +256,15 @@ nano .env
 
 ```bash
 cd /opt/sub2api/deploy
+
+# 如果你克隆了完整 Git 仓库并希望从源码构建：
+docker compose -f docker-compose.local.yml up -d --build
+
+# 如果你只想使用官方预编译镜像（不需要构建）：
 docker compose -f docker-compose.local.yml up -d
 ```
+
+> 说明：`docker-compose.local.yml` 默认使用官方镜像 `weishaw/sub2api:latest`；在完整 Git 仓库中加上 `--build` 会从本地 `Dockerfile` 构建 `sub2api:local` 镜像。
 
 查看启动日志：
 

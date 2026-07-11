@@ -201,24 +201,24 @@ nano .env
 
 ### 4.3 源码构建并启动
 
-**因为使用自己的 Git 仓库源码，必须叠加 `docker-compose.build.yml`**：
+**因为使用自己的 Git 仓库源码，使用 `docker-compose.local.yml` 并启用本地构建**：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
-> 注意：`docker-compose.build.yml` 会从当前 Git 工作区构建 `sub2api:latest`。更新代码时先 `git pull` 你的仓库，再重新执行构建命令。
+> 注意：`docker-compose.local.yml` 默认使用官方镜像；在完整 Git 仓库中加上 `--build` 会从当前工作区构建 `sub2api:local`。更新代码时先 `git pull`，再重新执行构建命令。
 
 ### 4.4 查看日志并获取 admin 密码
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs -f sub2api
+docker compose -f docker-compose.local.yml logs -f sub2api
 ```
 
 如果 `ADMIN_PASSWORD` 留空，在日志中搜索自动生成的 admin 密码：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs sub2api | grep "admin password"
+docker compose -f docker-compose.local.yml logs sub2api | grep "admin password"
 ```
 
 ### 4.5 访问 Web UI
@@ -239,16 +239,16 @@ http://你的VPS_IP:8080
 
 ```bash
 # 查看容器状态
-docker compose -f docker-compose.yml -f docker-compose.build.yml ps
+docker compose -f docker-compose.local.yml ps
 
 # 查看 Sub2API 健康状态
 curl http://localhost:8080/health
 
 # 检查 PostgreSQL
-docker compose -f docker-compose.yml -f docker-compose.build.yml exec postgres pg_isready
+docker compose -f docker-compose.local.yml exec postgres pg_isready
 
 # 检查 Redis
-docker compose -f docker-compose.yml -f docker-compose.build.yml exec redis redis-cli ping
+docker compose -f docker-compose.local.yml exec redis redis-cli ping
 ```
 
 ---
@@ -276,7 +276,7 @@ docker compose config > compose.current.yml
 
 # 记录老服务器实际使用的 Compose 命令，后续备份/停服都复用它
 # 源码构建版通常是：
-export OLD_COMPOSE="docker compose -f docker-compose.yml -f docker-compose.build.yml"
+export OLD_COMPOSE="docker compose -f docker-compose.local.yml"
 # 如果老服务器是普通镜像版，改成：
 # export OLD_COMPOSE="docker compose -f docker-compose.yml"
 # 如果老服务器是本地目录版，改成：
@@ -284,8 +284,8 @@ export OLD_COMPOSE="docker compose -f docker-compose.yml -f docker-compose.build
 
 # 重点查看这些文件
 sed -n '1,220p' .env
+sed -n '1,220p' docker-compose.local.yml
 sed -n '1,220p' docker-compose.yml
-test -f docker-compose.build.yml && sed -n '1,120p' docker-compose.build.yml
 test -f config.yaml && sed -n '1,220p' config.yaml
 
 # 查看 Nginx/Caddy 配置
@@ -378,13 +378,13 @@ TOTP_ENCRYPTION_KEY=老服务器同一个值
 先只启动 PostgreSQL 和 Redis：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d postgres redis
+docker compose -f docker-compose.local.yml up -d --build postgres redis
 ```
 
 恢复数据库 SQL 备份：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml exec -T postgres psql \
+docker compose -f docker-compose.local.yml exec -T postgres psql \
   -U ${POSTGRES_USER:-sub2api} \
   -d ${POSTGRES_DB:-sub2api} \
   < ~/sub2api_YYYYMMDD_HHMMSS.sql
@@ -393,8 +393,8 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml exec -T postgre
 再构建并启动应用：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build sub2api
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs -f sub2api
+docker compose -f docker-compose.local.yml up -d --build sub2api
+docker compose -f docker-compose.local.yml logs -f sub2api
 ```
 
 本机验证：
@@ -451,8 +451,8 @@ git status
 git pull --ff-only
 
 cd deploy
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build sub2api
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs -f sub2api
+docker compose -f docker-compose.local.yml up -d --build sub2api
+docker compose -f docker-compose.local.yml logs -f sub2api
 curl http://127.0.0.1:8080/health
 ```
 
@@ -461,7 +461,7 @@ curl http://127.0.0.1:8080/health
 ```bash
 cd ~/sub2api/deploy
 mkdir -p backup
-docker compose -f docker-compose.yml -f docker-compose.build.yml exec -T postgres pg_dump \
+docker compose -f docker-compose.local.yml exec -T postgres pg_dump \
   -U ${POSTGRES_USER:-sub2api} \
   -d ${POSTGRES_DB:-sub2api} \
   > backup/sub2api_before_update_$(date +%Y%m%d_%H%M%S).sql
@@ -475,8 +475,8 @@ git log --oneline -5
 git checkout <上一个可用commit>
 
 cd deploy
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build sub2api
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs -f sub2api
+docker compose -f docker-compose.local.yml up -d --build sub2api
+docker compose -f docker-compose.local.yml logs -f sub2api
 ```
 
 如果这次更新包含数据库迁移，代码回滚不一定能回滚数据库结构；需要用更新前的数据库备份恢复。
@@ -497,7 +497,7 @@ cp .env .env.backup.$(date +%Y%m%d)
 ```bash
 cd ~/sub2api/deploy
 
-docker compose -f docker-compose.yml -f docker-compose.build.yml exec postgres pg_dump \
+docker compose -f docker-compose.local.yml exec postgres pg_dump \
   -U sub2api \
   -d sub2api \
   > sub2api_backup_$(date +%Y%m%d_%H%M%S).sql
@@ -529,10 +529,10 @@ docker run --rm \
 
 ### 9.2 找不到 `sub2api:local` 镜像
 
-说明你用了 `docker-compose.local.yml` 但没叠加 build 文件。源码部署请使用：
+说明你想从源码构建但没有加 `--build`。源码部署请使用：
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 ### 9.3 数据库连接失败
@@ -678,18 +678,18 @@ sudo systemctl reload caddy
 ```bash
 # 启动
 cd ~/sub2api/deploy
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 
 # 停止
-docker compose -f docker-compose.yml -f docker-compose.build.yml down
+docker compose -f docker-compose.local.yml down
 
 # 查看日志
-docker compose -f docker-compose.yml -f docker-compose.build.yml logs -f sub2api
+docker compose -f docker-compose.local.yml logs -f sub2api
 
 # 重启 sub2api
-docker compose -f docker-compose.yml -f docker-compose.build.yml restart sub2api
+docker compose -f docker-compose.local.yml restart sub2api
 
 # 更新（git pull 后）
 cd ~/sub2api && git pull --ff-only && cd deploy
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build sub2api
+docker compose -f docker-compose.local.yml up -d --build sub2api
 ```

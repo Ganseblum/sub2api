@@ -385,6 +385,17 @@ const routes: RouteRecordRaw[] = [
       titleKey: 'customPage.title',
     }
   },
+  {
+    path: '/help',
+    name: 'HelpCenter',
+    component: () => import('@/views/user/HelpCenterView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Help Center',
+      titleKey: 'nav.helpCenter',
+    }
+  },
 
   // ==================== Admin Routes ====================
   {

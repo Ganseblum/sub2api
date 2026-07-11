@@ -10,13 +10,15 @@
             ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
             : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-800 dark:text-dark-400 dark:hover:bg-dark-700'
         ]"
-        :title="hasUpdate ? t('version.updateAvailable') : t('version.upToDate')"
+        :title="badgeTitle"
       >
         <span v-if="currentVersion" class="font-medium">v{{ currentVersion }}</span>
         <span
-          v-else
+          v-else-if="loading"
           class="h-3 w-12 animate-pulse rounded bg-gray-200 font-medium dark:bg-dark-600"
+          aria-hidden="true"
         ></span>
+        <span v-else class="font-medium" :aria-label="t('version.unavailable')">v--</span>
         <!-- Update indicator -->
         <span v-if="hasUpdate" class="relative flex h-2 w-2">
           <span
@@ -79,14 +81,11 @@
             <!-- Content -->
             <template v-else>
               <!-- Version display - centered and prominent -->
-              <div class="mb-4 text-center">
+              <div v-if="currentVersion" class="mb-4 text-center">
                 <div class="inline-flex items-center gap-2">
-                  <span
-                    v-if="currentVersion"
-                    class="text-2xl font-bold text-gray-900 dark:text-white"
+                  <span class="text-2xl font-bold text-gray-900 dark:text-white"
                     >v{{ currentVersion }}</span
                   >
-                  <span v-else class="text-2xl font-bold text-gray-400 dark:text-dark-500">--</span>
                   <!-- Show check mark when up to date -->
                   <span
                     v-if="!hasUpdate"
@@ -114,8 +113,24 @@
                 </p>
               </div>
 
-              <!-- Priority 1: Update error (must check before hasUpdate) -->
-              <div v-if="updateError" class="space-y-2">
+              <!-- Priority 1: Version unavailable -->
+              <div v-if="!currentVersion" class="space-y-2">
+                <p
+                  class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-center text-sm text-gray-500 dark:border-dark-700 dark:bg-dark-900/50 dark:text-dark-400"
+                >
+                  {{ t('version.unavailable') }}
+                </p>
+                <button
+                  @click="refreshVersion(true)"
+                  class="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 dark:border-dark-700 dark:text-dark-300 dark:hover:bg-dark-700/50"
+                >
+                  <Icon name="refresh" size="sm" :stroke-width="2" />
+                  {{ t('version.retry') }}
+                </button>
+              </div>
+
+              <!-- Priority 2: Update error (must check before hasUpdate) -->
+              <div v-else-if="updateError" class="space-y-2">
                 <div
                   class="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800/50 dark:bg-red-900/20"
                 >
@@ -149,7 +164,7 @@
                 </button>
               </div>
 
-              <!-- Priority 2: Update success - need restart -->
+              <!-- Priority 3: Update success - need restart -->
               <div v-else-if="updateSuccess && needRestart" class="space-y-2">
                 <div
                   class="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800/50 dark:bg-green-900/20"
@@ -231,7 +246,7 @@
                 </button>
               </div>
 
-              <!-- Priority 3: Update available for source build - show git pull hint -->
+              <!-- Priority 4: Update available for source build - show git pull hint -->
               <div v-else-if="hasUpdate && !isReleaseBuild" class="space-y-2">
                 <a
                   v-if="releaseInfo?.html_url && releaseInfo.html_url !== '#'"
@@ -291,7 +306,7 @@
                 </div>
               </div>
 
-              <!-- Priority 4: Update available for release build - show update button -->
+              <!-- Priority 5: Update available for release build - show update button -->
               <div v-else-if="hasUpdate && isReleaseBuild" class="space-y-2">
                 <!-- Update info card -->
                 <div
@@ -355,7 +370,7 @@
                 </a>
               </div>
 
-              <!-- Priority 5: Up to date - GitHub link + version rollback -->
+              <!-- Priority 6: Up to date - GitHub link + version rollback -->
               <div v-else class="space-y-2">
                 <a
                   v-if="releaseInfo?.html_url && releaseInfo.html_url !== '#'"
@@ -676,6 +691,12 @@ const latestVersion = computed(() => appStore.latestVersion)
 const hasUpdate = computed(() => appStore.hasUpdate)
 const releaseInfo = computed(() => appStore.releaseInfo)
 const buildType = computed(() => appStore.buildType)
+const badgeTitle = computed(() => {
+  if (!currentVersion.value) {
+    return loading.value ? t('version.checking') : t('version.unavailable')
+  }
+  return hasUpdate.value ? t('version.updateAvailable') : t('version.upToDate')
+})
 
 // Update process states (local to this component)
 const updating = ref(false)

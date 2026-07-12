@@ -193,15 +193,6 @@
           />
         </div>
 
-        <!-- Terms Agreement -->
-        <div class="flex items-start gap-2 text-sm text-gray-600 dark:text-dark-300">
-          <input
-            type="checkbox"
-            class="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-800"
-          />
-          <span>{{ t('auth.termsAgreement') }}</span>
-        </div>
-
         <LoginAgreementPrompt
           v-if="loginAgreementEnabled"
           :accepted="agreementAccepted"

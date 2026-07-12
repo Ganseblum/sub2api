@@ -6,7 +6,7 @@ import type { CustomMenuItem } from '@/types'
 const legalDocumentTitles: Record<string, string> = {
   terms: '服务条款',
   'usage-policy': '使用政策',
-  'supported-countries': '支持的国家和地区',
+  'supported-regions': '支持的国家和地区',
   'service-specific-terms': '服务特定条款',
   'admin-compliance': '管理员合规确认'
 }

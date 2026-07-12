@@ -10,6 +10,11 @@
       <slot name="filters" />
     </div>
 
+    <!-- 固定区域：表格上方内容 -->
+    <div v-if="$slots.aboveTable" class="layout-section-fixed">
+      <slot name="aboveTable" />
+    </div>
+
     <!-- 滚动区域：表格 -->
     <div class="layout-section-scrollable">
       <div class="card table-scroll-container">

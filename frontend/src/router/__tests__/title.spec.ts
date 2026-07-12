@@ -31,7 +31,7 @@ describe('resolveDocumentTitle', () => {
       resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'usage-policy' })
     ).toBe('使用政策 - YOUC AI')
     expect(
-      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'supported-countries' })
+      resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'supported-regions' })
     ).toBe('支持的国家和地区 - YOUC AI')
     expect(
       resolveDocumentTitle('Legal Document', 'YOUC AI', undefined, { documentId: 'service-specific-terms' })

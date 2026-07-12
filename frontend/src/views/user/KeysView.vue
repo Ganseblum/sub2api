@@ -2,33 +2,33 @@
   <AppLayout>
     <TablePageLayout>
       <template #filters>
-        <div class="flex flex-col gap-3">
-          <div class="flex flex-wrap items-center gap-3">
-            <SearchInput
-              v-model="filterSearch"
-              :placeholder="t('keys.searchPlaceholder')"
-              class="w-full sm:w-64"
-              @search="onFilterChange"
-            />
-            <Select
-              :model-value="filterGroupId"
-              class="w-40"
-              :options="groupFilterOptions"
-              @update:model-value="onGroupFilterChange"
-            />
-            <Select
-              :model-value="filterStatus"
-              class="w-40"
-              :options="statusFilterOptions"
-              @update:model-value="onStatusFilterChange"
-            />
-          </div>
-          <EndpointPopover
-            v-if="publicSettings?.api_base_url || (publicSettings?.custom_endpoints?.length ?? 0) > 0"
-            :api-base-url="publicSettings?.api_base_url || ''"
-            :custom-endpoints="publicSettings?.custom_endpoints || []"
+        <div class="flex flex-wrap items-center gap-3">
+          <SearchInput
+            v-model="filterSearch"
+            :placeholder="t('keys.searchPlaceholder')"
+            class="w-full sm:w-64"
+            @search="onFilterChange"
+          />
+          <Select
+            :model-value="filterGroupId"
+            class="w-40"
+            :options="groupFilterOptions"
+            @update:model-value="onGroupFilterChange"
+          />
+          <Select
+            :model-value="filterStatus"
+            class="w-40"
+            :options="statusFilterOptions"
+            @update:model-value="onStatusFilterChange"
           />
         </div>
+      </template>
+
+      <template #aboveTable>
+        <EndpointPopover
+          :api-base-url="apiBaseUrl"
+          :custom-endpoints="publicSettings?.custom_endpoints || []"
+        />
       </template>
 
       <template #actions>
@@ -1301,6 +1301,7 @@ const selectedKey = ref<ApiKey | null>(null)
 const copiedKeyId = ref<number | null>(null)
 const groupSelectorKeyId = ref<number | null>(null)
 const publicSettings = ref<PublicSettings | null>(null)
+const apiBaseUrl = computed(() => publicSettings.value?.api_base_url || (typeof window !== 'undefined' ? window.location.origin : ''))
 const dropdownRef = ref<HTMLElement | null>(null)
 const columnDropdownRef = ref<HTMLElement | null>(null)
 const dropdownPosition = ref<{ top?: number; bottom?: number; left: number } | null>(null)

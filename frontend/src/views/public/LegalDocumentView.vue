@@ -72,6 +72,36 @@
           class="legal-document-content"
           v-html="renderedHtml"
         ></div>
+
+        <!-- Prev / Next navigation -->
+        <div
+          v-if="prevDocument || nextDocument"
+          class="mt-10 flex flex-col gap-4 border-t border-gray-200 pt-8 sm:flex-row sm:items-center sm:justify-between dark:border-dark-700"
+        >
+          <RouterLink
+            v-if="prevDocument"
+            :to="`/legal/${prevDocument.id}`"
+            class="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-primary-300 hover:bg-primary-50/50 dark:border-dark-700 dark:bg-dark-900 dark:hover:border-primary-700 dark:hover:bg-primary-900/10 sm:max-w-[48%]"
+          >
+            <span class="text-xs font-medium text-gray-500 dark:text-dark-400">{{ t('legal.prevDocument') }}</span>
+            <span class="mt-1 text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+              {{ prevDocument.title }}
+            </span>
+          </RouterLink>
+          <div v-else class="hidden sm:block sm:max-w-[48%]"></div>
+
+          <RouterLink
+            v-if="nextDocument"
+            :to="`/legal/${nextDocument.id}`"
+            class="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 text-right transition-colors hover:border-primary-300 hover:bg-primary-50/50 dark:border-dark-700 dark:bg-dark-900 dark:hover:border-primary-700 dark:hover:bg-primary-900/10 sm:max-w-[48%]"
+          >
+            <span class="text-xs font-medium text-gray-500 dark:text-dark-400">{{ t('legal.nextDocument') }}</span>
+            <span class="mt-1 text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+              {{ nextDocument.title }}
+            </span>
+          </RouterLink>
+        </div>
+
         <div
           v-else
           class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-14 text-center text-sm text-gray-500 dark:border-dark-700 dark:bg-dark-900 dark:text-dark-400"
@@ -97,6 +127,14 @@ import { normalizeBrandName } from '@/config/brand'
 import type { LoginAgreementDocument, PublicSettings } from '@/types'
 import zhAdminCompliance from '../../../../docs/legal/admin-compliance.zh.md?raw'
 import enAdminCompliance from '../../../../docs/legal/admin-compliance.en.md?raw'
+import zhTerms from '../../../../docs/legal/terms.zh.md?raw'
+import enTerms from '../../../../docs/legal/terms.en.md?raw'
+import zhUsagePolicy from '../../../../docs/legal/usage-policy.zh.md?raw'
+import enUsagePolicy from '../../../../docs/legal/usage-policy.en.md?raw'
+import zhSupportedRegions from '../../../../docs/legal/supported-regions.zh.md?raw'
+import enSupportedRegions from '../../../../docs/legal/supported-regions.en.md?raw'
+import zhServiceSpecificTerms from '../../../../docs/legal/service-specific-terms.zh.md?raw'
+import enServiceSpecificTerms from '../../../../docs/legal/service-specific-terms.en.md?raw'
 
 type LegalDocumentIcon = 'document' | 'shield' | 'globe' | 'cog'
 
@@ -112,7 +150,49 @@ marked.setOptions({
 })
 
 const documentId = computed(() => String(route.params.documentId || ''))
-const isAdminComplianceDocument = computed(() => documentId.value === 'admin-compliance')
+
+interface LocalDocument {
+  title: string
+  zh: string
+  en: string
+  typeLabel: string
+}
+
+const LOCAL_DOCUMENTS: Record<string, LocalDocument> = {
+  'admin-compliance': {
+    title: t('adminCompliance.title'),
+    zh: zhAdminCompliance,
+    en: enAdminCompliance,
+    typeLabel: t('legal.adminCompliance'),
+  },
+  'terms': {
+    title: '服務條款',
+    zh: zhTerms,
+    en: enTerms,
+    typeLabel: t('legal.loginAgreement'),
+  },
+  'usage-policy': {
+    title: '使用政策',
+    zh: zhUsagePolicy,
+    en: enUsagePolicy,
+    typeLabel: t('legal.loginAgreement'),
+  },
+  'supported-regions': {
+    title: '支援的國家和地區',
+    zh: zhSupportedRegions,
+    en: enSupportedRegions,
+    typeLabel: t('legal.loginAgreement'),
+  },
+  'service-specific-terms': {
+    title: '服務特定條款',
+    zh: zhServiceSpecificTerms,
+    en: enServiceSpecificTerms,
+    typeLabel: t('legal.loginAgreement'),
+  },
+}
+
+const localDocument = computed(() => LOCAL_DOCUMENTS[documentId.value] ?? null)
+const isLocalDocument = computed(() => localDocument.value !== null)
 const documents = computed(() => settings.value?.login_agreement_documents ?? [])
 const siteName = computed(() => normalizeBrandName(settings.value?.site_name))
 const siteLogo = computed(() => sanitizeUrl(settings.value?.site_logo || '', {
@@ -120,18 +200,19 @@ const siteLogo = computed(() => sanitizeUrl(settings.value?.site_logo || '', {
   allowDataUrl: true,
 }))
 const updatedAt = computed(() =>
-  isAdminComplianceDocument.value ? '' : settings.value?.login_agreement_updated_at || ''
+  isLocalDocument.value ? '' : settings.value?.login_agreement_updated_at || ''
 )
 const documentTypeLabel = computed(() =>
-  isAdminComplianceDocument.value ? t('legal.adminCompliance') : t('legal.loginAgreement')
+  localDocument.value?.typeLabel ?? t('legal.loginAgreement')
 )
 
 const currentDocument = computed<LoginAgreementDocument | null>(() => {
-  if (isAdminComplianceDocument.value) {
+  const local = localDocument.value
+  if (local) {
     return {
-      id: 'admin-compliance',
-      title: t('adminCompliance.title'),
-      content_md: getLocale() === 'zh' ? zhAdminCompliance : enAdminCompliance
+      id: documentId.value,
+      title: local.title,
+      content_md: getLocale() === 'zh' ? local.zh : local.en,
     }
   }
   const id = documentId.value
@@ -153,17 +234,46 @@ const renderedHtml = computed(() => {
 })
 
 const documentIcon = computed<LegalDocumentIcon>(() => {
-  const title = currentDocument.value?.title || ''
-  if (title.includes('政策') || title.includes('隐私')) {
+  const id = documentId.value
+  if (id === 'usage-policy' || id === 'privacy') {
     return 'shield'
   }
-  if (title.includes('国家') || title.includes('地区')) {
+  if (id === 'supported-regions') {
     return 'globe'
   }
-  if (title.includes('特定')) {
+  if (id === 'service-specific-terms') {
     return 'cog'
   }
   return 'document'
+})
+
+// Order of local legal documents for prev/next navigation
+const LEGAL_DOCUMENT_ORDER: string[] = [
+  'terms',
+  'usage-policy',
+  'supported-regions',
+  'service-specific-terms',
+]
+
+const documentOrderIndex = computed(() => {
+  const index = LEGAL_DOCUMENT_ORDER.indexOf(documentId.value)
+  return index === -1 ? null : index
+})
+
+const prevDocument = computed(() => {
+  const index = documentOrderIndex.value
+  if (index === null || index <= 0) return null
+  const id = LEGAL_DOCUMENT_ORDER[index - 1]
+  const local = LOCAL_DOCUMENTS[id]
+  return local ? { id, title: local.title } : null
+})
+
+const nextDocument = computed(() => {
+  const index = documentOrderIndex.value
+  if (index === null || index >= LEGAL_DOCUMENT_ORDER.length - 1) return null
+  const id = LEGAL_DOCUMENT_ORDER[index + 1]
+  const local = LOCAL_DOCUMENTS[id]
+  return local ? { id, title: local.title } : null
 })
 
 onMounted(async () => {

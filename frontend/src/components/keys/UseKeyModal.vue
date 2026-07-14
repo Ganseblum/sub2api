@@ -140,6 +140,10 @@ import BaseDialog from '@/components/common/BaseDialog.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { useClipboard } from '@/composables/useClipboard'
 import type { GroupPlatform } from '@/types'
+import {
+  OPENAI_CC_SWITCH_CODEX_MODEL,
+  OPENAI_CC_SWITCH_CODEX_REASONING_EFFORT
+} from '@/utils/ccswitchImport'
 
 interface Props {
   show: boolean
@@ -534,9 +538,9 @@ function generateOpenAIFiles(baseUrl: string, apiKey: string): FileConfig[] {
 
   // config.toml content
   const configContent = `model_provider = "OpenAI"
-model = "gpt-5.5"
-review_model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model = "${OPENAI_CC_SWITCH_CODEX_MODEL}"
+review_model = "${OPENAI_CC_SWITCH_CODEX_MODEL}"
+model_reasoning_effort = "${OPENAI_CC_SWITCH_CODEX_REASONING_EFFORT}"
 disable_response_storage = true
 network_access = "enabled"
 windows_wsl_setup_acknowledged = true
@@ -574,9 +578,9 @@ function generateOpenAIWsFiles(baseUrl: string, apiKey: string): FileConfig[] {
 
   // config.toml content with WebSocket v2
   const configContent = `model_provider = "OpenAI"
-model = "gpt-5.5"
-review_model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model = "${OPENAI_CC_SWITCH_CODEX_MODEL}"
+review_model = "${OPENAI_CC_SWITCH_CODEX_MODEL}"
+model_reasoning_effort = "${OPENAI_CC_SWITCH_CODEX_REASONING_EFFORT}"
 disable_response_storage = true
 network_access = "enabled"
 windows_wsl_setup_acknowledged = true

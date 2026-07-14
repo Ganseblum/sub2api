@@ -193,6 +193,7 @@ export default {
     channelStatus: '渠道状态',
     modelMarket: '模型市场',
     riskControl: '风控中心',
+    contactUs: '联系我们',
     helpCenter: '帮助中心',
   },
 

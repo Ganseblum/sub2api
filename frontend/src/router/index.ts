@@ -398,6 +398,17 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/contact',
+    name: 'Contact',
+    component: () => import('@/views/user/ContactView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Contact Us',
+      titleKey: 'nav.contactUs',
+    }
+  },
+  {
     path: '/help',
     name: 'HelpCenter',
     component: () => import('@/views/user/HelpCenterView.vue'),

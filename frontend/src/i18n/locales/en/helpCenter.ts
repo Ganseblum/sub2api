@@ -16,7 +16,6 @@ export default {
       quickStart: "Quick Start",
       platformUsage: "Platform Usage",
       faq: "FAQ",
-      contact: "Contact Us",
       tools: "Configuration Tools",
       ccSwitch: "CC Switch",
       claudeCode: "Claude Code",
@@ -27,9 +26,6 @@ export default {
       cherryStudio: "Cherry Studio"
     },
     articles: {
-      contact: {
-        title: "Contact Us"
-      },
       intro: {
         title: "Introduction"
       },

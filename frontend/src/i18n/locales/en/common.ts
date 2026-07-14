@@ -193,6 +193,7 @@ export default {
     channelStatus: 'Channel Status',
     modelMarket: 'Model Market',
     riskControl: 'Risk Control',
+    contactUs: 'Contact Us',
     helpCenter: 'Help Center',
   },
 

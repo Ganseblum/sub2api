@@ -16,7 +16,6 @@ export default {
       quickStart: "快速开始",
       platformUsage: "平台使用",
       faq: "常见问题",
-      contact: "联系我们",
       tools: "配置工具",
       ccSwitch: "CC Switch",
       claudeCode: "Claude Code",
@@ -26,9 +25,6 @@ export default {
       cherryStudio: "Cherry Studio"
     },
     articles: {
-      contact: {
-        title: "联系我们"
-      },
       intro: {
         title: "介绍"
       },

@@ -400,24 +400,6 @@ Cherry Studio 是一个开源的跨平台桌面 AI 聊天客户端，支持 Wind
 官方网站：[cherry-ai.com](https://cherry-ai.com)
 `
 
-const contactMd = `
-如果你在使用过程中遇到问题，或者有任何建议，可以通过以下方式联系我们：
-
-## 客服 QQ
-
-- **QQ 号**：977252487
-- 加好友时请备注你注册的账号，否则不通过。
-
-## QQ 交流群
-
-- **群号**：821362587
-- 加群时请备注你注册的账号，否则不通过。
-
-## 注意事项
-
-添加客服或加群时，请务必填写你在本平台注册的账号。未备注账号的申请一律不通过。
-`
-
 export function buildCatalog(
 	t: (key: string) => string,
 	tm: (
@@ -708,20 +690,6 @@ ${billingParamsTable}
 					sectionTitle: t("helpCenter.sections.tools"),
 					updatedAt: "2026-07-06",
 					contentMd: cherryStudioMd,
-				},
-			],
-		},
-		{
-			key: "contact",
-			title: t("helpCenter.sections.contact"),
-			items: [
-				{
-					id: "contact",
-					title: t("helpCenter.articles.contact.title"),
-					sectionKey: "contact",
-					sectionTitle: t("helpCenter.sections.contact"),
-					updatedAt: "2026-07-06",
-					contentMd: contactMd,
 				},
 			],
 		},

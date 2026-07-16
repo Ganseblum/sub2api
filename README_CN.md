@@ -333,10 +333,10 @@ docker compose logs -f sub2api
 ```
 
 **脚本功能：**
-- 下载 `docker-compose.local.yml`（本地保存为 `docker-compose.yml`）和 `.env.example`
+- 下载 `docker-compose.yml` 和 `.env.example`
 - 自动生成安全凭证（JWT_SECRET、TOTP_ENCRYPTION_KEY、POSTGRES_PASSWORD）
 - 创建 `.env` 文件并填充自动生成的密钥
-- 创建数据目录（使用本地目录，便于备份和迁移）
+- 创建数据目录（`data/`、`postgres_data/`、`redis_data/`），供本地目录部署方式使用
 - 显示生成的凭证供你记录
 
 #### 手动部署
@@ -389,31 +389,37 @@ openssl rand -hex 32
 ```
 
 ```bash
-# 4. 创建数据目录（本地版）
+# 4. 创建数据目录（源码构建本地目录版需要）
 mkdir -p data postgres_data redis_data
 
 # 5. 启动所有服务
-# 选项 A：本地目录版（推荐 - 易于迁移）
-docker compose -f docker-compose.local.yml up -d
-
-# 选项 B：命名卷版（简单设置）
+# 选项 A：命名卷版（官方镜像，与一键脚本一致）
 docker compose up -d
 
+# 选项 B：源码构建本地目录版（适合 fork/自定义代码，易于迁移）
+docker compose -f docker-compose.local.yml up -d --build
+
 # 6. 查看状态
+docker compose ps
+# 源码构建本地目录版：
 docker compose -f docker-compose.local.yml ps
 
 # 7. 查看日志
+docker compose logs -f sub2api
+# 源码构建本地目录版：
 docker compose -f docker-compose.local.yml logs -f sub2api
 ```
 
 #### 部署版本对比
 
-| 版本 | 数据存储 | 迁移便利性 | 适用场景 |
-|------|---------|-----------|---------|
-| **docker-compose.local.yml** | 本地目录 | ✅ 简单（打包整个目录） | 生产环境、频繁备份 |
-| **docker-compose.yml** | 命名卷 | ⚠️ 需要 docker 命令 | 简单设置 |
+| 版本 | 镜像来源 | 数据存储 | 迁移便利性 | 适用场景 |
+|------|----------|---------|-----------|---------|
+| **docker-compose.yml** | 拉取 `weishaw/sub2api:latest` | 命名卷 | ⚠️ 需要 docker 命令 | 一键脚本快速部署、不修改源码 |
+| **docker-compose.local.yml** | 从本地 `Dockerfile` 构建 | 本地目录 | ✅ 简单（打包整个目录） | fork 部署、自定义代码、生产备份 |
 
-**推荐：** 使用 `docker-compose.local.yml`（脚本部署）以便更轻松地管理数据。
+**推荐：**
+- 不修改源码、只想快速运行：使用 `docker-compose.yml`。
+- 使用自己的 fork/clone 并希望本地目录备份：使用 `docker-compose.local.yml`。
 
 #### 启用“数据管理”功能（datamanagementd）
 
@@ -433,15 +439,21 @@ docker compose -f docker-compose.local.yml logs -f sub2api
 
 如果管理员密码是自动生成的，在日志中查找：
 ```bash
+docker compose logs sub2api | grep "admin password"
+# 源码构建本地目录版：
 docker compose -f docker-compose.local.yml logs sub2api | grep "admin password"
 ```
 
 #### 升级
 
 ```bash
-# 拉取最新镜像并重建容器
-docker compose -f docker-compose.local.yml pull
-docker compose -f docker-compose.local.yml up -d
+# 命名卷版（官方镜像）
+docker compose pull
+docker compose up -d
+
+# 源码构建本地目录版
+git pull
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 #### 轻松迁移（本地目录版）
@@ -460,10 +472,28 @@ scp sub2api-complete.tar.gz user@new-server:/path/
 # 新服务器
 tar xzf sub2api-complete.tar.gz
 cd sub2api-deploy/
-docker compose -f docker-compose.local.yml up -d
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 #### 常用命令
+
+一键部署 / 命名卷版：
+
+```bash
+# 停止所有服务
+docker compose down
+
+# 重启
+docker compose restart
+
+# 查看所有日志
+docker compose logs -f
+
+# 删除所有数据（谨慎！）
+docker compose down -v
+```
+
+源码构建本地目录版：
 
 ```bash
 # 停止所有服务

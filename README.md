@@ -330,10 +330,10 @@ docker compose logs -f sub2api
 ```
 
 **What the script does:**
-- Downloads `docker-compose.local.yml` (saved as `docker-compose.yml`) and `.env.example`
+- Downloads `docker-compose.yml` and `.env.example`
 - Generates secure credentials (JWT_SECRET, TOTP_ENCRYPTION_KEY, POSTGRES_PASSWORD)
 - Creates `.env` file with auto-generated secrets
-- Creates data directories (uses local directories for easy backup/migration)
+- Creates data directories (`data/`, `postgres_data/`, `redis_data/`) for local-directory workflows
 - Displays generated credentials for your reference
 
 #### Manual Deployment
@@ -386,31 +386,37 @@ openssl rand -hex 32
 ```
 
 ```bash
-# 4. Create data directories (for local version)
+# 4. Create data directories (required for local source build)
 mkdir -p data postgres_data redis_data
 
 # 5. Start all services
-# Option A: Local directory version (recommended - easy migration)
-docker compose -f docker-compose.local.yml up -d
-
-# Option B: Named volumes version (simple setup)
+# Option A: Named volumes version (official image, same as one-click script)
 docker compose up -d
 
+# Option B: Local source build version (forked/custom code, easy migration)
+docker compose -f docker-compose.local.yml up -d --build
+
 # 6. Check status
+docker compose ps
+# Local source build:
 docker compose -f docker-compose.local.yml ps
 
 # 7. View logs
+docker compose logs -f sub2api
+# Local source build:
 docker compose -f docker-compose.local.yml logs -f sub2api
 ```
 
 #### Deployment Versions
 
-| Version | Data Storage | Migration | Best For |
-|---------|-------------|-----------|----------|
-| **docker-compose.local.yml** | Local directories | ✅ Easy (tar entire directory) | Production, frequent backups |
-| **docker-compose.yml** | Named volumes | ⚠️ Requires docker commands | Simple setup |
+| Version | Image Source | Data Storage | Migration | Best For |
+|---------|--------------|--------------|-----------|----------|
+| **docker-compose.yml** | Pulls `weishaw/sub2api:latest` | Named volumes | ⚠️ Requires docker commands | Quick start via `docker-deploy.sh`, no source changes |
+| **docker-compose.local.yml** | Builds from local `Dockerfile` | Local directories | ✅ Easy (tar entire directory) | Forked deployments, custom code, production with backups |
 
-**Recommendation:** Use `docker-compose.local.yml` (deployed by script) for easier data management.
+**Recommendation:**
+- Use `docker-compose.yml` if you just want to run Sub2API without modifying code.
+- Use `docker-compose.local.yml` if you deploy from your own fork/clone and want local-directory backups.
 
 #### Access
 
@@ -418,15 +424,21 @@ Open `http://YOUR_SERVER_IP:8080` in your browser.
 
 If admin password was auto-generated, find it in logs:
 ```bash
+docker compose logs sub2api | grep "admin password"
+# Local source build:
 docker compose -f docker-compose.local.yml logs sub2api | grep "admin password"
 ```
 
 #### Upgrade
 
 ```bash
-# Pull latest image and recreate container
-docker compose -f docker-compose.local.yml pull
-docker compose -f docker-compose.local.yml up -d
+# Named volumes version (official image)
+docker compose pull
+docker compose up -d
+
+# Local source build version
+git pull
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 #### Easy Migration (Local Directory Version)
@@ -445,10 +457,28 @@ scp sub2api-complete.tar.gz user@new-server:/path/
 # On new server
 tar xzf sub2api-complete.tar.gz
 cd sub2api-deploy/
-docker compose -f docker-compose.local.yml up -d
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 #### Useful Commands
+
+For the one-click / named volumes deployment:
+
+```bash
+# Stop all services
+docker compose down
+
+# Restart
+docker compose restart
+
+# View all logs
+docker compose logs -f
+
+# Remove all data (caution!)
+docker compose down -v
+```
+
+For the local source build deployment:
 
 ```bash
 # Stop all services

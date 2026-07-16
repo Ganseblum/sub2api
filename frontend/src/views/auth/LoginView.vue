@@ -10,7 +10,6 @@
           {{ t('auth.signInToAccount') }}
         </p>
       </div>
-
       <!-- Login Form -->
       <form @submit.prevent="handleLogin" class="space-y-5">
         <!-- Email Input -->
@@ -29,7 +28,7 @@
               required
               autofocus
               autocomplete="email"
-              :disabled="authFormDisabled"
+              :disabled="authActionDisabled"
               class="input pl-11"
               :class="{ 'input-error': errors.email }"
               :placeholder="t('auth.emailPlaceholder')"
@@ -52,7 +51,7 @@
               :type="showPassword ? 'text' : 'password'"
               required
               autocomplete="current-password"
-              :disabled="authFormDisabled"
+              :disabled="authActionDisabled"
               class="input pl-11 pr-11"
               :class="{ 'input-error': errors.password }"
               :placeholder="t('auth.passwordPlaceholder')"
@@ -60,26 +59,19 @@
             <button
               type="button"
               @click="showPassword = !showPassword"
-              :disabled="authFormDisabled"
+              :disabled="authActionDisabled"
               class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-dark-300"
             >
               <Icon v-if="showPassword" name="eyeOff" size="md" />
               <Icon v-else name="eye" size="md" />
             </button>
           </div>
-
-          <div class="mt-3 flex items-center justify-between">
-            <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-dark-300">
-              <input
-                type="checkbox"
-                class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-800"
-              />
-              {{ t('auth.rememberMe') }}
-            </label>
+          <div class="mt-1 flex items-center justify-between">
+            <span></span>
             <router-link
               v-if="passwordResetEnabled && !backendModeEnabled"
               to="/forgot-password"
-              class="text-sm font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
             >
               {{ t('auth.forgotPassword') }}
             </router-link>
@@ -186,7 +178,7 @@
         {{ t('auth.dontHaveAccount') }}
         <router-link
           to="/register"
-          class="font-semibold text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+          class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
         >
           {{ t('auth.signUp') }}
         </router-link>
@@ -290,10 +282,8 @@ const agreementGateActive = computed(
   () => loginAgreementEnabled.value && !agreementAccepted.value
 )
 
-const authFormDisabled = computed(() => isLoading.value || !publicSettingsLoaded.value)
-
 const authActionDisabled = computed(
-  () => authFormDisabled.value || agreementGateActive.value
+  () => isLoading.value || !publicSettingsLoaded.value || agreementGateActive.value
 )
 
 const showOAuthLogin = computed(

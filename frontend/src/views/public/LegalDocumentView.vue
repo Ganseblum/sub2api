@@ -103,7 +103,7 @@
         </div>
 
         <div
-          v-else
+          v-if="!hasContent"
           class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-14 text-center text-sm text-gray-500 dark:border-dark-700 dark:bg-dark-900 dark:text-dark-400"
         >
           {{ t('legal.empty') }}
@@ -124,17 +124,10 @@ import { getPublicSettings } from '@/api/auth'
 import { getLocale } from '@/i18n'
 import { sanitizeUrl } from '@/utils/url'
 import { normalizeBrandName } from '@/config/brand'
+import { hydrateLoginAgreementDocuments } from '@/utils/loginAgreementDefaults'
 import type { LoginAgreementDocument, PublicSettings } from '@/types'
 import zhAdminCompliance from '../../../../docs/legal/admin-compliance.zh.md?raw'
 import enAdminCompliance from '../../../../docs/legal/admin-compliance.en.md?raw'
-import zhTerms from '../../../../docs/legal/terms.zh.md?raw'
-import enTerms from '../../../../docs/legal/terms.en.md?raw'
-import zhUsagePolicy from '../../../../docs/legal/usage-policy.zh.md?raw'
-import enUsagePolicy from '../../../../docs/legal/usage-policy.en.md?raw'
-import zhSupportedRegions from '../../../../docs/legal/supported-regions.zh.md?raw'
-import enSupportedRegions from '../../../../docs/legal/supported-regions.en.md?raw'
-import zhServiceSpecificTerms from '../../../../docs/legal/service-specific-terms.zh.md?raw'
-import enServiceSpecificTerms from '../../../../docs/legal/service-specific-terms.en.md?raw'
 
 type LegalDocumentIcon = 'document' | 'shield' | 'globe' | 'cog'
 
@@ -165,35 +158,17 @@ const LOCAL_DOCUMENTS: Record<string, LocalDocument> = {
     en: enAdminCompliance,
     typeLabel: t('legal.adminCompliance'),
   },
-  'terms': {
-    title: '服務條款',
-    zh: zhTerms,
-    en: enTerms,
-    typeLabel: t('legal.loginAgreement'),
-  },
-  'usage-policy': {
-    title: '使用政策',
-    zh: zhUsagePolicy,
-    en: enUsagePolicy,
-    typeLabel: t('legal.loginAgreement'),
-  },
-  'supported-regions': {
-    title: '支援的國家和地區',
-    zh: zhSupportedRegions,
-    en: enSupportedRegions,
-    typeLabel: t('legal.loginAgreement'),
-  },
-  'service-specific-terms': {
-    title: '服務特定條款',
-    zh: zhServiceSpecificTerms,
-    en: enServiceSpecificTerms,
-    typeLabel: t('legal.loginAgreement'),
-  },
+}
+
+function localText(zh: string, en: string): string {
+  return getLocale() === 'zh' ? zh : en
 }
 
 const localDocument = computed(() => LOCAL_DOCUMENTS[documentId.value] ?? null)
 const isLocalDocument = computed(() => localDocument.value !== null)
-const documents = computed(() => settings.value?.login_agreement_documents ?? [])
+const documents = computed(() =>
+  hydrateLoginAgreementDocuments(settings.value?.login_agreement_documents ?? [], localText)
+)
 const siteName = computed(() => normalizeBrandName(settings.value?.site_name))
 const siteLogo = computed(() => sanitizeUrl(settings.value?.site_logo || '', {
   allowRelative: true,
@@ -247,33 +222,23 @@ const documentIcon = computed<LegalDocumentIcon>(() => {
   return 'document'
 })
 
-// Order of local legal documents for prev/next navigation
-const LEGAL_DOCUMENT_ORDER: string[] = [
-  'terms',
-  'usage-policy',
-  'supported-regions',
-  'service-specific-terms',
-]
-
 const documentOrderIndex = computed(() => {
-  const index = LEGAL_DOCUMENT_ORDER.indexOf(documentId.value)
+  const index = documents.value.findIndex((doc) => doc.id === documentId.value)
   return index === -1 ? null : index
 })
 
 const prevDocument = computed(() => {
   const index = documentOrderIndex.value
   if (index === null || index <= 0) return null
-  const id = LEGAL_DOCUMENT_ORDER[index - 1]
-  const local = LOCAL_DOCUMENTS[id]
-  return local ? { id, title: local.title } : null
+  const doc = documents.value[index - 1]
+  return doc ? { id: doc.id, title: doc.title } : null
 })
 
 const nextDocument = computed(() => {
   const index = documentOrderIndex.value
-  if (index === null || index >= LEGAL_DOCUMENT_ORDER.length - 1) return null
-  const id = LEGAL_DOCUMENT_ORDER[index + 1]
-  const local = LOCAL_DOCUMENTS[id]
-  return local ? { id, title: local.title } : null
+  if (index === null || index >= documents.value.length - 1) return null
+  const doc = documents.value[index + 1]
+  return doc ? { id: doc.id, title: doc.title } : null
 })
 
 onMounted(async () => {

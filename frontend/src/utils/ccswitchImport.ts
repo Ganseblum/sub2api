@@ -1,7 +1,6 @@
 import type { GroupPlatform } from '@/types'
 
-export const OPENAI_CC_SWITCH_CODEX_MODEL = 'gpt-5.6-sol'
-export const OPENAI_CC_SWITCH_CODEX_REASONING_EFFORT = 'xhigh'
+export const OPENAI_CC_SWITCH_CODEX_MODEL = 'gpt-5.5'
 
 export type CcSwitchClientType = 'claude' | 'gemini'
 
@@ -9,7 +8,6 @@ export interface CcSwitchImportConfig {
   app: string
   endpoint: string
   model?: string
-  reasoningEffort?: string
 }
 
 export interface CcSwitchImportDeeplinkInput {
@@ -36,8 +34,7 @@ export function resolveCcSwitchImportConfig(
       return {
         app: 'codex',
         endpoint: baseUrl,
-        model: OPENAI_CC_SWITCH_CODEX_MODEL,
-        reasoningEffort: OPENAI_CC_SWITCH_CODEX_REASONING_EFFORT
+        model: OPENAI_CC_SWITCH_CODEX_MODEL
       }
     case 'gemini':
       return {
@@ -69,9 +66,6 @@ export function buildCcSwitchImportDeeplink(input: CcSwitchImportDeeplinkInput):
 
   if (config.model) {
     entries.splice(2, 0, ['model', config.model])
-  }
-  if (config.reasoningEffort) {
-    entries.splice(3, 0, ['reasoningEffort', config.reasoningEffort])
   }
 
   return `ccswitch://v1/import?${new URLSearchParams(entries).toString()}`

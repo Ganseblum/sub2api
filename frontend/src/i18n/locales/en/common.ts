@@ -193,8 +193,9 @@ export default {
     channelStatus: 'Channel Status',
     modelMarket: 'Model Market',
     riskControl: 'Risk Control',
-    contactUs: 'Contact Us',
-    helpCenter: 'Help Center',
+    securityAudit: 'Security Audit',
+    contentModeration: 'Content Moderation',
+    promptAudit: 'Prompt Audit',
     auditLogs: 'Audit Logs',
   },
 

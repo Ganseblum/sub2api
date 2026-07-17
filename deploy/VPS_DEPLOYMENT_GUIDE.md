@@ -4,9 +4,10 @@
 >
 > 假设条件：
 > - 操作系统：Ubuntu 22.04/24.04 LTS
-> - 已可通过 SSH 登录 `ubuntu` 用户
+> - 已可通过 SSH 登录服务器（root 或具有 sudo 权限的用户）
 > - 你使用的 Sub2API 代码来自自己的 Git 仓库（fork 或 clone），不是 Docker Hub 官方镜像
 > - 日常更新以 `git pull` 你的仓库最新代码后本地重建镜像为准
+> - 项目部署在 `/opt/sub2api`
 
 ---
 
@@ -40,8 +41,8 @@ NTP service: active
 API 高并发需要更大的文件句柄数：
 
 ```bash
-echo "ubuntu soft nofile 1048576" | sudo tee -a /etc/security/limits.conf
-echo "ubuntu hard nofile 1048576" | sudo tee -a /etc/security/limits.conf
+echo "$USER soft nofile 1048576" | sudo tee -a /etc/security/limits.conf
+echo "$USER hard nofile 1048576" | sudo tee -a /etc/security/limits.conf
 ```
 
 **重新 SSH 登录后**验证：
@@ -113,19 +114,21 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 
 ## 三、安装 Docker 与 Compose V2
 
-### 3.1 安装 Docker
+> 本项目使用 `docker compose`（Compose V2 插件）执行 `deploy/docker-compose.local.yml`。
 
 ```bash
-# 添加 Docker 官方源
+# 添加 Docker 官方 GPG 密钥
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
+# 添加 Docker 官方源
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+# 安装 Docker 及 Compose V2 插件
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# 将 ubuntu 用户加入 docker 组
-sudo usermod -aG docker ubuntu
+# 将当前用户加入 docker 组
+sudo usermod -aG docker $USER
 ```
 
 **重新 SSH 登录后**验证：
@@ -135,7 +138,11 @@ docker -v
 docker compose version
 ```
 
-### 3.2 配置 Docker 镜像加速
+⚠️ 如果之前安装过 `docker.io`，请先卸载，避免与 `docker-ce` 冲突：
+
+```bash
+sudo apt remove docker.io
+```
 
 海外 VPS 直连 Docker Hub 较慢，建议配置镜像源：
 
@@ -162,9 +169,10 @@ sudo systemctl restart docker
 ### 4.1 拉取你的 Git 仓库
 
 ```bash
-cd ~
+sudo mkdir -p /opt
+cd /opt
 git clone <你的 Sub2API 仓库地址> sub2api
-cd sub2api
+cd /opt/sub2api
 ```
 
 ### 4.2 配置环境变量
@@ -267,7 +275,7 @@ docker ps
 docker compose ls
 
 # 常见部署目录，按实际情况进入
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 
 # 查看当前使用的 compose 文件和环境变量
 ls -la
@@ -308,7 +316,7 @@ sudo test -f /etc/caddy/Caddyfile && sudo sed -n '1,220p' /etc/caddy/Caddyfile
 先备份 `.env` 和数据库：
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 mkdir -p backup
 
 cp .env backup/.env.$(date +%Y%m%d_%H%M%S)
@@ -322,14 +330,14 @@ ${OLD_COMPOSE} exec -T postgres pg_dump \
 如果使用的是本地目录版 `docker-compose.local.yml`，再打包数据目录：
 
 ```bash
-cd ~/sub2api
+cd /opt/sub2api
 tar czf sub2api-deploy-backup-$(date +%Y%m%d_%H%M%S).tar.gz deploy/.env deploy/data deploy/postgres_data deploy/redis_data
 ```
 
 如果使用的是命名卷版 `docker-compose.yml`，再打包命名卷：
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 
 docker run --rm \
   -v deploy_sub2api_data:/data \
@@ -347,11 +355,11 @@ docker run --rm \
   alpine tar czf /backup/redis_data_$(date +%Y%m%d_%H%M%S).tar.gz -C /data .
 ```
 
-把备份传到新服务器：
+把备份传到新服务器（假设新服务器用 root 登录，部署目录为 `/opt`）：
 
 ```bash
-scp backup/sub2api_*.sql ubuntu@新服务器IP:~/
-scp backup/.env.* ubuntu@新服务器IP:~/sub2api.env
+scp backup/sub2api_*.sql root@新服务器IP:/opt/
+scp backup/.env.* root@新服务器IP:/opt/sub2api.env
 ```
 
 ### 6.3 新服务器恢复并验证
@@ -359,10 +367,11 @@ scp backup/.env.* ubuntu@新服务器IP:~/sub2api.env
 在新服务器拉取你自己的 Git 仓库最新代码：
 
 ```bash
-cd ~
+sudo mkdir -p /opt
+cd /opt
 git clone <你的 Sub2API 仓库地址> sub2api
-cd ~/sub2api/deploy
-cp ~/sub2api.env .env
+cd /opt/sub2api/deploy
+cp /opt/sub2api.env .env
 ```
 
 确认 `.env` 至少包含：
@@ -387,7 +396,7 @@ docker compose -f docker-compose.local.yml up -d --build postgres redis
 docker compose -f docker-compose.local.yml exec -T postgres psql \
   -U ${POSTGRES_USER:-sub2api} \
   -d ${POSTGRES_DB:-sub2api} \
-  < ~/sub2api_YYYYMMDD_HHMMSS.sql
+  < /opt/sub2api_YYYYMMDD_HHMMSS.sql
 ```
 
 再构建并启动应用：
@@ -425,14 +434,14 @@ curl -I https://your-domain.com/health
 老服务器停应用但保留数据库和数据卷：
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 ${OLD_COMPOSE} stop sub2api
 ```
 
 如果确认已经完成切换，可以停止老服务器全部服务，但不要立刻删除卷：
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 ${OLD_COMPOSE} down
 ```
 
@@ -445,7 +454,7 @@ ${OLD_COMPOSE} down
 每次更新自己的 Git 仓库后，只重建 `sub2api` 容器，不动数据库：
 
 ```bash
-cd ~/sub2api
+cd /opt/sub2api
 git fetch origin
 git status
 git pull --ff-only
@@ -459,7 +468,7 @@ curl http://127.0.0.1:8080/health
 更新前建议先备份数据库：
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 mkdir -p backup
 docker compose -f docker-compose.local.yml exec -T postgres pg_dump \
   -U ${POSTGRES_USER:-sub2api} \
@@ -470,7 +479,7 @@ docker compose -f docker-compose.local.yml exec -T postgres pg_dump \
 如果更新后应用无法启动，先回到上一个 Git 提交重新构建：
 
 ```bash
-cd ~/sub2api
+cd /opt/sub2api
 git log --oneline -5
 git checkout <上一个可用commit>
 
@@ -488,14 +497,14 @@ docker compose -f docker-compose.local.yml logs -f sub2api
 ### 8.1 备份 `.env` 文件
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 cp .env .env.backup.$(date +%Y%m%d)
 ```
 
 ### 8.2 备份数据库
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 
 docker compose -f docker-compose.local.yml exec postgres pg_dump \
   -U sub2api \
@@ -506,7 +515,7 @@ docker compose -f docker-compose.local.yml exec postgres pg_dump \
 ### 8.3 备份命名卷（完整备份）
 
 ```bash
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 
 docker run --rm \
   -v deploy_postgres_data:/data \
@@ -677,7 +686,7 @@ sudo systemctl reload caddy
 
 ```bash
 # 启动
-cd ~/sub2api/deploy
+cd /opt/sub2api/deploy
 docker compose -f docker-compose.local.yml up -d --build
 
 # 停止
@@ -690,6 +699,6 @@ docker compose -f docker-compose.local.yml logs -f sub2api
 docker compose -f docker-compose.local.yml restart sub2api
 
 # 更新（git pull 后）
-cd ~/sub2api && git pull --ff-only && cd deploy
+cd /opt/sub2api && git pull --ff-only && cd deploy
 docker compose -f docker-compose.local.yml up -d --build sub2api
 ```

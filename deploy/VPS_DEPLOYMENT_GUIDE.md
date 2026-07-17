@@ -215,7 +215,7 @@ nano .env
 docker compose -f docker-compose.local.yml up -d --build
 ```
 
-> 注意：`docker-compose.local.yml` 会从 `/opt/sub2api/Dockerfile` 构建 `sub2api:local` 镜像，部署的是你当前 Git 工作区的代码。更新代码时先 `git pull`，再重新执行构建命令。
+> 注意：`docker-compose.local.yml` 会从当前 Git 工作区的 `Dockerfile` 构建 `sub2api:local` 镜像，部署的是你当前 Git 工作区的代码。更新代码时先 `git pull`，再重新执行构建命令。
 
 ### 4.4 查看日志并获取 admin 密码
 

@@ -96,7 +96,7 @@ import { Icon } from '@/components/icons'
 import { useClipboard } from '@/composables/useClipboard'
 
 const customerServiceQQ = '977252487'
-const qqGroup = '821362587'
+const qqGroup = '819159939'
 
 const { t } = useI18n()
 const { copyToClipboard } = useClipboard()

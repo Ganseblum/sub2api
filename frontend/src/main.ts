@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import i18n, { initI18n } from './i18n'
 import { useAppStore } from '@/stores/app'
+import { APP_BRAND_NAME } from '@/config/brand'
 import { updateFavicon } from '@/utils/branding'
 import './style.css'
 

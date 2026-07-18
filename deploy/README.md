@@ -21,6 +21,7 @@ This directory contains files for deploying Sub2API on Linux servers and Apple-s
 | `APPLE_CONTAINER.md` | Apple `container` deployment and operations guide |
 | `.env.example` | Container environment variables template |
 | `DOCKER.md` | Docker Hub documentation |
+| `PRODUCTION_DEPLOYMENT_S3.md` | 完整生产部署、HTTPS、S3 备份、服务器迁移及 Git 更新指南（中文） |
 | `install.sh` | One-click binary installation script |
 | `install-datamanagementd.sh` | datamanagementd 一键安装脚本 |
 | `sub2api.service` | Systemd service unit file |

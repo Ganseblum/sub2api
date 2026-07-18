@@ -214,6 +214,7 @@ git clone https://github.com/Ganseblum/sub2api.git .
 ```bash
 cd deploy
 cp .env.example .env
+chmod 600 .env
 ```
 
 生成固定密钥（**必须**，否则每次重启后登录态会失效）：
@@ -221,8 +222,9 @@ cp .env.example .env
 ```bash
 JWT_SECRET=$(openssl rand -hex 32)
 TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)
-POSTGRES_PASSWORD=$(openssl rand -base64 32)
+POSTGRES_PASSWORD=$(openssl rand -hex 32)
 
+sed -i "s/^BIND_HOST=.*/BIND_HOST=127.0.0.1/" .env
 sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET}/" .env
 sed -i "s/^TOTP_ENCRYPTION_KEY=.*/TOTP_ENCRYPTION_KEY=${TOTP_ENCRYPTION_KEY}/" .env
 sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=${POSTGRES_PASSWORD}/" .env
@@ -236,13 +238,14 @@ nano .env
 
 | 变量 | 建议值 | 说明 |
 |------|--------|------|
-| `POSTGRES_PASSWORD` | 已自动生成 | 必须修改，勿用默认值 |
-| `REDIS_PASSWORD` | 留空 | Docker Compose 内部 Redis 建议无密码，避免 healthcheck 失败 |
+| `BIND_HOST` | `127.0.0.1` | 使用反向代理时不要向公网暴露 8080 |
+| `POSTGRES_PASSWORD` | 已自动生成 | 必须固定，勿用默认值 |
+| `REDIS_PASSWORD` | 可留空 | 非空时 Compose 会同步配置 Redis、应用和健康检查 |
 | `JWT_SECRET` | 已自动生成 | 必须固定 |
 | `TOTP_ENCRYPTION_KEY` | 已自动生成 | 必须固定，否则 2FA 失效 |
 | `ADMIN_EMAIL` | 你的邮箱 | 默认 `admin@sub2api.local` |
 | `ADMIN_PASSWORD` | 强密码 | 留空则首次启动自动生成 |
-| `SERVER_PORT` | 8080 | 容器内部端口 |
+| `SERVER_PORT` | 8080 | 宿主机映射端口 |
 | `TZ` | Asia/Shanghai | 时区 |
 
 > **重要**：如果 `ADMIN_PASSWORD` 留空，首次启动后需在日志中查找自动生成的密码：
@@ -329,6 +332,12 @@ Caddy 会自动申请并续期 Let's Encrypt 证书。
 
 ```bash
 sudo apt install -y nginx certbot python3-certbot-nginx
+```
+
+Sub2API 会使用带下划线的请求头（例如 `session_id`）。在 Nginx 主配置 `/etc/nginx/nginx.conf` 的 `http` 块中加入：
+
+```nginx
+underscores_in_headers on;
 ```
 
 #### 方案 A：配置文件放在 `/etc/nginx/conf.d/`（推荐，管理方便）
@@ -449,6 +458,8 @@ sudo certbot --nginx -d s2a.youc.online
 
 Sub2API 支持将 PostgreSQL 数据库备份自动上传到 **S3 兼容对象存储**，支持 Cloudflare R2、AWS S3、阿里云 OSS、MinIO 等。
 
+> 管理后台“数据管理”功能需要额外部署宿主机 `datamanagementd`。Docker Socket、权限和服务配置见 [DATAMANAGEMENTD_CN.md](./DATAMANAGEMENTD_CN.md)。
+
 ### 6.1 支持的 S3 服务商配置示例
 
 #### Cloudflare R2（推荐）
@@ -565,27 +576,125 @@ Sub2API 支持将 PostgreSQL 数据库备份自动上传到 **S3 兼容对象存
 
 ### 7.4 完整服务器迁移（含本地数据）
 
-使用 `docker-compose.local.yml` 时，所有数据都在本地目录，迁移简单：
+迁移期间不要让新旧实例同时接受写请求，否则用户、令牌、余额和用量数据会分叉。推荐提前降低 DNS TTL，并安排短维护窗口。
+
+#### 7.4.1 确认旧服务器部署方式
 
 ```bash
-# 在原服务器停止服务
-cd /opt/sub2api/deploy
-docker compose -f docker-compose.local.yml down
-
-# 打包整个部署目录
-cd /opt
-tar czf sub2api-complete.tar.gz sub2api/
-
-# 传输到新服务器
-scp sub2api-complete.tar.gz ubuntu@new-server:/opt/
-
-# 在新服务器解压并启动
-ssh ubuntu@new-server
-cd /opt
-sudo tar xzf sub2api-complete.tar.gz
-cd sub2api/deploy
-docker compose -f docker-compose.local.yml up -d
+docker compose ls
+docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
 ```
+
+以下命令默认旧服务器位于 `/opt/sub2api/deploy`，并使用 `docker-compose.local.yml`。如果实际使用 `docker-compose.yml`，修改 `COMPOSE_FILE` 即可。数据库采用逻辑备份，不依赖底层是本地目录还是命名卷。
+
+#### 7.4.2 旧服务器最终备份并停服
+
+先停止应用写入，保留 PostgreSQL 运行以生成一致的逻辑备份：
+
+```bash
+cd /opt/sub2api/deploy
+export COMPOSE_FILE=docker-compose.local.yml
+export BACKUP_ID="$(date +%Y%m%d_%H%M%S)"
+export BACKUP_DIR="$HOME/sub2api-migration-$BACKUP_ID"
+mkdir -p "$BACKUP_DIR/data" "$BACKUP_DIR/redis_data"
+
+docker compose -f "$COMPOSE_FILE" stop sub2api
+
+docker compose -f "$COMPOSE_FILE" exec -T postgres sh -c \
+  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  | gzip > "$BACKUP_DIR/database.sql.gz"
+```
+
+数据库备份成功后，停止依赖服务并从容器导出应用和 Redis 数据：
+
+```bash
+docker compose -f "$COMPOSE_FILE" stop postgres redis
+docker cp sub2api:/app/data/. "$BACKUP_DIR/data/"
+docker cp sub2api-redis:/data/. "$BACKUP_DIR/redis_data/"
+cp .env "$BACKUP_DIR/.env"
+
+docker compose -f "$COMPOSE_FILE" down
+
+sudo tar -C "$BACKUP_DIR" -czf "$HOME/sub2api-migration-$BACKUP_ID.tar.gz" .
+sudo chown "$USER":"$USER" "$HOME/sub2api-migration-$BACKUP_ID.tar.gz"
+sha256sum "$HOME/sub2api-migration-$BACKUP_ID.tar.gz"
+```
+
+`down` 会移除容器和网络，但保留原数据。不要执行 `down -v`，也不要删除旧服务器，直到新服务器稳定运行并完成异地备份。
+
+传输备份：
+
+```bash
+scp "$HOME/sub2api-migration-$BACKUP_ID.tar.gz" root@新服务器IP:/tmp/
+```
+
+#### 7.4.3 新服务器从自己的 Git 仓库恢复
+
+新服务器完成前三章的系统与 Docker 安装后，拉取自己的代码：
+
+```bash
+sudo git clone https://github.com/Ganseblum/sub2api.git /opt/sub2api
+sudo chown -R "$USER":"$USER" /opt/sub2api
+```
+
+解压迁移包并恢复旧服务器配置和运行时数据：
+
+```bash
+export BACKUP_FILE=/tmp/sub2api-migration-YYYYMMDD_HHMMSS.tar.gz
+export RESTORE_DIR=/tmp/sub2api-restore
+
+sudo mkdir -p "$RESTORE_DIR"
+sudo tar -xzf "$BACKUP_FILE" -C "$RESTORE_DIR"
+
+cd /opt/sub2api/deploy
+sudo cp "$RESTORE_DIR/.env" .env
+sudo mkdir -p data redis_data postgres_data
+sudo cp -a "$RESTORE_DIR/data/." data/
+sudo cp -a "$RESTORE_DIR/redis_data/." redis_data/
+sudo chown "$USER":"$USER" .env
+chmod 600 .env
+```
+
+迁移时必须使用旧服务器的 `.env`，不要重新生成 `POSTGRES_PASSWORD`、`JWT_SECRET` 或 `TOTP_ENCRYPTION_KEY`。
+
+先初始化新的 PostgreSQL 容器：
+
+```bash
+docker compose -f docker-compose.local.yml up -d postgres
+docker compose -f docker-compose.local.yml ps postgres
+```
+
+确认 PostgreSQL 状态为 `healthy` 后恢复数据库：
+
+```bash
+gzip -dc "$RESTORE_DIR/database.sql.gz" | \
+  docker compose -f docker-compose.local.yml exec -T postgres sh -c \
+  'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
+构建自己的代码并启动服务：
+
+```bash
+cd /opt/sub2api
+git status --short --branch
+git pull --ff-only origin main
+
+cd deploy
+docker compose -f docker-compose.local.yml up -d --build
+docker compose -f docker-compose.local.yml ps
+docker compose -f docker-compose.local.yml logs --tail=100 sub2api
+curl -fsS http://127.0.0.1:8080/health
+```
+
+#### 7.4.4 切换域名与保留回滚点
+
+1. 在新服务器恢复 Caddy/Nginx 配置，反向代理到 `127.0.0.1:8080`。
+2. 用临时域名或本地 `hosts` 验证登录、后台数据和实际 API 调用。
+3. 将 DNS A/AAAA 记录切换到新服务器。
+4. 从外部检查 `https://你的域名/health` 和实际 API 请求。
+5. 旧服务器保持停服至少 24 小时，确认无误后再下线。
+
+需要回切时，先停止新服务器应用，恢复旧服务器容器，再把 DNS 指回旧服务器。不要让两边同时接受写入。
 
 ---
 
@@ -593,14 +702,48 @@ docker compose -f docker-compose.local.yml up -d
 
 ### 8.1 更新 Sub2API
 
+更新前先确认工作区没有服务器手工修改，并查看将要拉取的提交：
+
 ```bash
 cd /opt/sub2api
-git pull
+git status --short
+git fetch origin
+git log --oneline HEAD..origin/main
+```
+
+如果 `git status --short` 有输出，先保存或提交这些修改，不要直接覆盖。然后备份数据库并更新：
+
+```bash
+cd /opt/sub2api/deploy
+docker compose -f docker-compose.local.yml exec -T postgres sh -c \
+  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  | gzip > "$HOME/sub2api-before-update-$(date +%Y%m%d_%H%M%S).sql.gz"
+
+cd /opt/sub2api
+git pull --ff-only origin main
 
 cd deploy
-# 只重建 sub2api 容器，不删除数据库
-docker compose -f docker-compose.local.yml up -d --build sub2api
+docker compose -f docker-compose.local.yml build --pull sub2api
+docker compose -f docker-compose.local.yml up -d --no-deps sub2api
+docker compose -f docker-compose.local.yml ps
+docker compose -f docker-compose.local.yml logs --tail=100 sub2api
+curl -fsS http://127.0.0.1:8080/health
 ```
+
+`--no-deps` 只重建应用容器，不重建 PostgreSQL 和 Redis。应用启动时会自动执行尚未应用的数据库迁移。
+
+如果新版无法启动，可临时切换到上一个已知可用提交并重新构建：
+
+```bash
+cd /opt/sub2api
+git log --oneline -10
+git switch --detach <上一个可用commit>
+
+cd deploy
+docker compose -f docker-compose.local.yml up -d --build --no-deps sub2api
+```
+
+下次更新前先执行 `git switch main`。数据库迁移是前向执行的；如果旧代码与新数据库结构不兼容，需要停服并恢复更新前的数据库备份，不能只回退 Git。
 
 ### 8.2 查看日志
 
@@ -689,17 +832,22 @@ docker compose -f docker-compose.local.yml logs --tail=200 sub2api
   ```bash
   docker compose -f docker-compose.local.yml exec postgres pg_isready
   ```
-- 如果修改了 `POSTGRES_PASSWORD` 但数据库卷已存在，需要删除卷重新初始化（会丢失数据）
+- 如果数据库已经初始化后误改了 `POSTGRES_PASSWORD`，先恢复旧 `.env` 中的密码。需要轮换密码时，应在 PostgreSQL 内执行 `ALTER ROLE`，再同步更新 `.env`；不要通过删除数据目录解决密码不一致。
 
 ### 10.3 Redis healthcheck 失败
 
-`.env` 中设置：
+当前 Compose 会把 `REDIS_PASSWORD` 同时传给 Redis、应用和 healthcheck。先检查最终配置和日志：
 
 ```bash
-REDIS_PASSWORD=
+docker compose -f docker-compose.local.yml config --quiet
+docker compose -f docker-compose.local.yml logs --tail=100 redis sub2api
 ```
 
-留空即可。
+`REDIS_PASSWORD` 可以留空，也可以设置非空密码；修改后需要同时重建 Redis 和应用容器：
+
+```bash
+docker compose -f docker-compose.local.yml up -d --force-recreate redis sub2api
+```
 
 ### 10.4 登录态每次重启后失效
 
@@ -767,7 +915,7 @@ SERVER_PORT=8090
 
 - [ ] 已经创建当前数据库的手动备份或确认 S3 上有一份最新的 `completed` 备份
 - [ ] 已经备份 `.env` 文件
-- [ ] 已经备份 `/opt/sub2api/deploy/` 整个目录（包含数据卷目录）
+- [ ] 已按第 7.4 节备份 PostgreSQL、`.env`、应用数据和 Redis 数据；没有复制运行中的 `postgres_data/`
 - [ ] 已经通知相关用户或将服务切换到维护模式
 - [ ] 已经记录下当前操作的回滚方案
 
@@ -819,7 +967,7 @@ rm -rf /opt/sub2api/deploy/data
 | `POSTGRES_PASSWORD` | ❌ 不能直接修改 | 数据库内密码不会自动同步，导致连接失败 |
 | `JWT_SECRET` | ✅ 可以修改 | 修改后所有用户需要重新登录 |
 | `TOTP_ENCRYPTION_KEY` | ✅ 可以修改 | 修改后所有 2FA 需要重新绑定 |
-| `REDIS_PASSWORD` | ❌ 不建议修改 | 需要同步修改 Redis 容器配置 |
+| `REDIS_PASSWORD` | ✅ 可修改并重建容器 | 必须同时重建 Redis 和 Sub2API 容器 |
 | `ADMIN_EMAIL` | ✅ 可以修改 | 仅影响首次自动创建的管理员账号 |
 | `ADMIN_PASSWORD` | ✅ 可以修改 | 首次启动后建议在 Web UI 修改 |
 
@@ -828,18 +976,19 @@ rm -rf /opt/sub2api/deploy/data
 ```bash
 cd /opt/sub2api/deploy
 
-# 1. 备份 .env
-cp .env .env.backup.$(date +%Y%m%d_%H%M%S)
+# 1. 创建备份目录并备份 .env
+BACKUP_DIR="$HOME/sub2api-backup-$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+cp .env "$BACKUP_DIR/.env"
 
 # 2. 备份数据库（推荐）
-docker compose -f docker-compose.local.yml exec postgres pg_dump \
-  -U sub2api \
-  -d sub2api \
-  | gzip > sub2api_backup_$(date +%Y%m%d_%H%M%S).sql.gz
+docker compose -f docker-compose.local.yml exec -T postgres sh -c \
+  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  | gzip > "$BACKUP_DIR/database.sql.gz"
 
-# 3. 备份整个部署目录（含数据卷）
-cd /opt
-tar czf sub2api-emergency-backup-$(date +%Y%m%d_%H%M%S).tar.gz sub2api/
+# 3. 完整灾难恢复备份
+# 安排维护窗口，并按第 7.4.2 节停止写入后导出 /app/data 和 Redis 数据。
+# 不要在 PostgreSQL 运行时直接打包 postgres_data/。
 ```
 
 ---
@@ -889,15 +1038,19 @@ docker compose -f docker-compose.local.yml down
 # 重启 sub2api
 docker compose -f docker-compose.local.yml restart sub2api
 
-# 更新（git pull 后）
-cd /opt/sub2api && git pull && cd deploy
-docker compose -f docker-compose.local.yml up -d --build sub2api
+# 更新自己的 Git 仓库代码（完整流程见 8.1）
+cd /opt/sub2api
+git pull --ff-only origin main
+cd deploy
+docker compose -f docker-compose.local.yml up -d --build --no-deps sub2api
 
 # 进入 PostgreSQL
 docker compose -f docker-compose.local.yml exec postgres psql -U sub2api -d sub2api
 
 # 手动备份数据库
-docker compose -f docker-compose.local.yml exec postgres pg_dump -U sub2api -d sub2api > sub2api_manual_$(date +%Y%m%d_%H%M%S).sql
+docker compose -f docker-compose.local.yml exec -T postgres sh -c \
+  'pg_dump --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  | gzip > "sub2api_manual_$(date +%Y%m%d_%H%M%S).sql.gz"
 
 # 查看 S3 备份配置是否正确（进入容器后无此命令，请在管理后台测试）
 ```

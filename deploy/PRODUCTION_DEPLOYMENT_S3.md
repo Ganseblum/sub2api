@@ -10,9 +10,9 @@
 2. [系统初始化与安全加固](#二系统初始化与安全加固)
 3. [安装 Docker](#三安装-docker)
 4. [部署 Sub2API](#四部署-sub2api)
-5. [反向代理与 HTTPS](#五反向代理与-https)
+5. [Nginx 反向代理与 HTTPS](#五nginx-反向代理与-https)
 6. [S3 备份同步配置](#六s3-备份同步配置)
-7. [备份与恢复](#七备份与恢复)
+7. [备份、恢复与旧服务器迁移](#七备份恢复与旧服务器迁移)
 8. [日常运维](#八日常运维)
 9. [监控与告警](#九监控与告警)
 10. [故障排查](#十故障排查)
@@ -293,164 +293,275 @@ docker compose -f docker-compose.local.yml exec redis redis-cli ping
 
 ---
 
-## 五、反向代理与 HTTPS
+## 五、Nginx 反向代理与 HTTPS
 
-推荐使用 **Caddy** 自动 HTTPS，配置最简单。
+本指南统一使用 **Nginx + Certbot**。旧服务器的实际配置可以通过
+`nginx -T` 查看；只要最后显示 `syntax is ok` 和 `test is successful`，说明当前 Nginx
+配置语法有效。本文所有 Nginx 配置都写入宿主机 `/etc/nginx/`，不要创建项目内的
+`nginx/conf.d` 或 `nginx/ssl`。先把域名 A/AAAA 记录解析到新服务器，并确认 `.env`
+中保持：
 
-### 5.1 安装 Caddy
+```ini
+BIND_HOST=127.0.0.1
+SERVER_PORT=8080
+```
+
+这样 Sub2API 只监听本机，公网仅开放 Nginx 的 `80/443`。
+
+### 5.1 安装 Nginx 和 Certbot
 
 ```bash
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 sudo apt update
-sudo apt install -y caddy
+sudo apt install -y nginx certbot python3-certbot-nginx dnsutils
+sudo systemctl enable nginx --now
 ```
 
-### 5.2 配置 Caddyfile
+### 5.2 配置公共 HTTP 参数
+
+开始修改前，先完整备份当前 Nginx 配置和展开后的有效配置：
 
 ```bash
-sudo nano /etc/caddy/Caddyfile
+BACKUP="/root/nginx-backup-$(date +%Y%m%d_%H%M%S)"
+sudo mkdir -p "$BACKUP"
+sudo cp -a /etc/nginx/. "$BACKUP/"
+sudo nginx -T > /tmp/nginx-before.conf 2>&1
+sudo mv /tmp/nginx-before.conf "$BACKUP/nginx-full.conf"
+echo "Nginx backup: $BACKUP"
 ```
 
-```
-your-domain.com {
-    reverse_proxy localhost:8080
-    encode gzip zstd
-}
-```
+`BACKUP` 变量只在当前终端会话有效；打开新终端后，应根据上面的输出重新设置实际备份
+路径。备份完成后再创建 `/etc/nginx/conf.d/sub2api-http.conf`：
 
 ```bash
-sudo systemctl reload caddy
+sudo nano /etc/nginx/conf.d/sub2api-http.conf
 ```
 
-Caddy 会自动申请并续期 Let's Encrypt 证书。
-
-### 5.3 使用 Nginx 的备选配置
-
-如果你更习惯 Nginx，推荐配合 **Certbot** 自动申请 Let's Encrypt 证书：
-
-```bash
-sudo apt install -y nginx certbot python3-certbot-nginx
-```
-
-Sub2API 会使用带下划线的请求头（例如 `session_id`）。在 Nginx 主配置 `/etc/nginx/nginx.conf` 的 `http` 块中加入：
+写入：
 
 ```nginx
+# Sub2API 使用 session_id 等带下划线的请求头。
 underscores_in_headers on;
-```
 
-#### 方案 A：配置文件放在 `/etc/nginx/conf.d/`（推荐，管理方便）
-
-```bash
-sudo nano /etc/nginx/conf.d/sub2api.conf
-```
-
-```nginx
-server {
-    listen 80;
-    server_name ai.youc.online;
-    return 301 https://$host$request_uri;
+# 同时支持普通 HTTP、SSE 和 WebSocket。
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
 }
 
-server {
-    listen 443 ssl http2;
-    server_name ai.youc.online;
-
-    # SSL 证书路径（Certbot 会自动管理）
-    ssl_certificate /etc/letsencrypt/live/ai.youc.online/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ai.youc.online/privkey.pem;
-
-    # 上传文件大小限制，Sub2API 可能需要处理较大请求体
-    client_max_body_size 500M;
-
-    # 长连接/流式响应优化
-    proxy_buffering off;
-    proxy_cache off;
-    gzip off;
-    chunked_transfer_encoding on;
-
-    proxy_http_version 1.1;
-    proxy_set_header Connection '';
-    proxy_read_timeout 600s;
-    proxy_send_timeout 600s;
-
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+limit_conn_zone $binary_remote_addr zone=sub2api_conn:20m;
 ```
 
-```bash
-# 申请并自动配置 HTTPS 证书
-sudo certbot --nginx -d ai.youc.online
+### 5.3 配置 Sub2API 站点（先配置 HTTP）
 
-# 测试并重载
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-#### 方案 B：配置文件放在 `/etc/nginx/sites-available/`
+先创建一个只监听 HTTP 的站点配置，把 `your-domain.com` 替换成实际域名。
+旧服务器示例中的域名是 `ai.youc.online`，迁移时应替换成你实际使用的域名：
 
 ```bash
 sudo nano /etc/nginx/sites-available/sub2api
 ```
 
-配置内容与方案 A 相同，然后启用：
-
-```bash
-sudo ln -s /etc/nginx/sites-available/sub2api /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-#### 如果你的 Nginx 还代理 WebSocket 服务
-
-比如同时有另一个服务跑在 `127.0.0.1:3001`（如 s2a-manager），增加一段：
-
 ```nginx
 server {
-    listen 443 ssl http2;
-    server_name s2a.youc.online;
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
 
-    ssl_certificate /etc/letsencrypt/live/s2a.youc.online/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/s2a.youc.online/privkey.pem;
+    client_header_timeout 10s;
+    client_max_body_size 500m;
+    large_client_header_buffers 4 16k;
+    limit_conn sub2api_conn 40;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_request_buffering off;
+    gzip off;
+    proxy_read_timeout 600s;
+    proxy_send_timeout 600s;
+
+    # Certbot 的 HTTP-01 校验目录。
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
 
     location / {
-        proxy_pass http://127.0.0.1:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 86400s;
-        proxy_send_timeout 86400s;
+        proxy_pass http://127.0.0.1:8080;
     }
 }
 ```
 
+启用配置并验证 HTTP 访问：
+
 ```bash
-sudo certbot --nginx -d s2a.youc.online
+# Ubuntu 默认站点只是启用软链接；移除链接前已经完整备份 /etc/nginx。
+if [ -L /etc/nginx/sites-enabled/default ]; then
+  sudo unlink /etc/nginx/sites-enabled/default
+elif [ -e /etc/nginx/sites-enabled/default ]; then
+  echo "/etc/nginx/sites-enabled/default 不是软链接，请人工确认后再处理。" >&2
+  exit 1
+fi
+
+if [ ! -e /etc/nginx/sites-enabled/sub2api ] && \
+   [ ! -L /etc/nginx/sites-enabled/sub2api ]; then
+  sudo ln -s /etc/nginx/sites-available/sub2api \
+    /etc/nginx/sites-enabled/sub2api
+fi
+
+sudo nginx -t
+sudo systemctl reload nginx
+curl -fsS http://your-domain.com/health
 ```
 
-### 5.4 Nginx 配置关键参数说明
+如果 `nginx -t` 失败，不要 reload；根据报错修正配置，或从 `$BACKUP` 选择性恢复后重新
+测试。
 
-| 参数 | 作用 | 建议值 |
-|------|------|--------|
-| `client_max_body_size 500M` | 允许客户端上传最大 500MB 的请求体 | 根据业务调整，Sub2API 建议 500M 起步 |
-| `proxy_buffering off` | 关闭后端响应缓冲，适合流式输出 | 关闭 |
-| `proxy_cache off` | 关闭代理缓存 | 关闭 |
-| `gzip off` | 关闭 gzip，避免与流式响应冲突 | 关闭 |
-| `chunked_transfer_encoding on` | 支持分块传输 | 开启 |
-| `proxy_read_timeout 600s` | 后端读取超时时间 | 600s 或更长 |
-| `proxy_send_timeout 600s` | 后端发送超时时间 | 600s 或更长 |
-| `proxy_http_version 1.1` | 使用 HTTP/1.1 保持长连接 | 1.1 |
+### 5.4 申请 HTTPS 证书并完成跳转
+
+先确认域名已经指向当前服务器。A 记录应与服务器公网 IPv4 一致；启用 AAAA 时也要确认
+IPv6 能够正常访问：
+
+```bash
+dig +short your-domain.com A
+dig +short your-domain.com AAAA
+curl -4 ifconfig.me
+```
+
+确认解析正确后再申请证书：
+
+```bash
+sudo certbot --nginx -d your-domain.com
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot renew --dry-run
+curl -fsS https://your-domain.com/health
+```
+
+Certbot 会在现有站点上补充 TLS 配置，并由 systemd timer 自动续期证书。证书申请成功后，
+站点结构应与旧服务器一致：80 端口保留 ACME 校验目录并将普通请求跳转到 HTTPS，443
+端口终止 TLS 后反代到 `127.0.0.1:8080`。可以用下面的配置核对 Certbot 生成的结果：
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name your-domain.com;
+
+    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    client_max_body_size 500m;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_request_buffering off;
+    gzip off;
+    proxy_read_timeout 600s;
+    proxy_send_timeout 600s;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+    }
+}
+```
+
+如果服务器没有启用 IPv6，删除上面两行 `listen [::]:...`，否则 `nginx -t` 可能因地址
+不可用而失败。Ubuntu 新版 Nginx 也可能提示 `http2` 参数的弃用警告；只要测试成功，
+可以按当前系统版本改为单独的 `http2 on;`。
+
+最后保存生效后的完整配置并检查服务状态和错误日志：
+
+```bash
+sudo nginx -T > /tmp/nginx-after.conf 2>&1
+sudo nginx -t
+sudo systemctl is-active nginx
+curl -I http://your-domain.com
+curl -fsS https://your-domain.com/health
+sudo tail -n 100 /var/log/nginx/error.log
+```
+
+如果配置失败，保留当前文件并从 `$BACKUP` 选择性恢复；恢复后仍须先执行 `nginx -t`，
+成功后才能 reload。不要删除整个 `/etc/nginx`，也不要为排查 Nginx 问题删除 Sub2API
+数据目录或执行 `docker compose down -v`。
+
+### 5.5 Nginx 配置说明
+
+| 参数 | 作用 |
+|------|------|
+| `underscores_in_headers on` | 保留 `session_id` 等请求头，避免粘性会话失效 |
+| `client_max_body_size 500m` | 与旧服务器配置一致，允许较大的请求体 |
+| `proxy_buffering off` | 避免缓冲 SSE 流式响应 |
+| `proxy_cache off` | 不缓存 API 响应 |
+| `gzip off` | 避免压缩干扰 SSE 流式响应 |
+| `proxy_request_buffering off` | 请求体直接转发给应用 |
+| `$proxy_add_x_forwarded_for` | 保留已有代理链中的客户端 IP 信息 |
+| `Upgrade` / `Connection` | 保留 WebSocket 升级能力 |
+| `proxy_read_timeout 600s` | 与旧服务器一致；超长任务可按业务提高 |
+
+如果 Nginx 前面还有 CDN 或负载均衡，不要直接信任客户端传入的 `X-Forwarded-For`。先限制源站只允许可信代理访问，再按 [EDGE_SECURITY.md](./EDGE_SECURITY.md) 配置 real IP 和 `server.trusted_proxies`。
+
+### 5.6 迁移旧服务器的 Nginx 配置
+
+旧服务器上不要直接复制完整的 `nginx -T` 输出覆盖新服务器。先保存它作为排查和核对
+材料，再把实际站点文件复制出来：
+
+```bash
+# 旧服务器执行
+export NGINX_BACKUP_DIR="$HOME/sub2api-nginx-backup-$(date +%Y%m%d_%H%M%S)"
+set -e
+umask 077
+sudo nginx -t
+mkdir -p "$NGINX_BACKUP_DIR"
+sudo nginx -T > "$NGINX_BACKUP_DIR/nginx-full.conf"
+sudo nginx -t > "$NGINX_BACKUP_DIR/nginx-test.txt" 2>&1
+sudo readlink -f /etc/nginx/sites-enabled/sub2api \
+  > "$NGINX_BACKUP_DIR/site-realpath.txt"
+sudo cp -L /etc/nginx/sites-enabled/sub2api "$NGINX_BACKUP_DIR/sub2api"
+sudo certbot certificates > "$NGINX_BACKUP_DIR/certbot-certificates.txt"
+```
+
+上面保存的是旧站点规则和证书信息，不会删除任何 Nginx 或应用数据。新服务器先按
+5.3 节创建 HTTP 配置，确认域名已经指向新服务器后重新申请证书：
+
+```bash
+sudo certbot --nginx -d your-domain.com
+sudo nginx -t
+sudo systemctl reload nginx
+curl -fsS https://your-domain.com/health
+```
+
+不要把旧服务器的 `/etc/letsencrypt/live/` 路径直接写进新服务器而不检查文件是否存在；
+通常在新服务器重新申请证书更可靠。旧站点配置文件只作为核对参考，域名、证书路径和
+上游端口必须按新服务器实际值确认后再 reload。
 
 ---
 
@@ -551,7 +662,9 @@ Sub2API 支持将 PostgreSQL 数据库备份自动上传到 **S3 兼容对象存
 
 ---
 
-## 七、备份与恢复
+## 七、备份、恢复与旧服务器迁移
+
+> 要把旧服务器数据同步到新服务器，直接执行 [7.4 旧服务器数据同步到新服务器](#74-旧服务器数据同步到新服务器完整流程)。迁移不是重新注册用户，而是迁移原 `.env`、PostgreSQL、应用数据和 Redis 持久化数据。
 
 ### 7.1 手动立即备份
 
@@ -574,9 +687,21 @@ Sub2API 支持将 PostgreSQL 数据库备份自动上传到 **S3 兼容对象存
 
 点击备份记录右侧的 **下载**，系统会生成一个 1 小时有效的预签名 URL。
 
-### 7.4 完整服务器迁移（含本地数据）
+### 7.4 旧服务器数据同步到新服务器（完整流程）
 
 迁移期间不要让新旧实例同时接受写请求，否则用户、令牌、余额和用量数据会分叉。推荐提前降低 DNS TTL，并安排短维护窗口。
+
+需要同步的数据如下：
+
+| 旧服务器数据 | 同步方式 | 新服务器位置 | 是否必须 |
+|-------------|---------|-------------|---------|
+| `deploy/.env` | 放入迁移压缩包 | `/opt/sub2api/deploy/.env` | 必须，保留数据库密码、JWT 和 2FA 密钥 |
+| PostgreSQL | 停止应用写入后执行 `pg_dump` | 恢复到新 PostgreSQL 容器 | 必须，包含用户、Key、余额、账单、用量和设置 |
+| 容器 `/app/data` | `docker cp` | `/opt/sub2api/deploy/data/` | 必须，包含运行时配置和应用数据 |
+| Redis 容器 `/data` | 停止 Redis 后执行 `docker cp` | `/opt/sub2api/deploy/redis_data/` | 建议，保留持久化缓存和队列状态 |
+| Nginx 站点配置 | 旧服务器先留档，新服务器按第 5.6 节重建 | `/etc/nginx/` | 必须 |
+
+整体顺序：先准备新服务器和 Git 代码，再停止旧应用写入，生成最终备份，传输并恢复数据，验证新服务器，最后切换 DNS。旧服务器在确认迁移成功前保持停服但不要删除。
 
 #### 7.4.1 确认旧服务器部署方式
 
@@ -596,36 +721,56 @@ cd /opt/sub2api/deploy
 export COMPOSE_FILE=docker-compose.local.yml
 export BACKUP_ID="$(date +%Y%m%d_%H%M%S)"
 export BACKUP_DIR="$HOME/sub2api-migration-$BACKUP_ID"
+set -euo pipefail
+umask 077
 mkdir -p "$BACKUP_DIR/data" "$BACKUP_DIR/redis_data"
+
+# 留存旧 Nginx 配置供新服务器核对；不要把完整 nginx -T 输出直接当作站点配置使用。
+sudo nginx -t
+sudo nginx -T > "$BACKUP_DIR/nginx-full.conf"
+sudo cp -L /etc/nginx/sites-enabled/sub2api "$BACKUP_DIR/nginx-sub2api.conf"
+sudo certbot certificates > "$BACKUP_DIR/certbot-certificates.txt"
 
 docker compose -f "$COMPOSE_FILE" stop sub2api
 
 docker compose -f "$COMPOSE_FILE" exec -T postgres sh -c \
-  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  'pg_dump --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
   | gzip > "$BACKUP_DIR/database.sql.gz"
+
+test -s "$BACKUP_DIR/database.sql.gz"
+gzip -t "$BACKUP_DIR/database.sql.gz"
 ```
 
 数据库备份成功后，停止依赖服务并从容器导出应用和 Redis 数据：
 
 ```bash
+set -euo pipefail
 docker compose -f "$COMPOSE_FILE" stop postgres redis
 docker cp sub2api:/app/data/. "$BACKUP_DIR/data/"
 docker cp sub2api-redis:/data/. "$BACKUP_DIR/redis_data/"
 cp .env "$BACKUP_DIR/.env"
 
-docker compose -f "$COMPOSE_FILE" down
+# 保留已停止的容器作为回滚点；不要在此处执行 down 或 down -v。
+docker compose -f "$COMPOSE_FILE" ps
 
 sudo tar -C "$BACKUP_DIR" -czf "$HOME/sub2api-migration-$BACKUP_ID.tar.gz" .
 sudo chown "$USER":"$USER" "$HOME/sub2api-migration-$BACKUP_ID.tar.gz"
-sha256sum "$HOME/sub2api-migration-$BACKUP_ID.tar.gz"
+
+cd "$HOME"
+sha256sum "sub2api-migration-$BACKUP_ID.tar.gz" \
+  > "sub2api-migration-$BACKUP_ID.tar.gz.sha256"
+sha256sum -c "sub2api-migration-$BACKUP_ID.tar.gz.sha256"
 ```
 
-`down` 会移除容器和网络，但保留原数据。不要执行 `down -v`，也不要删除旧服务器，直到新服务器稳定运行并完成异地备份。
+旧服务器此时保持停服，容器和绑定目录都保留，便于回滚。不要执行 `down -v`、删除
+`postgres_data`，也不要删除旧服务器，直到新服务器稳定运行并完成异地备份。
 
 传输备份：
 
 ```bash
-scp "$HOME/sub2api-migration-$BACKUP_ID.tar.gz" root@新服务器IP:/tmp/
+scp "$HOME/sub2api-migration-$BACKUP_ID.tar.gz" \
+  "$HOME/sub2api-migration-$BACKUP_ID.tar.gz.sha256" \
+  root@新服务器IP:/tmp/
 ```
 
 #### 7.4.3 新服务器从自己的 Git 仓库恢复
@@ -642,18 +787,40 @@ sudo chown -R "$USER":"$USER" /opt/sub2api
 ```bash
 export BACKUP_FILE=/tmp/sub2api-migration-YYYYMMDD_HHMMSS.tar.gz
 export RESTORE_DIR=/tmp/sub2api-restore
+set -euo pipefail
+# 将 YYYYMMDD_HHMMSS 替换为老服务器实际生成的时间戳，例如 20260719_054044。
+
+cd /tmp
+sha256sum -c "$(basename "$BACKUP_FILE").sha256"
 
 sudo mkdir -p "$RESTORE_DIR"
 sudo tar -xzf "$BACKUP_FILE" -C "$RESTORE_DIR"
 
 cd /opt/sub2api/deploy
-sudo cp "$RESTORE_DIR/.env" .env
 sudo mkdir -p data redis_data postgres_data
+
+# 目标目录必须为空；发现已有内容时中止，不覆盖也不自动清理。
+for dir in data redis_data postgres_data; do
+  if [ -n "$(sudo find "$dir" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+    echo "$dir 非空，已中止恢复；请先确认目标数据并另行处理。" >&2
+    exit 1
+  fi
+done
+if [ -e .env ]; then
+  echo ".env 已存在，已中止恢复；请先备份并确认是否覆盖。" >&2
+  exit 1
+fi
+
+sudo cp "$RESTORE_DIR/.env" .env
 sudo cp -a "$RESTORE_DIR/data/." data/
 sudo cp -a "$RESTORE_DIR/redis_data/." redis_data/
 sudo chown "$USER":"$USER" .env
 chmod 600 .env
 ```
+
+迁移包中的 `nginx-sub2api.conf`、`nginx-full.conf` 和 `certbot-certificates.txt` 只用于核对旧
+服务器配置。不要在证书文件尚未存在时直接覆盖 `/etc/nginx/sites-enabled/`；按第 5.6 节
+先创建 HTTP 配置，再在新服务器重新申请证书并执行 `nginx -t`。
 
 迁移时必须使用旧服务器的 `.env`，不要重新生成 `POSTGRES_PASSWORD`、`JWT_SECRET` 或 `TOTP_ENCRYPTION_KEY`。
 
@@ -666,7 +833,10 @@ docker compose -f docker-compose.local.yml ps postgres
 
 确认 PostgreSQL 状态为 `healthy` 后恢复数据库：
 
+下面的备份不包含 `--clean`，恢复到非空目标库时会报错并停止，不会主动删除目标表。
+
 ```bash
+set -euo pipefail
 gzip -dc "$RESTORE_DIR/database.sql.gz" | \
   docker compose -f docker-compose.local.yml exec -T postgres sh -c \
   'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
@@ -686,9 +856,17 @@ docker compose -f docker-compose.local.yml logs --tail=100 sub2api
 curl -fsS http://127.0.0.1:8080/health
 ```
 
+恢复后至少核对：
+
+1. 管理员能够使用旧账号登录。
+2. 用户、API Key、分组、余额和历史用量与旧服务器一致。
+3. 实际调用一个 API Key 能正常返回，并产生新的用量记录。
+4. `docker compose -f docker-compose.local.yml ps` 中三个服务均为正常状态。
+5. 新服务器 Nginx 域名访问和 HTTPS 正常。
+
 #### 7.4.4 切换域名与保留回滚点
 
-1. 在新服务器恢复 Caddy/Nginx 配置，反向代理到 `127.0.0.1:8080`。
+1. 按第 5 节在新服务器配置 Nginx，反向代理到 `127.0.0.1:8080`。
 2. 用临时域名或本地 `hosts` 验证登录、后台数据和实际 API 调用。
 3. 将 DNS A/AAAA 记录切换到新服务器。
 4. 从外部检查 `https://你的域名/health` 和实际 API 请求。
@@ -715,8 +893,9 @@ git log --oneline HEAD..origin/main
 
 ```bash
 cd /opt/sub2api/deploy
+set -euo pipefail
 docker compose -f docker-compose.local.yml exec -T postgres sh -c \
-  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  'pg_dump --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
   | gzip > "$HOME/sub2api-before-update-$(date +%Y%m%d_%H%M%S).sql.gz"
 
 cd /opt/sub2api
@@ -756,8 +935,8 @@ docker compose -f docker-compose.local.yml logs -f sub2api
 # 最近 100 行
 docker compose -f docker-compose.local.yml logs --tail=100 sub2api
 
-# Caddy 日志
-sudo journalctl -u caddy -f
+# Nginx 日志
+sudo tail -f /var/log/nginx/access.log /var/log/nginx/error.log
 ```
 
 ### 8.3 重启服务
@@ -886,7 +1065,7 @@ docker compose -f docker-compose.local.yml up -d
 SERVER_PORT=8090
 ```
 
-然后同步修改 Caddy/Nginx 的 `proxy_pass` 端口。
+然后同步修改 Nginx 的 `proxy_pass` 端口。
 
 ---
 
@@ -900,7 +1079,7 @@ SERVER_PORT=8090
 
 | 禁止操作 | 后果 | 正确做法 |
 |---------|------|---------|
-| `docker compose -f docker-compose.local.yml down -v` | 删除命名卷，PostgreSQL 和 Redis 数据**永久丢失** | 如需清理，先完整备份 `.env`、源码目录和数据目录 |
+| `docker compose -f docker-compose.local.yml down -v` | 对命名卷会删除卷；当前 `local` 配置虽使用绑定目录，但仍会移除容器和网络 | 生产环境停服使用 `stop`，不要执行 `down -v` |
 | `rm -rf /opt/sub2api/deploy/postgres_data` | 直接删除数据库文件，**所有用户、订单、配置全部丢失** | 永远不要手动删除该目录 |
 | `rm -rf /opt/sub2api/deploy/data` | 删除 Sub2API 运行时数据（配置、日志等） | 先备份再操作 |
 | `docker volume prune` | 可能误删未被容器使用的数据卷 | 生产环境避免使用 |
@@ -978,12 +1157,14 @@ cd /opt/sub2api/deploy
 
 # 1. 创建备份目录并备份 .env
 BACKUP_DIR="$HOME/sub2api-backup-$(date +%Y%m%d_%H%M%S)"
+set -euo pipefail
+umask 077
 mkdir -p "$BACKUP_DIR"
 cp .env "$BACKUP_DIR/.env"
 
 # 2. 备份数据库（推荐）
 docker compose -f docker-compose.local.yml exec -T postgres sh -c \
-  'pg_dump --clean --if-exists --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
+  'pg_dump --no-owner --no-privileges -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
   | gzip > "$BACKUP_DIR/database.sql.gz"
 
 # 3. 完整灾难恢复备份
@@ -1001,7 +1182,7 @@ docker compose -f docker-compose.local.yml exec -T postgres sh -c \
 |------|------|------------|
 | `curl` | 命令行 HTTP 客户端，用于下载脚本、调用 API、测试健康状态 | 否 |
 | `wget` | 文件下载工具 | 否 |
-| `vim` | 文本编辑器，修改 `.env`、Caddyfile、Nginx 配置等 | 否 |
+| `vim` | 文本编辑器，修改 `.env`、Nginx 配置等 | 否 |
 | `unzip` | 解压 zip 文件 | 否 |
 | `htop` | 交互式系统监控工具，查看 CPU/内存/进程 | 否 |
 | `git` | 版本控制，拉取 Sub2API 代码、更新版本 | 否 |
@@ -1011,7 +1192,10 @@ docker compose -f docker-compose.local.yml exec -T postgres sh -c \
 | `fail2ban` | 入侵防御，自动封禁暴力破解来源 IP | 是 |
 | `docker-ce` | Docker 容器引擎 | 是 |
 | `docker-compose-plugin` | Docker Compose V2，编排多容器应用 | 否（Docker 插件） |
-| `caddy` | 反向代理与自动 HTTPS | 是 |
+| `nginx` | 反向代理、HTTPS 入口和流式请求转发 | 是 |
+| `certbot` | 申请和续期 Let's Encrypt 证书 | 否（由 timer 定期调用） |
+| `python3-certbot-nginx` | 让 Certbot 自动识别和更新 Nginx 站点 | 否（Certbot 插件） |
+| `dnsutils` | 提供 `dig`，用于核对域名 A/AAAA 解析 | 否 |
 
 ### Docker 相关组件说明
 
@@ -1032,8 +1216,8 @@ docker compose -f docker-compose.local.yml exec -T postgres sh -c \
 cd /opt/sub2api/deploy
 docker compose -f docker-compose.local.yml up -d
 
-# 停止
-docker compose -f docker-compose.local.yml down
+# 停止（保留容器和数据，生产环境优先使用 stop）
+docker compose -f docker-compose.local.yml stop
 
 # 重启 sub2api
 docker compose -f docker-compose.local.yml restart sub2api

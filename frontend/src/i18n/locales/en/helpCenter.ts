@@ -37,6 +37,7 @@ export default {
       },
       billing: {
         title: "Recharge & Billing",
+        parameters: "Billing Parameters",
         paramName: "Parameter",
         paramDesc: "Description",
         paramsList: [

@@ -306,6 +306,7 @@ export default {
       secondary: '查看文档'
     },
     footer: {
+      allRightsReserved: '保留所有权利。',
       copyrightSuffix: 'AI API 网关',
       tagline: 'AI API 网关平台，把 AI 订阅额度变成可分发、可计量、可管控的 API 能力。',
       product: {

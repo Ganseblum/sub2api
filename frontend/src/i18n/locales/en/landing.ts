@@ -306,6 +306,7 @@ export default {
       secondary: 'View docs'
     },
     footer: {
+      allRightsReserved: 'All rights reserved.',
       copyrightSuffix: 'AI API Gateway',
       tagline: 'An AI API gateway that turns AI subscriptions into distributable, metered and controllable API capabilities.',
       product: {

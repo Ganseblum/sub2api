@@ -19,6 +19,7 @@ export default {
       tools: "配置工具",
       ccSwitch: "CC Switch",
       claudeCode: "Claude Code",
+      codex: "Codex",
       geminiCli: "Gemini CLI",
       opencode: "OpenCode",
       openclaw: "OpenClaw",
@@ -36,6 +37,7 @@ export default {
       },
       billing: {
         title: "充值与计费",
+        parameters: "计费参数",
         paramName: "参数",
         paramDesc: "说明",
         paramsList: [

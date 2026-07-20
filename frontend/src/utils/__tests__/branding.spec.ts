@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { APP_BRAND_LOGO } from '@/config/brand'
 import { updateFavicon } from '@/utils/branding'
 
 describe('updateFavicon', () => {
   beforeEach(() => {
-    document.head.innerHTML = '<link rel="icon" href="/logo.png">'
+    document.head.innerHTML = `<link rel="icon" href="${APP_BRAND_LOGO}">`
   })
 
   it('replaces the default favicon with the configured logo', () => {
@@ -17,6 +18,6 @@ describe('updateFavicon', () => {
     updateFavicon('javascript:alert(1)')
 
     const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
-    expect(link?.getAttribute('href')).toBe('/logo.png')
+    expect(link?.getAttribute('href')).toBe(APP_BRAND_LOGO)
   })
 })

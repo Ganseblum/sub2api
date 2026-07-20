@@ -47,7 +47,7 @@
             class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30"
           >
             <img
-              :src="siteLogo || '/logo.png'"
+              :src="siteLogo || APP_BRAND_LOGO"
               alt="Logo"
               class="h-full w-full object-contain"
             />
@@ -666,7 +666,7 @@
                 class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white"
               >
                 <img
-                  :src="siteLogo || '/logo.png'"
+                  :src="siteLogo || APP_BRAND_LOGO"
                   alt="Logo"
                   class="h-full w-full object-contain"
                 />
@@ -797,7 +797,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore, useAppStore } from '@/stores'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
-import { normalizeBrandName } from '@/config/brand'
+import { APP_BRAND_LOGO, normalizeBrandName } from '@/config/brand'
 import { sanitizeUrl } from '@/utils/url'
 
 const { t } = useI18n()

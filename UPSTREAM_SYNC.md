@@ -237,6 +237,43 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 本机未预装 `golangci-lint`，因此 `make test-backend` 在全部 Go 测试通过后停在工具缺失；
 随后使用 CI 固定版本 `v2.9.0` 执行同一 lint，结果为 0 issues。
 
+## 2026-07-22 同步（支付服务商文档）
+
+| 项目 | 提交 |
+|------|------|
+| Fork 父提交 | `054931265a6614e945299354d1e3ee19efaaf4d5` |
+| 上游父提交 | `5a8d6c4e41e38f05cea4164e6ff03443fc0f6923` |
+| Merge base | `a978d56c7b03600101dd727446c2756c7f44f4c1` |
+| 备份分支 | `backup/pre-upstream-sync-20260722-054931265` |
+| 合并提交 | 当前记录随本次 merge commit 一同提交 |
+
+同步前 fork 与上游分别有 43 和 2 个独有提交。上游独有历史由
+`c05b2311d` 及其合并提交 `5a8d6c4e4` 组成，只修改支付服务商文档。
+
+### 实际冲突
+
+本次 `git merge --no-ff --no-commit upstream/main` 自动合并成功，没有实际内容冲突、
+未合并索引项或冲突标记，因此无需重新应用 fork 逻辑。
+
+### 自动合并复查点
+
+- 上游修改 `docs/PAYMENT.md` 和 `docs/PAYMENT_CN.md`，更新 Kyren Topup 的域名、费率和
+  提现说明。
+- fork 从 merge base 到同步前提交未修改这两个文件，不属于双方同改文件。
+- 最终暂存内容与 `upstream/main` 中的两个文档逐字一致；fork 的品牌、部署和前端自定义
+  均未受本次文档合并影响。
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check`、`git diff --cached --check` | 通过 |
+| `git diff --name-only --diff-filter=U`、`git ls-files -u` | 通过；无未合并文件 |
+| 冲突标记扫描 | 通过；源码和文档中无遗留冲突标记 |
+| `git diff --cached upstream/main -- docs/PAYMENT.md docs/PAYMENT_CN.md` | 通过；最终文档与上游一致 |
+
+本次仅修改 Markdown 文档，不涉及前端、后端、数据库、API 或依赖，因此未额外运行代码测试。
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：

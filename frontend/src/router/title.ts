@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n'
 import { normalizeBrandName } from '@/config/brand'
+import { localizeCustomMenuLabel } from '@/utils/customMenu'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 import type { CustomMenuItem } from '@/types'
 
@@ -53,7 +54,7 @@ export function resolveRouteDocumentTitle(
   const menuItem = route.name === 'CustomPage' && id
     ? customMenuItems.find((item) => item.id === id)
     : undefined
-  const menuTitle = menuItem?.label.trim()
+  const menuTitle = menuItem ? localizeCustomMenuLabel(menuItem, i18n.global.t).trim() : ''
 
   return resolveDocumentTitle(
     menuTitle || route.meta.title,

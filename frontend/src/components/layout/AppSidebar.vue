@@ -203,6 +203,7 @@ import { sanitizeSvg } from '@/utils/sanitize'
 import { sanitizeUrl } from '@/utils/url'
 import { FeatureFlags, makeSidebarFlag } from '@/utils/featureFlags'
 import { useBatchImageAccess } from '@/composables/useBatchImageAccess'
+import { localizeCustomMenuLabel, shouldHideCustomMenuItem } from '@/utils/customMenu'
 
 interface NavItem {
   path: string
@@ -752,7 +753,7 @@ function buildSelfNavItems(withDashboard: boolean): NavItem[] {
     { path: '/help', label: t('nav.helpCenter'), icon: HelpIcon },
     ...customMenuItemsForUser.value.map((item): NavItem => ({
       path: `/custom/${item.id}`,
-      label: item.label,
+      label: localizeCustomMenuLabel(item, t),
       icon: null,
       iconSvg: item.icon_svg,
     })),
@@ -779,6 +780,7 @@ const customMenuItemsForUser = computed(() => {
   const items = appStore.cachedPublicSettings?.custom_menu_items ?? []
   return items
     .filter((item) => item.visibility === 'user')
+    .filter((item) => !shouldHideCustomMenuItem(item, { hasBuiltInPurchaseEntry: flagPayment() }))
     .sort((a, b) => a.sort_order - b.sort_order)
 })
 
@@ -862,14 +864,14 @@ const adminNavItems = computed((): NavItem[] => {
     filtered.push({ path: '/keys', label: t('nav.apiKeys'), icon: KeyIcon })
     filtered.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
     for (const cm of customMenuItemsForAdmin.value) {
-      filtered.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
+      filtered.push({ path: `/custom/${cm.id}`, label: localizeCustomMenuLabel(cm, t), icon: null, iconSvg: cm.icon_svg })
     }
     return filtered
   }
 
   visible.push({ path: '/admin/settings', label: t('nav.settings'), icon: CogIcon })
   for (const cm of customMenuItemsForAdmin.value) {
-    visible.push({ path: `/custom/${cm.id}`, label: cm.label, icon: null, iconSvg: cm.icon_svg })
+    visible.push({ path: `/custom/${cm.id}`, label: localizeCustomMenuLabel(cm, t), icon: null, iconSvg: cm.icon_svg })
   }
   return visible
 })

@@ -61,3 +61,11 @@ describe('AppSidebar support navigation', () => {
     expect(componentSource).toContain(`${contactItem},\n    ${helpItem},`)
   })
 })
+
+describe('AppSidebar migrated purchase menu', () => {
+  it('localizes the migrated label and hides it only beside the built-in entry', () => {
+    expect(componentSource).toContain("import { localizeCustomMenuLabel, shouldHideCustomMenuItem } from '@/utils/customMenu'")
+    expect(componentSource).toContain('label: localizeCustomMenuLabel(item, t)')
+    expect(componentSource).toContain('shouldHideCustomMenuItem(item, { hasBuiltInPurchaseEntry: flagPayment() })')
+  })
+})

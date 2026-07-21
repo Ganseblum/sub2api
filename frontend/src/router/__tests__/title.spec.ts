@@ -1,5 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { i18n } from '@/i18n'
 import { resolveDocumentTitle, resolveRouteDocumentTitle } from '@/router/title'
+import { MIGRATED_PURCHASE_MENU_ID } from '@/utils/customMenu'
+
+beforeAll(() => {
+  i18n.global.setLocaleMessage('en', {
+    nav: { buySubscription: () => 'Recharge Center' }
+  })
+  i18n.global.locale.value = 'en'
+})
 
 describe('resolveDocumentTitle', () => {
   it('路由存在标题时，使用“路由标题 - 站点名”格式', () => {
@@ -60,5 +69,24 @@ describe('resolveRouteDocumentTitle', () => {
         sort_order: 0
       }
     ])).toBe('账号调度器 - EzouAPI')
+  })
+
+  it('迁移后的充值菜单使用当前语言生成标题', () => {
+    const route = {
+      name: 'CustomPage',
+      params: { id: MIGRATED_PURCHASE_MENU_ID },
+      meta: { title: 'Custom Page' }
+    }
+
+    expect(resolveRouteDocumentTitle(route, 'EzouAPI', [
+      {
+        id: MIGRATED_PURCHASE_MENU_ID,
+        label: '充值/订阅',
+        icon_svg: '',
+        url: 'https://example.com',
+        visibility: 'user',
+        sort_order: 100
+      }
+    ])).toBe('Recharge Center - EzouAPI')
   })
 })

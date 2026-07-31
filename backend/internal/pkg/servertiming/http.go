@@ -53,9 +53,11 @@ func Do(client *http.Client, req *http.Request) (*http.Response, error) {
 		client = http.DefaultClient
 	}
 	if req == nil || !Active(req.Context()) {
+		// #nosec G704 -- URL validation belongs to the caller; this helper only records timing.
 		return client.Do(req)
 	}
 	startedAt := time.Now()
+	// #nosec G704 -- URL validation belongs to the caller; this helper only records timing.
 	response, err := client.Do(req)
 	RecordDependency(req.Context(), dependencyModule(req), startedAt, time.Now())
 	return response, err

@@ -274,6 +274,142 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 
 本次仅修改 Markdown 文档，不涉及前端、后端、数据库、API 或依赖，因此未额外运行代码测试。
 
+## 2026-08-01 同步（upstream/main 至 v0.1.169）
+
+| 项目 | 提交 |
+|------|------|
+| 本地 fork 起点 | `06df1568df21cb97bfc7828292d634f6b0ffd6b4` |
+| fork 远端起点 | `0bb9378d1bbe6852ffa40f1306e22f9c48f93b74` |
+| 上游起点 | `682c4fe0e61b851508fa976ac693e0f68a0639eb` |
+| 初始本地与上游 merge base | `5a8d6c4e41e38f05cea4164e6ff03443fc0f6923` |
+| 实际 upstream 合并 merge base | `cb24522dd53f8f363d008e3afdc8e4baf9788cab` |
+| 备份分支 | `codex/backup-upstream-sync-20260801-002613` |
+| 合并提交 | 当前记录随本次 upstream merge commit 一同提交 |
+
+同步流程先 `git fetch origin --prune`、`git fetch upstream --prune`，随后先合入
+`origin/main`，再合入 `upstream/main`。`origin/main` 自动合并成功；`upstream/main`
+产生以下 2 个实际内容冲突。
+
+### 冲突 1：`backend/cmd/server/wire_gen.go`
+
+**冲突区域**：`initializeApplication` 中 `handler.ProvideHandlers(...)` 的参数列表。
+
+**上游行为**：
+
+- 新增 `passkeyHandler`，注册 passkey 登录/管理处理器。
+- 新增 `modelPlazaHandler`，注册模型广场处理器。
+- 保留 `optionalJWTAuthMiddleware` 并传给 router。
+
+**Fork 行为**：
+
+- 已有 `modelMarketHandler`，用于 fork 的模型市场功能。
+
+**最终结果**：
+
+- 以上游 `ProvideHandlers` 新签名为底稿。
+- 在 `channelMonitorUserHandler` 之后补回 fork 的 `modelMarketHandler`。
+- 同时保留 upstream 的 `passkeyHandler`、`modelPlazaHandler` 和
+  `optionalJWTAuthMiddleware`。
+
+**验证**：
+
+- `go test ./...`：通过。
+- `go test ./internal/pkg/servertiming ./internal/server/middleware ./internal/service ./internal/handler ./internal/handler/admin ./internal/repository`：通过。
+- `golangci-lint run ./...`：通过，`0 issues`。
+- `make build-backend`：通过，版本 `0.1.169`。
+- `git diff --name-only --diff-filter=U`、`git ls-files -u`：通过；无未合并文件。
+- 冲突标记扫描：通过；无 Git 冲突标记。
+
+**已提示用户**：是，冲突文件在处理前已报告。
+
+### 冲突 2：`frontend/src/components/layout/AppHeader.vue`
+
+**冲突区域**：`<script setup>` import 区。
+
+**上游行为**：
+
+- 新增 `FeatureFlags` 与 `isFeatureFlagEnabled`，用于 `modelPlazaEnabled` 计算属性。
+
+**Fork 行为**：
+
+- 使用 `localizeCustomMenuLabel` 本地化 fork 自定义菜单项。
+
+**最终结果**：
+
+- 保留 upstream 的 feature flag import，模型广场入口继续受开关控制。
+- 重新加入 fork 的 `localizeCustomMenuLabel` import，自定义菜单标签继续本地化。
+
+**验证**：
+
+- `pnpm --dir frontend run lint:check`：通过。
+- `pnpm --dir frontend run typecheck`：首次发现 `HomeView.vue` 自动合并缺少
+  `siteSubtitle`，补回后复验通过。
+- `pnpm --dir frontend run build`：通过；仅有 Vite 分块/动态导入警告。
+- `make test-frontend`：通过，6 个文件、103 个用例通过。
+- `git diff --check`、`git diff --cached --check`：通过。
+- 冲突标记扫描：通过；无 Git 冲突标记。
+
+**已提示用户**：是，冲突文件在处理前已报告。
+
+### 自动合并复查点
+
+双方都修改但 Git 自动合并成功的文件共 23 个：
+
+- `README.md`
+- `README_CN.md`
+- `backend/cmd/server/wire_gen.go`
+- `backend/internal/handler/handler.go`
+- `backend/internal/handler/wire.go`
+- `backend/internal/server/routes/user.go`
+- `backend/internal/service/pricing_service.go`
+- `deploy/docker-compose.local.yml`
+- `frontend/src/components/account/CreateAccountModal.vue`
+- `frontend/src/components/layout/AppHeader.vue`
+- `frontend/src/i18n/locales/en/admin/accounts.ts`
+- `frontend/src/i18n/locales/en/admin/channels.ts`
+- `frontend/src/i18n/locales/en/admin/overview.ts`
+- `frontend/src/i18n/locales/en/common.ts`
+- `frontend/src/i18n/locales/zh/admin/accounts.ts`
+- `frontend/src/i18n/locales/zh/admin/channels.ts`
+- `frontend/src/i18n/locales/zh/admin/overview.ts`
+- `frontend/src/i18n/locales/zh/common.ts`
+- `frontend/src/router/index.ts`
+- `frontend/src/stores/app.ts`
+- `frontend/src/views/HomeView.vue`
+- `frontend/src/views/admin/SettingsView.vue`
+- `frontend/src/views/auth/RegisterView.vue`
+
+高风险自动合并与复查结果：
+
+- 后端 DI/handler：保留 fork 的 `ModelMarket`，并保留 upstream 的 `Passkey`、
+  `ModelPlaza`、`OptionalJWTAuthMiddleware`。
+- 用户路由：保留 upstream 的 panel rate limit 与 passkey 路由；fork 用户路由未被移除。
+- 定价服务：保留 upstream 的 GPT-5.6 Luna/Terra、Gemini thinking tier、Claude Opus
+  5/4.8 回退逻辑；同时保留 fork 模型市场依赖的定价服务。
+- 前端路由/设置/store：保留 upstream 的 model plaza、passkey、compact home、panel
+  rate limit 开关；保留 fork 的 model market、自定义菜单、品牌和注册入口逻辑。
+- `HomeView.vue`：自动合并后 typecheck 发现缺少 `siteSubtitle`，已补接
+  `cachedPublicSettings.site_subtitle`。
+- 后端 lint 复查：对 caller-controlled HTTP timing wrapper、测试 server 转发、operator
+  配置的调试/定价文件路径添加了带说明的 gosec 抑制；OIDC EC JWK 点校验改用
+  `crypto/ecdh`；`reflect.Ptr` 更新为 `reflect.Pointer`。
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check`、`git diff --cached --check` | 通过 |
+| `git diff --name-only --diff-filter=U`、`git ls-files -u` | 通过；无未合并文件 |
+| 冲突标记扫描 | 通过；无 Git 冲突标记 |
+| `pnpm --dir frontend run lint:check` | 通过 |
+| `pnpm --dir frontend run typecheck` | 通过；首次失败后补回 `siteSubtitle`，复验通过 |
+| `pnpm --dir frontend run build` | 通过；仅 Vite 警告 |
+| `make test-frontend` | 通过；6 个文件、103 个用例 |
+| `go test ./...` | 通过 |
+| 受影响 Go 包复验 | 通过 |
+| `golangci-lint run ./...` | 通过，`0 issues` |
+| `make build-backend` | 通过，版本 `0.1.169` |
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：

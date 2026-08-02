@@ -531,6 +531,41 @@ func TestDefaultPricingIncludesGemini36FlashRates(t *testing.T) {
 	}
 }
 
+func TestDefaultPricingIncludesClaude5MarketRates(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", "resources", "model-pricing", "model_prices_and_context_window.json"))
+	require.NoError(t, err)
+
+	pricingSvc := &PricingService{}
+	pricingData, err := pricingSvc.parsePricingData(data)
+	require.NoError(t, err)
+	pricingSvc.pricingData = pricingData
+
+	cases := []struct {
+		model      string
+		input      float64
+		output     float64
+		cacheRead  float64
+		cacheWrite float64
+	}{
+		{model: "claude-fable-5", input: 10e-6, output: 50e-6, cacheRead: 1e-6, cacheWrite: 12.5e-6},
+		{model: "claude-sonnet-5", input: 2e-6, output: 10e-6, cacheRead: 0.2e-6, cacheWrite: 2.5e-6},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.model, func(t *testing.T) {
+			require.True(t, pricingSvc.HasExactModelPricing(tc.model))
+			pricing := pricingSvc.GetModelPricing(tc.model)
+			require.NotNil(t, pricing)
+			require.InDelta(t, tc.input, pricing.InputCostPerToken, 1e-12)
+			require.InDelta(t, tc.output, pricing.OutputCostPerToken, 1e-12)
+			require.InDelta(t, tc.cacheRead, pricing.CacheReadInputTokenCost, 1e-12)
+			require.InDelta(t, tc.cacheWrite, pricing.CacheCreationInputTokenCost, 1e-12)
+			require.Equal(t, 1000000, pricing.MaxInputTokens)
+			require.Equal(t, 128000, pricing.MaxOutputTokens)
+		})
+	}
+}
+
 func TestDefaultPricingUsesCurrentCodexAutoReviewBaseRates(t *testing.T) {
 	data, err := os.ReadFile(filepath.Join("..", "..", "resources", "model-pricing", "model_prices_and_context_window.json"))
 	require.NoError(t, err)

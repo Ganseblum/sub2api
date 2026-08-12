@@ -52,7 +52,7 @@ var modelMarketSpecs = []modelMarketSpec{
 	{ID: "claude-opus-4-7", DisplayName: "Claude Opus 4.7", DisplayOrder: 2500, ReleaseDate: "2026-04-16", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-opus-4-8", DisplayName: "Claude Opus 4.8", DisplayOrder: 2450, ReleaseDate: "2026-06-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-opus-5", DisplayName: "Claude Opus 5", DisplayOrder: 2425, ReleaseDate: "2026-07-25", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "opus", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
-	{ID: "claude-fable-5", DisplayName: "Claude Code (Fable 5)", DisplayOrder: 2400, ReleaseDate: "2026-07-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
+	{ID: "claude-fable-5", DisplayName: "Claude Fable 5", DisplayOrder: 2400, ReleaseDate: "2026-07-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "fable", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-sonnet-5", DisplayName: "Claude Sonnet 5", DisplayOrder: 2350, ReleaseDate: "2026-07-15", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-sonnet-4-6", DisplayName: "Claude Sonnet 4.6", DisplayOrder: 2300, ReleaseDate: "2026-02-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "sonnet", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
 	{ID: "claude-haiku-4-5", DisplayName: "Claude Haiku 4.5", DisplayOrder: 2200, ReleaseDate: "2025-10-01", Family: "claude", Provider: service.PlatformAnthropic, DisplayProvider: "Claude", Tier: "haiku", GroupPlatforms: []string{service.PlatformAnthropic, service.PlatformAntigravity}},
@@ -60,22 +60,16 @@ var modelMarketSpecs = []modelMarketSpec{
 	// Gemini — newest first (3.6 / 3.5 / 3.1 / 3.0 series)
 	{ID: "gemini-3.6-flash", DisplayName: "Gemini 3.6 Flash", DisplayOrder: 2175, ReleaseDate: "2026-07-31", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
 	{ID: "gemini-3.5-flash", DisplayName: "Gemini 3.5 Flash", DisplayOrder: 2150, ReleaseDate: "2026-05-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3.5-flash-low", DisplayName: "Gemini 3.5 Flash Low", DisplayOrder: 2125, ReleaseDate: "2026-05-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.5-flash"},
+	{ID: "gemini-3.5-flash-lite", DisplayName: "Gemini 3.5 Flash-Lite", DisplayOrder: 2125, ReleaseDate: "2026-05-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
 	{ID: "gemini-3.1-pro-preview", DisplayName: "Gemini 3.1 Pro Preview", DisplayOrder: 2100, ReleaseDate: "2026-04-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3.1-pro-preview-thinking-128", DisplayName: "Gemini 3.1 Pro Preview Thinking 128K", DisplayOrder: 2050, ReleaseDate: "2026-04-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-pro-preview"},
-	{ID: "gemini-3.1-flash", DisplayName: "Gemini 3.1 Flash", DisplayOrder: 2000, ReleaseDate: "2026-03-15", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3.1-flash-lite"},
+	{ID: "gemini-3.1-flash-lite", DisplayName: "Gemini 3.1 Flash-Lite", DisplayOrder: 2000, ReleaseDate: "2026-03-15", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
 	{ID: "gemini-3.1-flash-image", DisplayName: "Gemini 3.1 Flash Image", DisplayOrder: 1950, ReleaseDate: "2026-03-20", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash", DisplayName: "Gemini 3 Flash", DisplayOrder: 1900, ReleaseDate: "2026-03-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
-	{ID: "gemini-3-flash-thinking-128", DisplayName: "Gemini 3 Flash Thinking 128K", DisplayOrder: 1850, ReleaseDate: "2026-03-05", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-flash"},
-	{ID: "gemini-3-pro", DisplayName: "Gemini 3 Pro", DisplayOrder: 1800, ReleaseDate: "2026-02-15", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}, PricingID: "gemini-3-pro-preview"},
-	{ID: "gemini-3-pro-preview", DisplayName: "Gemini 3 Pro Preview", DisplayOrder: 1750, ReleaseDate: "2026-02-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "flagship", GroupPlatforms: []string{service.PlatformGemini}},
+	{ID: "gemini-3-flash-preview", DisplayName: "Gemini 3 Flash Preview", DisplayOrder: 1900, ReleaseDate: "2026-03-01", Family: "gemini", Provider: service.PlatformGemini, DisplayProvider: "Gemini", Tier: "standard", GroupPlatforms: []string{service.PlatformGemini}},
 
 	// OpenAI GPT
 	{ID: "gpt-5.6-sol", DisplayName: "GPT-5.6 Sol", DisplayOrder: 900, ReleaseDate: "2026-06-01", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
 	{ID: "gpt-5.6-terra", DisplayName: "GPT-5.6 Terra", DisplayOrder: 850, ReleaseDate: "2026-05-20", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "standard", GroupPlatforms: []string{service.PlatformOpenAI}},
 	{ID: "gpt-5.6-luna", DisplayName: "GPT-5.6 Luna", DisplayOrder: 800, ReleaseDate: "2026-05-15", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "mini", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.5", DisplayName: "GPT-5.5", DisplayOrder: 700, ReleaseDate: "2026-04-23", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
-	{ID: "gpt-5.4", DisplayName: "GPT-5.4", DisplayOrder: 600, ReleaseDate: "2026-03-05", Family: "gpt", Provider: service.PlatformOpenAI, DisplayProvider: "OpenAI", Tier: "flagship", GroupPlatforms: []string{service.PlatformOpenAI}},
 }
 
 type modelMarketResponse struct {
@@ -115,13 +109,23 @@ type modelMarketContextDTO struct {
 }
 
 type modelMarketPricingDTO struct {
+	InputPer1M        *float64                          `json:"input_per_1m"`
+	OutputPer1M       *float64                          `json:"output_per_1m"`
+	CacheWritePer1M   *float64                          `json:"cache_write_per_1m"`
+	CacheWrite1hPer1M *float64                          `json:"cache_write_1h_per_1m"`
+	CacheReadPer1M    *float64                          `json:"cache_read_per_1m"`
+	ImageOutputPer1M  *float64                          `json:"image_output_per_1m"`
+	PerRequest        *float64                          `json:"per_request"`
+	LongContext       *modelMarketLongContextPricingDTO `json:"long_context"`
+}
+
+type modelMarketLongContextPricingDTO struct {
+	ThresholdTokens   int      `json:"threshold_tokens"`
 	InputPer1M        *float64 `json:"input_per_1m"`
 	OutputPer1M       *float64 `json:"output_per_1m"`
 	CacheWritePer1M   *float64 `json:"cache_write_per_1m"`
 	CacheWrite1hPer1M *float64 `json:"cache_write_1h_per_1m"`
 	CacheReadPer1M    *float64 `json:"cache_read_per_1m"`
-	ImageOutputPer1M  *float64 `json:"image_output_per_1m"`
-	PerRequest        *float64 `json:"per_request"`
 }
 
 type modelMarketGroupDTO struct {
@@ -307,7 +311,52 @@ func toModelMarketPricing(pricing *service.LiteLLMModelPricing) modelMarketPrici
 		CacheReadPer1M:    perMillionPtr(pricing.CacheReadInputTokenCost),
 		ImageOutputPer1M:  perMillionPtr(pricing.OutputCostPerImageToken),
 		PerRequest:        nonZeroFloatPtr(pricing.OutputCostPerImage),
+		LongContext:       toModelMarketLongContextPricing(pricing),
 	}
+}
+
+func toModelMarketLongContextPricing(pricing *service.LiteLLMModelPricing) *modelMarketLongContextPricingDTO {
+	if pricing == nil || pricing.LongContextInputTokenThreshold <= 0 {
+		return nil
+	}
+
+	inputPrice := pricing.InputCostPerTokenAbove200kTokens
+	if inputPrice <= 0 && pricing.LongContextInputCostMultiplier > 0 {
+		inputPrice = pricing.InputCostPerToken * pricing.LongContextInputCostMultiplier
+	}
+	outputPrice := pricing.OutputCostPerTokenAbove200kTokens
+	if outputPrice <= 0 && pricing.LongContextOutputCostMultiplier > 0 {
+		outputPrice = pricing.OutputCostPerToken * pricing.LongContextOutputCostMultiplier
+	}
+	cacheWritePrice := pricing.CacheCreationInputTokenCostAbove200kTokens
+	if cacheWritePrice <= 0 && pricing.LongContextInputCostMultiplier > 0 {
+		cacheWritePrice = pricing.CacheCreationInputTokenCost * pricing.LongContextInputCostMultiplier
+	}
+	cacheWrite1hPrice := 0.0
+	if pricing.LongContextInputCostMultiplier > 0 {
+		cacheWrite1hPrice = pricing.CacheCreationInputTokenCostAbove1hr * pricing.LongContextInputCostMultiplier
+	}
+	cacheReadPrice := pricing.CacheReadInputTokenCostAbove200kTokens
+	if cacheReadPrice <= 0 && pricing.LongContextInputCostMultiplier > 0 {
+		cacheReadPrice = pricing.CacheReadInputTokenCost * pricing.LongContextInputCostMultiplier
+	}
+
+	longContext := &modelMarketLongContextPricingDTO{
+		ThresholdTokens:   pricing.LongContextInputTokenThreshold,
+		InputPer1M:        perMillionPtr(inputPrice),
+		OutputPer1M:       perMillionPtr(outputPrice),
+		CacheWritePer1M:   perMillionPtr(cacheWritePrice),
+		CacheWrite1hPer1M: perMillionPtr(cacheWrite1hPrice),
+		CacheReadPer1M:    perMillionPtr(cacheReadPrice),
+	}
+	if longContext.InputPer1M == nil &&
+		longContext.OutputPer1M == nil &&
+		longContext.CacheWritePer1M == nil &&
+		longContext.CacheWrite1hPer1M == nil &&
+		longContext.CacheReadPer1M == nil {
+		return nil
+	}
+	return longContext
 }
 
 func scaleMarketPricing(pricing modelMarketPricingDTO, rate float64) modelMarketPricingDTO {
@@ -319,6 +368,21 @@ func scaleMarketPricing(pricing modelMarketPricingDTO, rate float64) modelMarket
 		CacheReadPer1M:    scaleFloatPtr(pricing.CacheReadPer1M, rate),
 		ImageOutputPer1M:  scaleFloatPtr(pricing.ImageOutputPer1M, rate),
 		PerRequest:        scaleFloatPtr(pricing.PerRequest, rate),
+		LongContext:       scaleModelMarketLongContextPricing(pricing.LongContext, rate),
+	}
+}
+
+func scaleModelMarketLongContextPricing(pricing *modelMarketLongContextPricingDTO, rate float64) *modelMarketLongContextPricingDTO {
+	if pricing == nil {
+		return nil
+	}
+	return &modelMarketLongContextPricingDTO{
+		ThresholdTokens:   pricing.ThresholdTokens,
+		InputPer1M:        scaleFloatPtr(pricing.InputPer1M, rate),
+		OutputPer1M:       scaleFloatPtr(pricing.OutputPer1M, rate),
+		CacheWritePer1M:   scaleFloatPtr(pricing.CacheWritePer1M, rate),
+		CacheWrite1hPer1M: scaleFloatPtr(pricing.CacheWrite1hPer1M, rate),
+		CacheReadPer1M:    scaleFloatPtr(pricing.CacheReadPer1M, rate),
 	}
 }
 

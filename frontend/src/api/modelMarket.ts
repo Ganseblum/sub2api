@@ -8,6 +8,16 @@ export interface ModelMarketPricing {
   cache_read_per_1m: number | null
   image_output_per_1m: number | null
   per_request: number | null
+  long_context: ModelMarketLongContextPricing | null
+}
+
+export interface ModelMarketLongContextPricing {
+  threshold_tokens: number
+  input_per_1m: number | null
+  output_per_1m: number | null
+  cache_write_per_1m: number | null
+  cache_write_1h_per_1m: number | null
+  cache_read_per_1m: number | null
 }
 
 export interface ModelMarketContext {

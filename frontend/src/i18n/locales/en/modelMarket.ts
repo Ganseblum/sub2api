@@ -64,7 +64,8 @@ export default {
     cacheReadShort: "Cache R",
     perRequest: "Per Request",
     imageOutput: "Image Output",
-    rate: "Rate"
+    rate: "Rate",
+    aboveThreshold: "Full-tier pricing above {tokens} input"
   },
   capabilities: {
     reasoning: "Reasoning",

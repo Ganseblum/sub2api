@@ -247,6 +247,23 @@
                   <strong>{{ formatPrice(row.pricing.cache_read_per_1m, '/1M token') }}</strong>
                 </div>
               </div>
+              <div v-if="row.pricing.long_context" class="long-context-card mt-3">
+                <span class="long-context-heading">
+                  {{ t('modelMarket.price.aboveThreshold', {
+                    tokens: formatTokens(row.pricing.long_context.threshold_tokens),
+                  }) }}
+                </span>
+                <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  <span>
+                    {{ t('modelMarket.price.input') }}
+                    <strong>{{ formatPrice(row.pricing.long_context.input_per_1m, '/1M token') }}</strong>
+                  </span>
+                  <span>
+                    {{ t('modelMarket.price.output') }}
+                    <strong>{{ formatPrice(row.pricing.long_context.output_per_1m, '/1M token') }}</strong>
+                  </span>
+                </div>
+              </div>
 
               <div class="mt-5 border-t border-gray-100 pt-4 dark:border-dark-700">
                 <div class="mb-2 flex items-center justify-between gap-3">
@@ -477,26 +494,20 @@ const staticModelSpecs: ModelMarketModel[] = [
   makeStaticModel('claude-opus-4-7', 'Claude Opus 4.7', 2500, '2026-04-16', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
   makeStaticModel('claude-opus-4-8', 'Claude Opus 4.8', 2450, '2026-06-01', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
   makeStaticModel('claude-opus-5', 'Claude Opus 5', 2425, '2026-07-25', 'claude', 'Claude', 'opus', ['anthropic', 'antigravity'], { input: 5, output: 25, cacheWrite: 6.25, cacheWrite1h: 10, cacheRead: 0.5 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('claude-fable-5', 'Claude Code (Fable 5)', 2400, '2026-07-01', 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('claude-fable-5', 'Claude Fable 5', 2400, '2026-07-01', 'claude', 'Claude', 'fable', ['anthropic', 'antigravity'], { input: 10, output: 50, cacheWrite: 12.5, cacheWrite1h: 20, cacheRead: 1 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
   makeStaticModel('claude-sonnet-5', 'Claude Sonnet 5', 2350, '2026-07-15', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 2, output: 10, cacheWrite: 2.5, cacheWrite1h: 4, cacheRead: 0.2 }, { input: 1_000_000, output: 128_000, total: 128_000 }),
   makeStaticModel('claude-sonnet-4-6', 'Claude Sonnet 4.6', 2300, '2026-02-01', 'claude', 'Claude', 'sonnet', ['anthropic', 'antigravity'], { input: 3, output: 15, cacheWrite: 3.75, cacheWrite1h: 6, cacheRead: 0.3 }, { input: 1_000_000, output: 64_000, total: 64_000 }),
   makeStaticModel('claude-haiku-4-5', 'Claude Haiku 4.5', 2200, '2025-10-01', 'claude', 'Claude', 'haiku', ['anthropic', 'antigravity'], { input: 1, output: 5, cacheWrite: 1.25, cacheWrite1h: 2, cacheRead: 0.1 }, { input: 200_000, output: 64_000, total: 64_000 }),
   makeStaticModel('gemini-3.6-flash', 'Gemini 3.6 Flash', 2175, '2026-07-31', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.5, output: 7.5, cacheRead: 0.15 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
   makeStaticModel('gemini-3.5-flash', 'Gemini 3.5 Flash', 2150, '2026-05-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3.5-flash-low', 'Gemini 3.5 Flash Low', 2125, '2026-05-05', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 1.5, output: 9, cacheRead: 0.15 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 2100, '2026-04-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
-  makeStaticModel('gemini-3.1-pro-preview-thinking-128', 'Gemini 3.1 Pro Preview Thinking 128K', 2050, '2026-04-05', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
-  makeStaticModel('gemini-3.1-flash', 'Gemini 3.1 Flash', 2000, '2026-03-15', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.25, output: 1.5, cacheRead: 0.025 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.5-flash-lite', 'Gemini 3.5 Flash-Lite', 2125, '2026-05-05', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.3, output: 2.5, cacheRead: 0.03 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 2100, '2026-04-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2, longContext: { threshold: 200_000, input: 4, output: 18, cacheRead: 0.4 } }, { input: 1_048_576, output: 65_536, total: 65_536 }),
+  makeStaticModel('gemini-3.1-flash-lite', 'Gemini 3.1 Flash-Lite', 2000, '2026-03-15', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.25, output: 1.5, cacheRead: 0.025 }, { input: 1_048_576, output: 65_536, total: 65_536 }),
   makeStaticModel('gemini-3.1-flash-image', 'Gemini 3.1 Flash Image', 1950, '2026-03-20', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 65_536, output: 32_768, total: 32_768 }),
-  makeStaticModel('gemini-3-flash', 'Gemini 3 Flash', 1900, '2026-03-01', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-flash-thinking-128', 'Gemini 3 Flash Thinking 128K', 1850, '2026-03-05', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-pro', 'Gemini 3 Pro', 1800, '2026-02-15', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gemini-3-pro-preview', 'Gemini 3 Pro Preview', 1750, '2026-02-01', 'gemini', 'Gemini', 'flagship', ['gemini'], { input: 2, output: 12, cacheRead: 0.2 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
-  makeStaticModel('gpt-5.6-sol', 'GPT-5.6 Sol', 900, '2026-06-01', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-terra', 'GPT-5.6 Terra', 850, '2026-05-20', 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.6-luna', 'GPT-5.6 Luna', 800, '2026-05-15', 'gpt', 'OpenAI', 'mini', ['openai'], { input: 1, output: 6, cacheRead: 0.1 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.5', 'GPT-5.5', 700, '2026-04-23', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheRead: 0.5 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
-  makeStaticModel('gpt-5.4', 'GPT-5.4', 600, '2026-03-05', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 2.5, output: 15, cacheRead: 0.25 }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gemini-3-flash-preview', 'Gemini 3 Flash Preview', 1900, '2026-03-01', 'gemini', 'Gemini', 'standard', ['gemini'], { input: 0.5, output: 3, cacheRead: 0.05 }, { input: 1_048_576, output: 65_535, total: 65_535 }),
+  makeStaticModel('gpt-5.6-sol', 'GPT-5.6 Sol', 900, '2026-06-01', 'gpt', 'OpenAI', 'flagship', ['openai'], { input: 5, output: 30, cacheWrite: 6.25, cacheRead: 0.5, longContext: { threshold: 272_000, input: 10, output: 45, cacheWrite: 12.5, cacheRead: 1 } }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-terra', 'GPT-5.6 Terra', 850, '2026-05-20', 'gpt', 'OpenAI', 'standard', ['openai'], { input: 2, output: 12, cacheWrite: 2.5, cacheRead: 0.2, longContext: { threshold: 272_000, input: 4, output: 18, cacheWrite: 5, cacheRead: 0.4 } }, { input: 1_050_000, output: 128_000, total: 128_000 }),
+  makeStaticModel('gpt-5.6-luna', 'GPT-5.6 Luna', 800, '2026-05-15', 'gpt', 'OpenAI', 'mini', ['openai'], { input: 0.2, output: 1.2, cacheWrite: 0.25, cacheRead: 0.02, longContext: { threshold: 272_000, input: 0.4, output: 1.8, cacheWrite: 0.5, cacheRead: 0.04 } }, { input: 1_050_000, output: 128_000, total: 128_000 }),
 ]
 
 const PriceLines = defineComponent({
@@ -519,15 +530,47 @@ const PriceLines = defineComponent({
       ] as const
       const visible = rows.filter(([, value]) => value != null && value > 0)
       if (visible.length === 0) return h('span', { class: 'text-gray-400' }, '-')
+      const children = visible.map(([key, value, unit]) =>
+        h('div', { class: 'price-line', key }, [
+          h('span', { class: 'price-line-label' }, t(`modelMarket.price.${key}`)),
+          h('span', { class: 'price-line-value' }, formatPrice(value, unit)),
+        ]),
+      )
+
+      const longContext = pricing.long_context
+      if (longContext) {
+        const longContextRows = [
+          ['input', longContext.input_per_1m, '/1M token'],
+          ['output', longContext.output_per_1m, '/1M token'],
+          ['cacheWrite', longContext.cache_write_per_1m, '/1M token'],
+          ['cacheWrite1h', longContext.cache_write_1h_per_1m, '/1M token'],
+          ['cacheRead', longContext.cache_read_per_1m, '/1M token'],
+        ] as const
+        const visibleLongContextRows = longContextRows.filter(([, value]) => value != null && value > 0)
+        if (visibleLongContextRows.length > 0) {
+          children.push(
+            h('div', { class: 'long-context-lines' }, [
+              h(
+                'div',
+                { class: 'long-context-heading' },
+                t('modelMarket.price.aboveThreshold', {
+                  tokens: formatTokens(longContext.threshold_tokens),
+                }),
+              ),
+              ...visibleLongContextRows.map(([key, value, unit]) =>
+                h('div', { class: 'price-line', key: `long-${key}` }, [
+                  h('span', { class: 'price-line-label' }, t(`modelMarket.price.${key}`)),
+                  h('span', { class: 'price-line-value' }, formatPrice(value, unit)),
+                ]),
+              ),
+            ]),
+          )
+        }
+      }
       return h(
         'div',
         { class: 'price-lines' },
-        visible.map(([key, value, unit]) =>
-          h('div', { class: 'price-line', key }, [
-            h('span', { class: 'price-line-label' }, t(`modelMarket.price.${key}`)),
-            h('span', { class: 'price-line-value' }, formatPrice(value, unit)),
-          ]),
-        ),
+        children,
       )
     }
   },
@@ -725,7 +768,21 @@ function makeStaticModel(
   displayProvider: string,
   tier: string,
   groupPlatforms: string[],
-  prices: { input: number; output: number; cacheRead?: number; cacheWrite?: number; cacheWrite1h?: number },
+  prices: {
+    input: number
+    output: number
+    cacheRead?: number
+    cacheWrite?: number
+    cacheWrite1h?: number
+    longContext?: {
+      threshold: number
+      input?: number
+      output?: number
+      cacheRead?: number
+      cacheWrite?: number
+      cacheWrite1h?: number
+    }
+  },
   context: { input: number; output: number; total: number },
 ): ModelMarketModel {
   const provider = family === 'gpt' ? 'openai' : family === 'gemini' ? 'gemini' : 'anthropic'
@@ -748,6 +805,16 @@ function makeStaticModel(
       cache_read_per_1m: prices.cacheRead ?? null,
       image_output_per_1m: null,
       per_request: null,
+      long_context: prices.longContext
+        ? {
+            threshold_tokens: prices.longContext.threshold,
+            input_per_1m: prices.longContext.input ?? null,
+            output_per_1m: prices.longContext.output ?? null,
+            cache_write_per_1m: prices.longContext.cacheWrite ?? null,
+            cache_write_1h_per_1m: prices.longContext.cacheWrite1h ?? null,
+            cache_read_per_1m: prices.longContext.cacheRead ?? null,
+          }
+        : null,
     },
     context: {
       max_input_tokens: context.input,
@@ -770,6 +837,16 @@ function scalePricing(pricing: ModelMarketPricing, rate: number): ModelMarketPri
     cache_read_per_1m: scalePrice(pricing.cache_read_per_1m, rate),
     image_output_per_1m: scalePrice(pricing.image_output_per_1m, rate),
     per_request: scalePrice(pricing.per_request, rate),
+    long_context: pricing.long_context
+      ? {
+          threshold_tokens: pricing.long_context.threshold_tokens,
+          input_per_1m: scalePrice(pricing.long_context.input_per_1m, rate),
+          output_per_1m: scalePrice(pricing.long_context.output_per_1m, rate),
+          cache_write_per_1m: scalePrice(pricing.long_context.cache_write_per_1m, rate),
+          cache_write_1h_per_1m: scalePrice(pricing.long_context.cache_write_1h_per_1m, rate),
+          cache_read_per_1m: scalePrice(pricing.long_context.cache_read_per_1m, rate),
+        }
+      : null,
   }
 }
 
@@ -1018,6 +1095,22 @@ onMounted(loadModels)
 
 .price-line-value {
   @apply min-w-0 break-words font-medium tabular-nums text-gray-900 dark:text-white;
+}
+
+.long-context-lines {
+  @apply mt-2 space-y-1 border-t border-gray-200 pt-2 dark:border-dark-600;
+}
+
+.long-context-heading {
+  @apply block text-xs font-semibold text-amber-700 dark:text-amber-300;
+}
+
+.long-context-card {
+  @apply rounded-md border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-800/70 dark:bg-amber-950/20;
+}
+
+.long-context-card strong {
+  @apply ml-1 font-semibold tabular-nums text-gray-900 dark:text-white;
 }
 
 .detail-heading {

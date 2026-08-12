@@ -265,11 +265,14 @@ func (s *BillingService) initFallbackPricing() {
 
 	// Gemini 3.1 Pro
 	s.fallbackPrices["gemini-3.1-pro"] = &ModelPricing{
-		InputPricePerToken:         2e-6,   // $2 per MTok
-		OutputPricePerToken:        12e-6,  // $12 per MTok
-		CacheCreationPricePerToken: 2e-6,   // $2 per MTok
-		CacheReadPricePerToken:     0.2e-6, // $0.20 per MTok
-		SupportsCacheBreakdown:     false,
+		InputPricePerToken:          2e-6,   // $2 per MTok
+		OutputPricePerToken:         12e-6,  // $12 per MTok
+		CacheCreationPricePerToken:  2e-6,   // $2 per MTok
+		CacheReadPricePerToken:      0.2e-6, // $0.20 per MTok
+		SupportsCacheBreakdown:      false,
+		LongContextInputThreshold:   200000,
+		LongContextInputMultiplier:  2,
+		LongContextOutputMultiplier: 1.5,
 	}
 
 	// Gemini 3.6 Flash (Google AI pricing: $1.50 input / $7.50 output /

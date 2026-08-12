@@ -77,6 +77,63 @@ func TestParsePricingData_ParsesPriorityAndServiceTierFields(t *testing.T) {
 	require.True(t, pricing.SupportsServiceTier)
 }
 
+func TestParsePricingData_DerivesAbove200KSessionPricing(t *testing.T) {
+	svc := &PricingService{}
+	body := []byte(`{
+		"gemini-3.1-pro-preview": {
+			"input_cost_per_token": 0.000002,
+			"input_cost_per_token_above_200k_tokens": 0.000004,
+			"output_cost_per_token": 0.000012,
+			"output_cost_per_token_above_200k_tokens": 0.000018,
+			"cache_read_input_token_cost": 0.0000002,
+			"cache_read_input_token_cost_above_200k_tokens": 0.0000004,
+			"litellm_provider": "vertex_ai-language-models",
+			"mode": "chat"
+		}
+	}`)
+
+	data, err := svc.parsePricingData(body)
+	require.NoError(t, err)
+	pricing := data["gemini-3.1-pro-preview"]
+	require.NotNil(t, pricing)
+
+	// 验证：LiteLLM 的 >200K 绝对价格会转换为整次请求长上下文倍率。
+	require.Equal(t, 200000, pricing.LongContextInputTokenThreshold)
+	require.InDelta(t, 2.0, pricing.LongContextInputCostMultiplier, 1e-12)
+	require.InDelta(t, 1.5, pricing.LongContextOutputCostMultiplier, 1e-12)
+}
+
+func TestBillingService_AppliesAbove200KPricingToWholeSession(t *testing.T) {
+	pricingSvc := &PricingService{}
+	data, err := pricingSvc.parsePricingData([]byte(`{
+		"gemini-3.1-pro-preview": {
+			"input_cost_per_token": 0.000002,
+			"input_cost_per_token_above_200k_tokens": 0.000004,
+			"output_cost_per_token": 0.000012,
+			"output_cost_per_token_above_200k_tokens": 0.000018,
+			"cache_read_input_token_cost": 0.0000002,
+			"cache_read_input_token_cost_above_200k_tokens": 0.0000004,
+			"litellm_provider": "vertex_ai-language-models",
+			"mode": "chat"
+		}
+	}`))
+	require.NoError(t, err)
+	pricingSvc.pricingData = data
+	svc := NewBillingService(&config.Config{}, pricingSvc)
+
+	// 验证：提示词总量超过 200K 后，全部输入、缓存读取和输出都切换到高档价格。
+	cost, err := svc.CalculateCost("gemini-3.1-pro-preview", UsageTokens{
+		InputTokens:     150000,
+		CacheReadTokens: 60000,
+		OutputTokens:    1000,
+	}, 1)
+	require.NoError(t, err)
+	require.InDelta(t, 150000*4e-6, cost.InputCost, 1e-12)
+	require.InDelta(t, 60000*0.4e-6, cost.CacheReadCost, 1e-12)
+	require.InDelta(t, 1000*18e-6, cost.OutputCost, 1e-12)
+	require.True(t, cost.LongContextBillingApplied)
+}
+
 func TestBillingService_GPT56CacheWritePricingUsesOfficialMultiplier(t *testing.T) {
 	tests := []struct {
 		model             string
@@ -529,6 +586,31 @@ func TestDefaultPricingIncludesGemini36FlashRates(t *testing.T) {
 			require.InDelta(t, 0.15e-6, pricing.CacheReadPricePerToken, 1e-12)
 		})
 	}
+}
+
+func TestDefaultPricingIncludesCurrentGeminiMarketRates(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", "resources", "model-pricing", "model_prices_and_context_window.json"))
+	require.NoError(t, err)
+
+	pricingSvc := &PricingService{}
+	pricingData, err := pricingSvc.parsePricingData(data)
+	require.NoError(t, err)
+	pricingSvc.pricingData = pricingData
+
+	flashLite := pricingSvc.GetModelPricing("gemini-3.5-flash-lite")
+	require.NotNil(t, flashLite)
+	require.InDelta(t, 0.3e-6, flashLite.InputCostPerToken, 1e-12)
+	require.InDelta(t, 2.5e-6, flashLite.OutputCostPerToken, 1e-12)
+	require.InDelta(t, 0.03e-6, flashLite.CacheReadInputTokenCost, 1e-12)
+
+	pro := pricingSvc.GetModelPricing("gemini-3.1-pro-preview")
+	require.NotNil(t, pro)
+	require.Equal(t, 200000, pro.LongContextInputTokenThreshold)
+	require.InDelta(t, 2.0, pro.LongContextInputCostMultiplier, 1e-12)
+	require.InDelta(t, 1.5, pro.LongContextOutputCostMultiplier, 1e-12)
+	require.InDelta(t, 4e-6, pro.InputCostPerTokenAbove200kTokens, 1e-12)
+	require.InDelta(t, 18e-6, pro.OutputCostPerTokenAbove200kTokens, 1e-12)
+	require.InDelta(t, 0.4e-6, pro.CacheReadInputTokenCostAbove200kTokens, 1e-12)
 }
 
 func TestDefaultPricingIncludesClaude5MarketRates(t *testing.T) {

@@ -64,7 +64,8 @@ export default {
     cacheReadShort: "缓存读",
     perRequest: "按请求",
     imageOutput: "图片输出",
-    rate: "倍率"
+    rate: "倍率",
+    aboveThreshold: "输入超过 {tokens} 时的整档价格"
   },
   capabilities: {
     reasoning: "推理",

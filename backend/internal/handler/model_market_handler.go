@@ -328,9 +328,12 @@ func toModelMarketLongContextPricing(pricing *service.LiteLLMModelPricing) *mode
 	if outputPrice <= 0 && pricing.LongContextOutputCostMultiplier > 0 {
 		outputPrice = pricing.OutputCostPerToken * pricing.LongContextOutputCostMultiplier
 	}
-	cacheWritePrice := pricing.CacheCreationInputTokenCostAbove200kTokens
-	if cacheWritePrice <= 0 && pricing.LongContextInputCostMultiplier > 0 {
-		cacheWritePrice = pricing.CacheCreationInputTokenCost * pricing.LongContextInputCostMultiplier
+	cacheWritePrice := 0.0
+	if pricing.CacheCreationInputTokenCost > 0 {
+		cacheWritePrice = pricing.CacheCreationInputTokenCostAbove200kTokens
+		if cacheWritePrice <= 0 && pricing.LongContextInputCostMultiplier > 0 {
+			cacheWritePrice = pricing.CacheCreationInputTokenCost * pricing.LongContextInputCostMultiplier
+		}
 	}
 	cacheWrite1hPrice := 0.0
 	if pricing.LongContextInputCostMultiplier > 0 {

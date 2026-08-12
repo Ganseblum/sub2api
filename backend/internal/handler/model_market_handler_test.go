@@ -44,12 +44,13 @@ func TestModelMarketSpecsUseCurrentPublicModelIDs(t *testing.T) {
 
 func TestToModelMarketPricingIncludesLongContextTier(t *testing.T) {
 	pricing := toModelMarketPricing(&service.LiteLLMModelPricing{
-		InputCostPerToken:               2e-6,
-		OutputCostPerToken:              12e-6,
-		CacheReadInputTokenCost:         0.2e-6,
-		LongContextInputTokenThreshold:  200000,
-		LongContextInputCostMultiplier:  2,
-		LongContextOutputCostMultiplier: 1.5,
+		InputCostPerToken:                          2e-6,
+		OutputCostPerToken:                         12e-6,
+		CacheCreationInputTokenCostAbove200kTokens: 0.25e-6,
+		CacheReadInputTokenCost:                    0.2e-6,
+		LongContextInputTokenThreshold:             200000,
+		LongContextInputCostMultiplier:             2,
+		LongContextOutputCostMultiplier:            1.5,
 	})
 
 	// 验证：模型市场 API 会输出可按分组倍率缩放的长上下文整档价格。
@@ -58,6 +59,7 @@ func TestToModelMarketPricingIncludesLongContextTier(t *testing.T) {
 	require.InDelta(t, 4.0, *pricing.LongContext.InputPer1M, 1e-12)
 	require.InDelta(t, 18.0, *pricing.LongContext.OutputPer1M, 1e-12)
 	require.InDelta(t, 0.4, *pricing.LongContext.CacheReadPer1M, 1e-12)
+	// 验证：只有高档值、没有基础缓存写入价时，不把源数据字段误展示成独立缓存写入收费项。
 	require.Nil(t, pricing.LongContext.CacheWritePer1M)
 	require.Nil(t, pricing.LongContext.CacheWrite1hPer1M)
 

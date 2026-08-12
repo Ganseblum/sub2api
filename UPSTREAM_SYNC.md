@@ -410,6 +410,176 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 | `golangci-lint run ./...` | 通过，`0 issues` |
 | `make build-backend` | 通过，版本 `0.1.169` |
 
+## 2026-08-12 同步（upstream/main 至 v0.1.175）
+
+| 项目 | 提交 |
+|------|------|
+| 同步前本地 `main` | `0bb9378d1bbe6852ffa40f1306e22f9c48f93b74` |
+| Fork 父提交（`origin/main`） | `4e8f7aff85f91e0e48da7785e374c0652a0ee4f0` |
+| 上游父提交（`upstream/main`） | `5935e674a84341c3536e27e6a968384f67d9062b` |
+| Merge base | `7e2e9ba05026b7126318aa0754c1afa0ac00bc58` |
+| 备份分支 | `backup/main-before-upstream-sync-20260812-203735` |
+| 合并提交 | 当前记录随本次 merge commit 一同提交 |
+
+同步流程先依次执行 `git fetch --prune origin`、`git fetch --prune upstream`，再将本地
+`main` fast-forward 到 `origin/main`。同步前 fork 与上游分别有 50 和 308 个独有提交。
+`git merge-tree` 预演与实际 `git merge --no-commit --no-ff upstream/main` 均确认 9 个
+实际内容冲突；修改冲突前已向用户列出冲突文件。
+
+本次合并中 `HEAD` 明确指 fork `origin/main@4e8f7aff8`，被合入端明确指
+`upstream/main@5935e674a`。以下解决均以上游实现为底稿，再重新应用 fork 必需逻辑。
+
+### 冲突 1：`.gitignore`
+
+- **冲突区域**：仓库根测试与 Vite 缓存忽略项。
+- **上游行为**：忽略根目录 `.vite/`。
+- **Fork 行为**：忽略 `.test-results/`。
+- **最终结果**：同时保留 `.test-results/` 与 `.vite/`。
+- **验证**：`git diff --check` 与 `git diff --cached --check` 通过。
+- **已提示用户**：是。
+
+### 冲突 2：`backend/cmd/server/wire_gen.go`
+
+- **冲突区域**：用户 handler 构造及 `handler.ProvideHandlers(...)` 参数列表。
+- **上游行为**：构造并注入 `ChannelMonitorV2Handler`。
+- **Fork 行为**：构造并注入 `ModelMarketHandler`。
+- **最终结果**：在上游 V2 监控依赖链上补回模型市场 handler；同步修正
+  `handler.ProviderSet` 中历史遗失的 `NewModelMarketHandler`，随后执行
+  `go generate ./cmd/server` 重新生成该文件，避免手工生成代码与 Wire 源声明不一致。
+- **验证**：Wire 生成通过；`go test ./cmd/server`、完整 Go 测试和后端构建通过。
+- **已提示用户**：是。
+
+### 冲突 3：`backend/internal/handler/handler.go`
+
+- **冲突区域**：顶层 `Handlers` 字段。
+- **上游行为**：新增 `ChannelMonitorV2`。
+- **Fork 行为**：保留 `ModelMarket`。
+- **最终结果**：两个 handler 字段并存，分别服务上游渠道监控 V2 与 fork 模型市场。
+- **验证**：handler、routes 定向测试及完整 Go 测试通过。
+- **已提示用户**：是。
+
+### 冲突 4：`backend/internal/handler/wire.go`
+
+- **冲突区域**：`ProvideHandlers` 参数、返回结构和 Wire provider 集合。
+- **上游行为**：注入并注册 `ChannelMonitorV2Handler`。
+- **Fork 行为**：注入 `ModelMarketHandler`。
+- **最终结果**：以上游签名为基线补回 `ModelMarketHandler`，并显式注册
+  `NewModelMarketHandler`；生成代码与声明现已一致。
+- **验证**：`go generate ./cmd/server`、handler 定向测试、完整 Go 测试与构建通过。
+- **已提示用户**：是。
+
+### 冲突 5：`backend/internal/server/routes/user.go`
+
+- **冲突区域**：认证用户路由末尾。
+- **上游行为**：新增带重限流和模式门控的 `/channel-monitor-v2` 被动视图接口。
+- **Fork 行为**：保留 `/model-market` 用户模型市场接口。
+- **最终结果**：两个独立路由组均保留；V2 路由继续使用
+  `panelRateLimiter.Heavy()` 与 `channelMonitorModeV2Guard`。
+- **验证**：routes 定向测试及完整 Go 测试通过。
+- **已提示用户**：是。
+
+### 冲突 6：`backend/internal/service/pricing_service.go`
+
+- **冲突区域**：确定性模型价格识别 API。
+- **上游行为**：新增 `GetIdentifiedModelPricing`，返回已确定识别的价格对象，避免系列猜测。
+- **Fork 行为**：`HasExactModelPricing` 为模型市场判断价格目录中是否存在精确候选项。
+- **最终结果**：保留上游查询 API，并在其后重新加入 fork 精确存在性 API；二者继续使用
+  各自语义，调用方不互相替代。
+- **验证**：service 定向测试、`pricing_service_test.go` 覆盖及完整 Go 测试通过。
+- **已提示用户**：是。
+
+### 冲突 7：`frontend/src/components/admin/account/AccountTestModal.vue`
+
+- **冲突区域**：测试模式选项与 Gemini 模型优先级。
+- **上游行为**：新增 Grok 文本、图片、视频、搜索、TTS、STT、Realtime 测试模式。
+- **Fork 行为**：将 `gemini-3.6-flash` 放入优先模型列表。
+- **最终结果**：完整保留上游 Grok 测试模式，并在上游列表前补回
+  `gemini-3.6-flash`。
+- **验证**：前端 lint、typecheck、build 与关键 Vitest 通过。
+- **已提示用户**：是。
+
+### 冲突 8：`frontend/src/views/auth/EmailVerifyView.vue`
+
+- **冲突区域**：公共设置状态和挂载时初始化。
+- **上游行为**：加载腾讯天御与阿里云验证码开关、站点和凭证公开字段。
+- **Fork 行为**：默认站点名使用 `APP_BRAND_NAME`，服务端站点名经
+  `normalizeBrandName` 统一品牌回退。
+- **最终结果**：保留全部上游验证码状态与赋值，并重新应用 fork 品牌初始化和规范化。
+- **验证**：前端 lint、typecheck、build 与包含验证码流程的关键 Vitest 通过。
+- **已提示用户**：是。
+
+### 冲突 9：`frontend/src/views/auth/RegisterView.vue`
+
+- **冲突区域**：注册页公共设置状态和挂载时初始化。
+- **上游行为**：接入腾讯天御、阿里云验证码及地域配置。
+- **Fork 行为**：使用 `APP_BRAND_NAME` 与 `normalizeBrandName` 保持 YOUC 品牌回退。
+- **最终结果**：保留上游多验证码流程，并重新应用 fork 品牌回退；注册、OAuth、
+  登录协议及域名限量逻辑均继续存在。
+- **验证**：前端 lint、typecheck、build 与关键 Vitest 通过。
+- **已提示用户**：是。
+
+### 双方都修改但未产生内容冲突的文件
+
+共 27 个自动合并复查点（另 9 个双方同改文件已在上方作为实际冲突记录）：
+
+- `DEV_GUIDE.md`
+- `README.md`
+- `README_CN.md`
+- `backend/internal/handler/admin/setting_handler_update.go`
+- `backend/internal/handler/auth_oidc_oauth.go`
+- `backend/internal/pkg/antigravity/claude_types.go`
+- `backend/internal/pkg/antigravity/claude_types_test.go`
+- `backend/internal/repository/usage_log_repo_request_type_test.go`
+- `backend/internal/service/gateway_service.go`
+- `frontend/src/components/account/CreateAccountModal.vue`
+- `frontend/src/components/keys/UseKeyModal.vue`
+- `frontend/src/components/keys/__tests__/UseKeyModal.spec.ts`
+- `frontend/src/components/layout/AppSidebar.vue`
+- `frontend/src/composables/__tests__/useModelWhitelist.spec.ts`
+- `frontend/src/composables/useModelWhitelist.ts`
+- `frontend/src/i18n/locales/en/admin/accounts.ts`
+- `frontend/src/i18n/locales/en/admin/channels.ts`
+- `frontend/src/i18n/locales/en/admin/overview.ts`
+- `frontend/src/i18n/locales/en/common.ts`
+- `frontend/src/i18n/locales/en/index.ts`
+- `frontend/src/i18n/locales/zh/admin/accounts.ts`
+- `frontend/src/i18n/locales/zh/admin/channels.ts`
+- `frontend/src/i18n/locales/zh/admin/overview.ts`
+- `frontend/src/i18n/locales/zh/common.ts`
+- `frontend/src/i18n/locales/zh/index.ts`
+- `frontend/src/stores/app.ts`
+- `frontend/src/views/admin/SettingsView.vue`
+
+逐项比较最终索引与 `origin/main`、`upstream/main` 后确认：
+
+- 文档保留 fork 的源码构建/本地目录部署说明，同时采用上游 Go 1.26.5、赞助商和
+  Grok CLI 身份版本更新。
+- 后端保留 fork 模型市场所需的 Claude 5、Gemini 3.6、精确定价及既有安全 lint
+  修复；同时采用上游验证码、渠道监控 V2、响应模型计费、Grok 搜索/音视频和 Codex
+  指纹收敛实现。
+- 前端保留 fork 的 YOUC 品牌回退、模型市场、帮助/联系入口、自定义菜单本地化与登录
+  协议默认文档；同时采用上游多验证码、渠道监控 V2、Grok 全模式测试和新版客户端配置。
+- 中英文 i18n 同时包含 fork 页面键与上游新增的验证码、渠道监控、计费和测试模式键；
+  `zh/admin/overview.ts` 中模型路由文案保持在正确对象层级。
+- 上游新增 `docs/channel-monitor-v2-safe-defaults.md` 原有 3 处行尾空格导致
+  `git diff --check` 首次失败；已仅调整 Markdown 换行表达，复验通过。
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check`、`git diff --cached --check` | 通过 |
+| `git diff --name-only --diff-filter=U`、`git ls-files -u` | 通过；无未合并索引项 |
+| 冲突标记扫描 | 通过；无 Git 冲突标记 |
+| `go generate ./cmd/server` | 通过；Wire 生成代码与 provider 声明一致 |
+| 受影响 Go 包定向测试 | 通过；`cmd/server`、handler、routes、service、antigravity、repository |
+| `go test ./...` | 通过 |
+| `make build-backend` | 通过，版本 `0.1.175` |
+| `pnpm --dir frontend run lint:check` | 通过 |
+| `pnpm --dir frontend run typecheck` | 通过 |
+| `pnpm --dir frontend run build` | 通过；仅有既存的大 chunk 提示 |
+| `make test-frontend` | 通过；13 个文件、163 个用例 |
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：

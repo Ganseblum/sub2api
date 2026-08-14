@@ -580,9 +580,77 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 | `pnpm --dir frontend run build` | 通过；仅有既存的大 chunk 提示 |
 | `make test-frontend` | 通过；13 个文件、163 个用例 |
 
+## 2026-08-15 同步（upstream/main 至 v0.1.176）
+
+| 项目 | 提交 |
+|------|------|
+| Fork 父提交 | `f580036c1` |
+| 上游父提交 | `fbfdcef81` |
+| Merge base | `5935e674a84341c3536e27e6a968384f67d9062b` |
+| 合并提交 | `8794cc016` |
+| 备份分支 | `backup/pre-upstream-sync-20260815-014854` |
+
+本次无 Git 内容冲突标记；`ort` 策略自动合并成功。按规则复查了 8 个双方都修改过的文件。
+
+### 实际冲突
+
+无。
+
+### 自动合并复查点
+
+双方都修改的文件：
+
+- `backend/cmd/server/wire_gen.go`
+- `backend/internal/service/billing_service.go`
+- `frontend/src/composables/__tests__/useModelWhitelist.spec.ts`
+- `frontend/src/composables/useModelWhitelist.ts`
+- `frontend/src/i18n/locales/en/admin/channels.ts`
+- `frontend/src/i18n/locales/en/admin/overview.ts`
+- `frontend/src/i18n/locales/zh/admin/channels.ts`
+- `frontend/src/i18n/locales/zh/admin/overview.ts`
+
+语义复查结果：
+
+- `wire_gen.go`：采用上游 DI 变更，并保留 fork 的 `modelMarketHandler` 注入与
+  `ProvideHandlers` 参数。
+- `billing_service.go`：采用上游 Grok 4.6 / x_search / 长上下文与媒体计费改动；保留
+  fork 对 `gemini-3.1-pro` 的长上下文倍率，以及既有 Gemini 3.6 回退价卡。
+- `useModelWhitelist.ts` / 对应测试：采用上游白名单更新，并保留 fork 的
+  `gemini-3.6-flash` 列表、Antigravity 条目与预设映射。
+- `en/zh admin/channels.ts`：采用上游 video 计费文案，并保留 fork 的
+  `noGroupsSelected` / `emptyModelsInPricing`（ChannelsView 仍在使用）。
+- `en/zh admin/overview.ts`：采用上游 `modelPricing` 分组定价文案；保留 fork 的
+  `passwordCopied`、`accountsUnit` 文案（UserEditModal / GroupsView 仍在使用）。
+- `zh/admin/overview.ts` 高风险点：上游把 `claudeMaxSimulation` 错误嵌进
+  `modelRouting`，并把 `removeRule` 等键挤到其后；最终索引保持 fork 正确层级——
+  `modelRouting` 自洽关闭，`claudeMaxSimulation` 作为同级对象。英文文件与上游结构一致，
+  证实应保留该结构而非跟随上游中文嵌套错误。
+
+### 上游纳入要点
+
+- VERSION `0.1.176`
+- Grok JWT 档位 / grok-4.6、分组逐模型定价、长上下文阶梯开关
+- 独立 `/x_search`、Chat/Responses 保留 x_search
+- 定时备份 leader 锁、分组平台变更失效渠道缓存
+- Responses 探测 inconclusive 不再误判为不支持
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check` | 通过 |
+| 冲突标记扫描 | 通过；无 Git 冲突标记 |
+| `pnpm --dir frontend run lint:check` | 通过 |
+| `pnpm --dir frontend run typecheck` | 通过 |
+| `pnpm --dir frontend run build` | 通过；仅有既存的大 chunk 提示 |
+| `make test-frontend` | 通过；13 个文件、163 个用例 |
+| `go test ./internal/service/ ./internal/handler/ -count=1` | 通过 |
+| `go build ./cmd/server/` | 通过 |
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：
+
 
 ```markdown
 ## YYYY-MM-DD 同步

@@ -647,6 +647,79 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 | `go test ./internal/service/ ./internal/handler/ -count=1` | 通过 |
 | `go build ./cmd/server/` | 通过 |
 
+## 2026-08-17 同步（upstream/main 至 v0.1.177）
+
+| 项目 | 提交 |
+|------|------|
+| 同步前本地 fork 提交 | `f580036c1` |
+| 同步前 origin/main | `0031690e9` |
+| Fork 合并提交 | `6679e6602` |
+| 上游父提交 | `e330c243a` |
+| Merge base | `fbfdcef8184ae4b2e224d5cfc47cf1d0e3742710` |
+| 上游合并提交 | `f3b2cf929` |
+| 备份分支 | `backup/main-before-upstream-sync-20260817-164757` |
+
+本次先整合 `origin/main` 的最新 28 个提交，再同步 `upstream/main`。合并前使用
+`git merge-tree --write-tree` 预演，`ort` 策略自动合并成功，无实际内容冲突。
+
+### 实际冲突
+
+无。无未合并索引项，源码中无 Git 冲突标记；`backend/internal/pkg/antigravity/request_transformer.go`
+中的等号行属于已有的 MCP 协议文本，不是冲突标记。
+
+### 自动合并复查点
+
+双方都修改的文件：
+
+- `DEV_GUIDE.md`
+- `backend/cmd/server/wire_gen.go`
+- `backend/internal/handler/handler.go`
+- `backend/internal/handler/wire.go`
+- `frontend/src/components/account/CreateAccountModal.vue`
+- `frontend/src/composables/useModelWhitelist.ts`
+- `frontend/src/i18n/locales/en/admin/accounts.ts`
+- `frontend/src/i18n/locales/en/admin/overview.ts`
+- `frontend/src/i18n/locales/zh/admin/accounts.ts`
+- `frontend/src/i18n/locales/zh/admin/overview.ts`
+- `frontend/src/views/admin/SettingsView.vue`
+
+语义复查结果：
+
+- `DEV_GUIDE.md` 采用上游 Go 1.26.6、CI 版本断言和 Docker 构建镜像说明，保留 fork
+  的源码构建与本地部署指引。
+- `wire_gen.go`、`handler.go`、`wire.go` 纳入上游 Kimi/Zhipu/DeepSeek 管理处理器和
+  依赖注入，同时保留 fork 的 Model Market、Model Plaza 等处理器注册。
+- `CreateAccountModal.vue` 纳入国产供应商账号模式、API 协议、密钥提示和端点预设，保留
+  既有 OpenAI/Gemini/Grok/Anthropic 创建流程及 fork 的模型白名单入口。
+- `useModelWhitelist.ts` 纳入 Kimi 新模型和 `kimi` 平台别名，同时保留 fork 已有模型
+  市场条目与 Antigravity、Gemini 扩展模型。
+- 中英文账号与概览 i18n 纳入国产供应商、平台配额及昨日用量文案，同时保留 fork 的自定义
+  账号、模型市场和管理页面文案。
+- `SettingsView.vue` 纳入上游 OpenAI Fast/Flex 目标模型摘要、回退策略和无障碍标识，保留
+  fork 的支付、认证、品牌与运营设置。
+
+### 上游纳入要点
+
+- VERSION 更新为 `0.1.177`，Go 版本更新为 `1.26.6`。
+- Kimi/Zhipu/DeepSeek 一等供应商支持、配额/余额监控和多协议账号配置。
+- 分组用量日报汇总、时区隔离、逐模型定价和长上下文阶梯配置。
+- Codex turn state 透传、指纹收敛 opt-in、原生 compaction v2 探测与路由。
+- Grok 搜索、音视频、订阅档位及新模型目录相关更新。
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check` | 通过 |
+| `git diff --name-only --diff-filter=U`、`git ls-files -u` | 通过；无未合并文件 |
+| Git 冲突标记扫描 | 通过；无遗留冲突标记 |
+| `GOCACHE=/tmp/sub2api-go-test go test ./...` | 通过 |
+| `pnpm --dir frontend run lint:check` | 通过 |
+| `pnpm --dir frontend run typecheck` | 通过 |
+| `pnpm --dir frontend run build` | 通过；仅有既存 chunk 大小和 Browserslist 提示 |
+| `make test-frontend` | 通过；13 个文件、164 个用例 |
+| `GOCACHE=/tmp/sub2api-go-build-cache make build-backend` | 通过，版本 `0.1.177` |
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：

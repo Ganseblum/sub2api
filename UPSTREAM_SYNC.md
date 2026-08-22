@@ -720,6 +720,104 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 | `make test-frontend` | 通过；13 个文件、164 个用例 |
 | `GOCACHE=/tmp/sub2api-go-build-cache make build-backend` | 通过，版本 `0.1.177` |
 
+## 2026-08-22 同步（upstream/main 至 v0.1.179）
+
+| 项目 | 提交 |
+|------|------|
+| Fork 父提交 | `a05cc9ee0a15ca88f96eaaeac557c87cd19780b5` |
+| 上游父提交 | `67380eafd5ae2eaa8db910ae738199c3dac62e37` |
+| Merge base | `32a0d9ba2d537875f605e0360c28c7f8d418a29a` |
+| 备份分支 | `codex/backup-upstream-sync-20260822-111807` |
+| 合并提交 | 当前记录随本次 merge commit 一同提交 |
+
+同步前先抓取 `origin` 与 `upstream`。本地 `main` 比 `origin/main` 落后 175 个提交，
+工作区干净，因此先快进到最新 fork 提交，再合并 `upstream/main`。合并前 fork 与上游分别
+有 59 和 113 个独有提交；`git merge-tree --write-tree` 预演与实际合并均确认 2 个实际
+内容冲突，并已在修改冲突前向用户列出文件。
+
+### 冲突 1：`.gitignore`
+
+- **冲突区域**：仓库级测试和工具缓存忽略规则。
+- **上游行为**：新增 `.codegraph/`，忽略本地代码图缓存。
+- **Fork 行为**：保留 `.test-results/`，并继续使用 `!AGENTS.md` 将仓库指令文件重新
+  纳入跟踪。
+- **最终结果**：以上游规则为底稿，同时保留 `.codegraph/`、`.test-results/`、
+  `!AGENTS.md` 与既有 `.vite/`；两侧行为可以共存。
+- **验证**：`git diff --check` 通过，源码无遗留冲突标记。
+- **已提示用户**：是。
+
+### 冲突 2：`frontend/src/views/HomeView.vue`
+
+- **冲突区域**：默认首页 header 中的文档、主题和模型广场入口。
+- **上游行为**：当模型广场功能开启，且访问者已登录或页面不要求登录时，在 compact
+  与默认首页显示 `/model-plaza` 入口；路由守卫继续负责最终开关和鉴权。
+- **Fork 行为**：保留 YOUC 品牌回退、V3 首页布局、页内导航、登录/注册 CTA、帮助和
+  法律文档入口。
+- **最终结果**：保留 fork 的完整首页结构，在 compact 与 V3 默认首页的文档入口之后
+  最小重放上游模型广场入口、功能开关和鉴权门控。同步更新的上游测试中，旧
+  `.terminal-container` 断言改为 fork 当前使用的 `.terminal-window`，不改变页面行为。
+- **验证**：`HomeView.compact.spec.ts` 13 个用例通过，覆盖功能关闭、匿名公开、匿名需登录、
+  已登录需登录及两种首页模式。
+- **已提示用户**：是。
+
+### 双方都修改但未产生内容冲突的文件
+
+- `README.md`
+- `README_CN.md`
+- `backend/internal/service/billing_service.go`
+- `backend/internal/service/gateway_service.go`
+- `frontend/src/components/account/CreateAccountModal.vue`
+- `frontend/src/composables/__tests__/useModelWhitelist.spec.ts`
+- `frontend/src/composables/useModelWhitelist.ts`
+- `frontend/src/i18n/locales/en/admin/accounts.ts`
+- `frontend/src/i18n/locales/en/admin/channels.ts`
+- `frontend/src/i18n/locales/en/admin/overview.ts`
+- `frontend/src/i18n/locales/zh/admin/accounts.ts`
+- `frontend/src/i18n/locales/zh/admin/channels.ts`
+- `frontend/src/i18n/locales/zh/admin/overview.ts`
+
+逐项比较最终索引与共同基线、`origin/main`、`upstream/main` 后确认：
+
+- README 采用上游赞助商和部署说明更新，同时保留 fork 的源码构建、本地目录部署与
+  `docker-compose.local.yml --build` 流程；上游删除的两个赞助商图片同步删除。
+- `billing_service.go` 采用上游 Fast/Flex、渠道倍率、GPT-5.5、Grok 新价格、动态目录优先、
+  分组长上下文和分时定价实现；保留 fork 的 Gemini 3.1 长上下文倍率与 Gemini 3.6 价卡。
+- `gateway_service.go` 完整采用上游 SSE 终止、ServiceTier、同账号重试、模型列表缓存和
+  缓存失效行为；fork 仅保留不影响运行时的安全扫描注释。
+- `CreateAccountModal.vue` 采用上游国产供应商 adaptive 协议和多端点 payload，保留 fork
+  的模型白名单、默认映射和 Antigravity/Gemini 配置。
+- `useModelWhitelist.ts` 及测试采用上游 Grok 目录更新，保留 Gemini 3.6、Antigravity、
+  国产供应商模型和 fork 预设映射；未发现重复模型 ID。
+- 中英文 i18n 同时包含上游 adaptive、渠道倍率、Fast/Flex 等新增键与 fork 自定义键；
+  `zh/admin/overview.ts` 的 `claudeMaxSimulation` 保持为 `groups` 下的正确同级对象，
+  没有跟随上游版本产生错误嵌套。
+
+### 上游纳入要点
+
+- VERSION 更新为 `0.1.179`。
+- OpenAI Responses、WebSocket、compaction、工具名与错误切换兼容性修复。
+- Grok 4.6/4.20、搜索、音视频、Realtime、限流冷却和计费更新。
+- 渠道 Fast/Flex 与上下文区间倍率、分时价格及对应数据库迁移。
+- 国产供应商 adaptive API 协议、余额/额度刷新与 DeepSeek 探测修复。
+- 模型广场首页可发现性、Composite 分组消息/视频调度与 token refresh 锁修复。
+
+### 验证
+
+| 检查 | 结果 |
+|------|------|
+| `git diff --check`、未合并索引项与冲突标记扫描 | 通过；无未合并文件或遗留冲突标记 |
+| 首页、账户/白名单、i18n/分组定向 Vitest | 通过；7 个文件、86 个用例 |
+| `pnpm --dir frontend run lint:check` | 通过 |
+| `pnpm --dir frontend run typecheck` | 通过 |
+| `pnpm --dir frontend run build` | 通过；仅有既存动态导入、chunk 大小和 Browserslist 提示 |
+| `go test ./internal/service -count=1` | 通过 |
+| 模型市场 handler 定向测试 | 通过 |
+| Gemini 3.1 长上下文边界回归 | 通过；`unit` 标签下 2 个边界子用例实际执行 |
+| `make test-frontend` | 通过；13 个文件、165 个用例 |
+| `go test ./...` | 通过 |
+| `golangci-lint run ./...` | 通过；v2.12.2，0 issues |
+| `make build-backend` | 通过；版本 `0.1.179` |
+
 ## 后续记录模板
 
 以后每次同步复制以下章节：

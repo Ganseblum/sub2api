@@ -728,7 +728,7 @@ fork 本地文档与前后篇导航，并使用统一的 fork 品牌回退。
 | 上游父提交 | `67380eafd5ae2eaa8db910ae738199c3dac62e37` |
 | Merge base | `32a0d9ba2d537875f605e0360c28c7f8d418a29a` |
 | 备份分支 | `codex/backup-upstream-sync-20260822-111807` |
-| 合并提交 | 当前记录随本次 merge commit 一同提交 |
+| 合并提交 | `18865a26714074e41a26b669568af8223769e340` |
 
 同步前先抓取 `origin` 与 `upstream`。本地 `main` 比 `origin/main` 落后 175 个提交，
 工作区干净，因此先快进到最新 fork 提交，再合并 `upstream/main`。合并前 fork 与上游分别

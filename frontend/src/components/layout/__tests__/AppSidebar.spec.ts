@@ -53,3 +53,11 @@ describe('AppSidebar header styles', () => {
     expect(sidebarBrandBlockMatch?.[0]).not.toContain('overflow: hidden;')
   })
 })
+
+describe('AppSidebar support navigation', () => {
+  it('shows Contact Us immediately before Help Center', () => {
+    const contactItem = "{ path: '/contact', label: t('nav.contactUs'), icon: ContactIcon }"
+    const helpItem = "{ path: '/help', label: t('nav.helpCenter'), icon: HelpIcon }"
+    expect(componentSource).toContain(`${contactItem},\n    ${helpItem},`)
+  })
+})

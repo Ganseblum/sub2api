@@ -8833,6 +8833,10 @@ import {
   parseRegistrationEmailSuffixWhitelistInput,
 } from "@/utils/registrationEmailPolicy";
 import {
+  buildDefaultLoginAgreementDocuments,
+  hydrateLoginAgreementDocuments,
+} from "@/utils/loginAgreementDefaults";
+import {
   parseFingerprintSignalsToRows,
   serializeFingerprintRowsToJSON,
   defaultFingerprintSignalRows,
@@ -9050,28 +9054,7 @@ const tablePageSizeMax = 1000;
 const tablePageSizeDefault = 20;
 
 function defaultLoginAgreementDocuments(): LoginAgreementDocument[] {
-  return [
-    {
-      id: "terms",
-      title: localText("服务条款", "Terms of Service"),
-      content_md: "",
-    },
-    {
-      id: "usage-policy",
-      title: localText("使用政策", "Usage Policy"),
-      content_md: "",
-    },
-    {
-      id: "supported-regions",
-      title: localText("支持的国家和地区", "Supported Countries and Regions"),
-      content_md: "",
-    },
-    {
-      id: "service-specific-terms",
-      title: localText("服务特定条款", "Service-Specific Terms"),
-      content_md: "",
-    },
-  ];
+  return buildDefaultLoginAgreementDocuments(localText);
 }
 
 function normalizeLoginAgreementDocumentId(raw: string): string {
@@ -10808,11 +10791,14 @@ async function loadSettings() {
     form.login_agreement_documents =
       Array.isArray(settings.login_agreement_documents) &&
       settings.login_agreement_documents.length > 0
-        ? settings.login_agreement_documents.map((doc) => ({
-            id: doc.id || "",
-            title: doc.title || "",
-            content_md: doc.content_md || "",
-          }))
+        ? hydrateLoginAgreementDocuments(
+            settings.login_agreement_documents.map((doc) => ({
+              id: doc.id || "",
+              title: doc.title || "",
+              content_md: doc.content_md || "",
+            })),
+            localText,
+          )
         : defaultLoginAgreementDocuments();
     Object.assign(authSourceDefaults, buildAuthSourceDefaultsState(settings));
     form.default_platform_quotas = normalizePlatformQuotasMap(settings.default_platform_quotas);

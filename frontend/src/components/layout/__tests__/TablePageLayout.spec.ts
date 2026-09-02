@@ -8,6 +8,11 @@ const componentPath = resolve(dirname(fileURLToPath(import.meta.url)), '../Table
 const componentSource = readFileSync(componentPath, 'utf8')
 
 describe('TablePageLayout responsive table scrolling', () => {
+  it('provides a fixed slot for content above the scrollable table', () => {
+    expect(componentSource).toContain('v-if="$slots.aboveTable"')
+    expect(componentSource).toContain('<slot name="aboveTable" />')
+  })
+
   it('does not disable the table horizontal scroll container in mobile mode', () => {
     const tableWrapperBlocks = Array.from(
       componentSource.matchAll(/([^{}]*:deep\(\.table-wrapper\)[^{}]*)\{([^{}]*)\}/g)

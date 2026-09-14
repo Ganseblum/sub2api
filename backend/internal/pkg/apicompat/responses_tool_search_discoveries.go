@@ -3,6 +3,7 @@ package apicompat
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -10,8 +11,135 @@ type responsesDiscoveredToolIdentity struct {
 	typ       string
 	name      string
 	namespace string
+	custom    bool
 	encoded   string
 	ambiguous bool
+}
+
+// liftResponsesAdditionalClientTools promotes private input carriers only when
+// they contain a client-executable custom tool. It preserves top-level-first
+// ordering, removes the carrier from input, and rejects conflicting duplicate
+// definitions instead of silently choosing one.
+func liftResponsesAdditionalClientTools(req map[string]any) (bool, error) {
+	input, ok := req["input"].([]any)
+	if !ok || len(input) == 0 {
+		return false, nil
+	}
+	type carrier struct {
+		tools []any
+	}
+	var carriers []carrier
+	filtered := make([]any, 0, len(input))
+	current, _ := req["tools"].([]any)
+	needsAdapter := responsesAdditionalToolsNeedClientAdapter(current)
+	for _, raw := range input {
+		item, ok := raw.(map[string]any)
+		if !ok || strings.TrimSpace(stringValue(item["type"])) != "additional_tools" {
+			filtered = append(filtered, raw)
+			continue
+		}
+		tools, exists := item["tools"]
+		if !exists || tools == nil {
+			continue
+		}
+		additional, ok := tools.([]any)
+		if !ok {
+			return false, fmt.Errorf("responses input.additional_tools tools must be an array")
+		}
+		carriers = append(carriers, carrier{tools: additional})
+		if responsesAdditionalToolsNeedClientAdapter(additional) {
+			needsAdapter = true
+		}
+	}
+	if !needsAdapter {
+		for _, raw := range input {
+			item, ok := raw.(map[string]any)
+			if !ok || strings.TrimSpace(stringValue(item["type"])) != "additional_tools" {
+				continue
+			}
+			if tools, exists := item["tools"]; !exists || tools == nil {
+				filtered = append(filtered, raw)
+			} else {
+				filtered = append(filtered, raw)
+			}
+		}
+		return false, nil
+	}
+
+	var moved []any
+	for _, carrier := range carriers {
+		moved = append(moved, carrier.tools...)
+	}
+	merged, err := mergeResponsesClientToolDeclarations(current, moved)
+	if err != nil {
+		return false, err
+	}
+	req["tools"] = merged
+	req["input"] = filtered
+	return true, nil
+}
+
+func responsesAdditionalToolsNeedClientAdapter(tools []any) bool {
+	for _, raw := range tools {
+		tool, ok := raw.(map[string]any)
+		if !ok {
+			continue
+		}
+		switch strings.TrimSpace(stringValue(tool["type"])) {
+		case "custom":
+			return true
+		case "tool_search":
+			return true
+		case "namespace":
+			for _, childRaw := range namespaceChildren(tool) {
+				child, ok := childRaw.(map[string]any)
+				if ok && strings.TrimSpace(stringValue(child["type"])) == "custom" {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func mergeResponsesClientToolDeclarations(existing, moved []any) ([]any, error) {
+	merged := append([]any(nil), existing...)
+	seen := make(map[string]string, len(existing)+len(moved))
+	for _, raw := range existing {
+		key, encoded := responsesClientToolDeclarationIdentity(raw)
+		if previous, exists := seen[key]; exists && previous != encoded {
+			return nil, fmt.Errorf("responses additional_tools conflicts with an existing declaration")
+		}
+		seen[key] = encoded
+	}
+	for _, raw := range moved {
+		key, encoded := responsesClientToolDeclarationIdentity(raw)
+		if previous, exists := seen[key]; exists {
+			if previous == encoded {
+				continue
+			}
+			return nil, fmt.Errorf("responses additional_tools conflicts with an existing declaration")
+		}
+		seen[key] = encoded
+		merged = append(merged, raw)
+	}
+	return merged, nil
+}
+
+func responsesClientToolDeclarationIdentity(raw any) (string, string) {
+	tool, ok := raw.(map[string]any)
+	if !ok {
+		encoded, _ := json.Marshal(raw)
+		return "json:" + string(encoded), string(encoded)
+	}
+	typ := strings.TrimSpace(stringValue(tool["type"]))
+	name := strings.TrimSpace(stringValue(tool["name"]))
+	key := typ + "\x00" + name
+	if typ == "namespace" {
+		key += "\x00namespace"
+	}
+	encoded, _ := json.Marshal(raw)
+	return key, string(encoded)
 }
 
 // promoteResponsesToolSearchDiscoveries makes successfully discovered client
@@ -173,7 +301,7 @@ func admitResponsesDiscoveredTool(known map[string]responsesDiscoveredToolIdenti
 }
 
 func sameResponsesDiscoveredTool(left, right responsesDiscoveredToolIdentity) bool {
-	return left.typ == right.typ && left.name == right.name && left.namespace == right.namespace && left.encoded == right.encoded
+	return left.typ == right.typ && left.name == right.name && left.namespace == right.namespace && left.custom == right.custom && left.encoded == right.encoded
 }
 
 func responsesDirectToolDiscovery(tool map[string]any, typ string) (map[string]any, responsesDiscoveredToolIdentity, bool) {
@@ -223,6 +351,11 @@ func restoreInheritedResponsesClientToolDeclarations(lowered []any, mapping Resp
 			child := copyClientTool(tool)
 			child["type"] = "function"
 			child["name"] = identity.Name
+			if identity.Custom {
+				child["type"] = "custom"
+				child["parameters"] = json.RawMessage(customToolInputSchema)
+				delete(child, "format")
+			}
 			restored = append(restored, map[string]any{
 				"type": "namespace", "name": identity.Namespace, "tools": []any{child},
 			})
@@ -231,6 +364,48 @@ func restoreInheritedResponsesClientToolDeclarations(lowered []any, mapping Resp
 		}
 	}
 	return restored
+}
+
+// inheritedResponsesClientToolDeclarations reconstructs the declarations that
+// can be recovered from a session mapping when a continuation did not retain
+// the lowered declaration list. Prefer the exact lowered list when available;
+// the mapping-only fallback covers all client-tool kinds recorded by this
+// adapter (custom, tool_search, and namespace children).
+func inheritedResponsesClientToolDeclarations(mapping ResponsesClientToolMapping, lowered ...[]any) []any {
+	if len(lowered) > 0 && len(lowered[0]) > 0 {
+		return restoreInheritedResponsesClientToolDeclarations(lowered[0], mapping)
+	}
+
+	var declarations []any
+	customNames := make([]string, 0, len(mapping.CustomTools))
+	for name := range mapping.CustomTools {
+		customNames = append(customNames, name)
+	}
+	sort.Strings(customNames)
+	for _, name := range customNames {
+		declarations = append(declarations, map[string]any{"type": "custom", "name": name})
+	}
+	if mapping.ToolSearch {
+		declarations = append(declarations, map[string]any{"type": "tool_search"})
+	}
+	namespaceNames := make([]string, 0, len(mapping.NamespaceTools))
+	for name := range mapping.NamespaceTools {
+		namespaceNames = append(namespaceNames, name)
+	}
+	sort.Strings(namespaceNames)
+	for _, flat := range namespaceNames {
+		identity := mapping.NamespaceTools[flat]
+		childType := "function"
+		if identity.Custom {
+			childType = "custom"
+		}
+		declarations = append(declarations, map[string]any{
+			"type":  "namespace",
+			"name":  identity.Namespace,
+			"tools": []any{map[string]any{"type": childType, "name": identity.Name}},
+		})
+	}
+	return declarations
 }
 
 type responsesNamespaceToolCandidate struct {
@@ -251,19 +426,27 @@ func responsesNamespaceToolDiscovery(tool map[string]any) (map[string]any, []res
 	identities := make([]responsesNamespaceToolCandidate, 0, len(children))
 	for _, rawChild := range children {
 		child, ok := rawChild.(map[string]any)
-		if !ok || strings.TrimSpace(stringValue(child["type"])) != "function" {
-			continue
-		}
-		childCopy, direct, ok := responsesDirectToolDiscovery(child, "function")
 		if !ok {
 			continue
+		}
+		childType := strings.TrimSpace(stringValue(child["type"]))
+		if childType != "function" && childType != "custom" {
+			continue
+		}
+		childCopy, direct, ok := responsesDirectToolDiscovery(child, childType)
+		if !ok {
+			continue
+		}
+		if childType == "custom" {
+			childCopy["parameters"] = json.RawMessage(customToolInputSchema)
+			delete(childCopy, "format")
 		}
 		flat := flattenNamespaceToolName(namespace, direct.name)
 		identities = append(identities, responsesNamespaceToolCandidate{
 			flat:  flat,
 			child: childCopy,
 			identity: responsesDiscoveredToolIdentity{
-				typ: "namespace", name: direct.name, namespace: namespace, encoded: direct.encoded,
+				typ: "namespace", name: direct.name, namespace: namespace, custom: childType == "custom", encoded: direct.encoded,
 			},
 		})
 	}

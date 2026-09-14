@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ResponsesNamespaceName identifies a function child in a Responses namespace.
+// ResponsesNamespaceName identifies a child in a Responses namespace.
 // It aliases the chat bridge mapping so both native and bridged paths share one
 // namespace identity contract.
 type ResponsesNamespaceName = NamespacedToolName
@@ -54,7 +54,8 @@ func FlattenResponsesNamespacesExcept(req map[string]any, preserved map[string]b
 		}
 		for _, rawChild := range namespaceChildren(tool) {
 			child, ok := rawChild.(map[string]any)
-			if !ok || strings.TrimSpace(stringValue(child["type"])) != "function" {
+			typ := strings.TrimSpace(stringValue(child["type"]))
+			if !ok || (typ != "function" && typ != "custom") {
 				continue
 			}
 			name := strings.TrimSpace(stringValue(child["name"]))
@@ -62,7 +63,7 @@ func FlattenResponsesNamespacesExcept(req map[string]any, preserved map[string]b
 				continue
 			}
 			flat := flattenNamespaceToolName(namespace, name)
-			entry := ResponsesNamespaceName{Namespace: namespace, Name: name}
+			entry := ResponsesNamespaceName{Namespace: namespace, Name: name, Custom: typ == "custom"}
 			if topLevel[flat] {
 				return nil, false, fmt.Errorf("namespace tool %q/%q flattens to %q which conflicts with a top-level tool of the same name; this upstream cannot disambiguate them, rename one of the tools", namespace, name, flat)
 			}
@@ -91,7 +92,8 @@ func FlattenResponsesNamespacesExcept(req map[string]any, preserved map[string]b
 		}
 		for _, rawChild := range namespaceChildren(tool) {
 			child, ok := rawChild.(map[string]any)
-			if !ok || strings.TrimSpace(stringValue(child["type"])) != "function" {
+			typ := strings.TrimSpace(stringValue(child["type"]))
+			if !ok || (typ != "function" && typ != "custom") {
 				continue
 			}
 			name := strings.TrimSpace(stringValue(child["name"]))
@@ -105,6 +107,11 @@ func FlattenResponsesNamespacesExcept(req map[string]any, preserved map[string]b
 				flatChild[key] = value
 			}
 			flatChild["name"] = flat
+			if typ == "custom" {
+				flatChild["type"] = "function"
+				flatChild["parameters"] = json.RawMessage(customToolInputSchema)
+				delete(flatChild, "format")
+			}
 			flattened = append(flattened, flatChild)
 		}
 	}
@@ -159,7 +166,8 @@ func rewriteNamespaceQualifiedCalls(value any, names map[string]ResponsesNamespa
 			rewriteNamespaceQualifiedCalls(item, names)
 		}
 	case map[string]any:
-		if strings.TrimSpace(stringValue(typed["type"])) == "function_call" {
+		typ := strings.TrimSpace(stringValue(typed["type"]))
+		if typ == "function_call" || typ == "custom_tool_call" {
 			rewriteNamespaceQualifiedCall(typed, names)
 		}
 		for _, child := range typed {
@@ -192,10 +200,16 @@ func restoreResponsesNamespaceValue(value any, names map[string]ResponsesNamespa
 			changed = restoreResponsesNamespaceValue(item, names) || changed
 		}
 	case map[string]any:
-		if strings.TrimSpace(stringValue(typed["type"])) == "function_call" {
+		if typ := strings.TrimSpace(stringValue(typed["type"])); typ == "function_call" || typ == "custom_tool_call" {
 			if entry, ok := names[strings.TrimSpace(stringValue(typed["name"]))]; ok {
 				typed["name"] = entry.Name
 				typed["namespace"] = entry.Namespace
+				if entry.Custom && typ == "function_call" {
+					typed["type"] = "custom_tool_call"
+					typed["input"] = extractCustomToolCallInput(rawObjectString(typed["arguments"]))
+					delete(typed, "arguments")
+					retypeResponsesToolCallItemID(typed, "custom_tool_call")
+				}
 				changed = true
 			}
 		}

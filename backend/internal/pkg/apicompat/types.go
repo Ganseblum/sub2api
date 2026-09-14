@@ -628,7 +628,8 @@ type ResponsesStreamEvent struct {
 	Arguments string `json:"arguments,omitempty"`
 
 	// response.custom_tool_call_input.done
-	Input string `json:"input,omitempty"`
+	Input     string `json:"input,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
 
 	// response.reasoning_summary_text.delta / done
 	// Reuses Text/Delta fields above, SummaryIndex identifies which summary part

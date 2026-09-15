@@ -148,10 +148,17 @@ const TablePageLayoutStub = {
     <div>
       <slot name="filters" />
       <slot name="actions" />
+      <slot name="aboveTable" />
       <slot name="table" />
       <slot name="pagination" />
     </div>
   `,
+}
+
+const EndpointPopoverStub = {
+  name: 'EndpointPopover',
+  props: ['apiBaseUrl', 'customEndpoints'],
+  template: '<div data-test="endpoint-popover" :data-api-base-url="apiBaseUrl" :data-custom-endpoint-count="customEndpoints.length" />',
 }
 
 const DataTableStub = {
@@ -239,7 +246,7 @@ const mountView = async () => {
         Icon: IconStub,
         UseKeyModal: true,
         BulkEditKeysModal: true,
-        EndpointPopover: true,
+        EndpointPopover: EndpointPopoverStub,
         GroupBadge: true,
         GroupOptionItem: true,
         Teleport: true,
@@ -411,6 +418,29 @@ describe('user KeysView column settings', () => {
     await flushPromises()
     expect(table.props('selectedKeys')).toEqual([])
     wrapper.unmount()
+  })
+
+  it('keeps the API endpoint region above the scrollable table with an origin fallback', async () => {
+    const wrapper = await mountView()
+
+    expect(wrapper.get('[data-test="endpoint-popover"]').attributes('data-api-base-url')).toBe(
+      window.location.origin
+    )
+  })
+
+  it('uses the configured API endpoint and custom endpoints when available', async () => {
+    getPublicSettings.mockResolvedValueOnce({
+      api_base_url: 'https://api.youc.example/v1',
+      custom_endpoints: [
+        { name: 'Claude', endpoint: 'https://claude.youc.example', description: 'Claude endpoint' },
+      ],
+    })
+
+    const wrapper = await mountView()
+    const endpointRegion = wrapper.get('[data-test="endpoint-popover"]')
+
+    expect(endpointRegion.attributes('data-api-base-url')).toBe('https://api.youc.example/v1')
+    expect(endpointRegion.attributes('data-custom-endpoint-count')).toBe('1')
   })
 
   it('shows a hidden column when toggled and persists the preference', async () => {

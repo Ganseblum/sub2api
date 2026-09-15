@@ -80,3 +80,11 @@ describe('AppSidebar subscription feature flag', () => {
     expect(componentSource).toMatch(/path: '\/purchase'[^\n]*label: purchaseNavLabel\.value/)
   })
 })
+
+describe('AppSidebar support navigation', () => {
+  it('shows Contact Us immediately before Help Center', () => {
+    const contactItem = "{ path: '/contact', label: t('nav.contactUs'), icon: ContactIcon }"
+    const helpItem = "{ path: '/help', label: t('nav.helpCenter'), icon: HelpIcon }"
+    expect(componentSource).toContain(`${contactItem},\n    ${helpItem},`)
+  })
+})

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 )
@@ -64,6 +65,58 @@ func TestAdaptResponsesClientTools_LowersDeclarationsHistoryChoiceAndNamespaces(
 	require.JSONEq(t, `{"groups":["git"]}`, requireResponsesClientToolValue[string](t, searchOutput["output"]))
 	namespaceCall := requireResponsesClientToolValue[map[string]any](t, input[4])
 	require.Equal(t, "team__send", namespaceCall["name"])
+}
+
+func TestAdaptResponsesClientTools_LiftsCustomToolsFromAdditionalTools(t *testing.T) {
+	req := map[string]any{
+		"input": []any{
+			map[string]any{
+				"type": "additional_tools",
+				"tools": []any{
+					map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+					map[string]any{"type": "function", "name": "wait"},
+					map[string]any{
+						"type": "namespace", "name": "functions", "tools": []any{
+							map[string]any{"type": "custom", "name": "apply_patch", "format": map[string]any{"type": "text"}},
+						},
+					},
+				},
+			},
+			map[string]any{"type": "message", "role": "user", "content": "run"},
+		},
+	}
+
+	mapping, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.True(t, mapping.CustomTools["exec"])
+	require.Equal(t, ResponsesNamespaceName{Namespace: "functions", Name: "apply_patch", Custom: true}, mapping.NamespaceTools["functions__apply_patch"])
+
+	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
+	require.Equal(t, []string{"exec", "wait", "functions__apply_patch"}, responsesClientToolNames(t, tools))
+	custom := requireResponsesClientToolValue[map[string]any](t, tools[0])
+	require.Equal(t, "function", custom["type"])
+	require.JSONEq(t, customToolInputSchema, string(requireResponsesClientToolValue[json.RawMessage](t, custom["parameters"])))
+	namespaced := requireResponsesClientToolValue[map[string]any](t, tools[2])
+	require.Equal(t, "function", namespaced["type"])
+	require.JSONEq(t, customToolInputSchema, string(requireResponsesClientToolValue[json.RawMessage](t, namespaced["parameters"])))
+	input := requireResponsesClientToolValue[[]any](t, req["input"])
+	require.Len(t, input, 1)
+	require.Equal(t, "message", requireResponsesClientToolValue[map[string]any](t, input[0])["type"])
+}
+
+func TestAdaptResponsesClientTools_LeavesFunctionOnlyAdditionalToolsForOAuthLite(t *testing.T) {
+	additional := map[string]any{
+		"type":  "additional_tools",
+		"tools": []any{map[string]any{"type": "function", "name": "wait"}},
+	}
+	req := map[string]any{"input": []any{additional}}
+
+	mapping, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.False(t, changed)
+	require.Empty(t, mapping)
+	require.Equal(t, []any{additional}, req["input"])
 }
 
 func TestAdaptResponsesClientTools_RemovesDeferredFlagsWhenToolSearchIsLowered(t *testing.T) {
@@ -463,6 +516,62 @@ func TestAdaptResponsesClientToolsWithInheritedMapping_LowersFollowupHistoryWith
 	require.Equal(t, []any{map[string]any{"type": "input_text", "text": "ok"}}, output["output"])
 }
 
+func TestAdaptResponsesClientToolsWithInheritedMapping_LowersNamespacedCustomHistory(t *testing.T) {
+	req := map[string]any{
+		"input": []any{map[string]any{
+			"type": "custom_tool_call", "name": "exec", "namespace": "functions", "input": "pwd",
+		}},
+	}
+	inherited := ResponsesClientToolMapping{NamespaceTools: map[string]ResponsesNamespaceName{
+		"functions__exec": {Namespace: "functions", Name: "exec", Custom: true},
+	}}
+
+	mapping, changed, err := AdaptResponsesClientToolsWithInheritedMapping(req, inherited)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, inherited, mapping)
+	call := requireResponsesClientToolValue[map[string]any](t, requireResponsesClientToolValue[[]any](t, req["input"])[0])
+	require.Equal(t, "function_call", call["type"])
+	require.Equal(t, "functions__exec", call["name"])
+	require.NotContains(t, call, "namespace")
+	require.JSONEq(t, `{"input":"pwd"}`, requireResponsesClientToolValue[string](t, call["arguments"]))
+}
+
+func TestAdaptResponsesClientToolsWithInheritedMapping_LiftsAdditionalCustomTools(t *testing.T) {
+	req := map[string]any{
+		"input": []any{
+			map[string]any{
+				"type": "additional_tools",
+				"tools": []any{map[string]any{
+					"type": "namespace", "name": "functions", "tools": []any{
+						map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+					},
+				}},
+			},
+		},
+	}
+
+	inherited := ResponsesClientToolMapping{
+		ToolSearch: true,
+		NamespaceTools: map[string]ResponsesNamespaceName{
+			"codex_app__read_resource": {Namespace: "codex_app", Name: "read_resource"},
+		},
+	}
+	mapping, changed, err := AdaptResponsesClientToolsWithInheritedMapping(req, inherited)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.True(t, mapping.ToolSearch)
+	require.Equal(t, inherited.NamespaceTools["codex_app__read_resource"], mapping.NamespaceTools["codex_app__read_resource"])
+	require.Equal(t, ResponsesNamespaceName{Namespace: "functions", Name: "exec", Custom: true}, mapping.NamespaceTools["functions__exec"])
+	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
+	require.Len(t, tools, 3)
+	require.Equal(t, "tool_search", requireResponsesClientToolValue[map[string]any](t, tools[0])["name"])
+	require.Equal(t, "codex_app__read_resource", requireResponsesClientToolValue[map[string]any](t, tools[1])["name"])
+	tool := requireResponsesClientToolValue[map[string]any](t, tools[2])
+	require.Equal(t, "functions__exec", tool["name"])
+	require.JSONEq(t, customToolInputSchema, string(requireResponsesClientToolValue[json.RawMessage](t, tool["parameters"])))
+}
+
 func TestAdaptResponsesClientTools_NormalizesCustomToolOutput(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -516,9 +625,10 @@ func TestAdaptResponsesClientToolsWithInheritedMapping_PromotesOmittedToolsDisco
 		"input": []any{map[string]any{
 			"type": "tool_search_output", "call_id": "call_search", "status": "completed", "execution": "client",
 			"tools": []any{map[string]any{
-				"type": "namespace", "name": "multi_agent_v1", "tools": []any{map[string]any{
-					"type": "function", "name": "spawn_agent", "parameters": map[string]any{"type": "object"},
-				}},
+				"type": "namespace", "name": "multi_agent_v1", "tools": []any{
+					map[string]any{"type": "function", "name": "spawn_agent", "parameters": map[string]any{"type": "object"}},
+					map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+				},
 			}},
 		}},
 	}
@@ -540,10 +650,14 @@ func TestAdaptResponsesClientToolsWithInheritedMapping_PromotesOmittedToolsDisco
 	require.True(t, mapping.ToolSearch)
 	require.Equal(t, ResponsesNamespaceName{Namespace: "codex_app", Name: "read_resource"}, mapping.NamespaceTools["codex_app__read_resource"])
 	require.Equal(t, ResponsesNamespaceName{Namespace: "multi_agent_v1", Name: "spawn_agent"}, mapping.NamespaceTools["multi_agent_v1__spawn_agent"])
+	require.Equal(t, ResponsesNamespaceName{Namespace: "multi_agent_v1", Name: "exec", Custom: true}, mapping.NamespaceTools["multi_agent_v1__exec"])
 	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
 	require.Equal(t, []string{
-		"static_first", "tool_search", "codex_app__read_resource", "multi_agent_v1__spawn_agent",
+		"static_first", "tool_search", "codex_app__read_resource", "multi_agent_v1__spawn_agent", "multi_agent_v1__exec",
 	}, responsesClientToolNames(t, tools))
+	discoveredCustom := requireResponsesClientToolValue[map[string]any](t, tools[4])
+	require.Equal(t, "function", discoveredCustom["type"])
+	require.JSONEq(t, customToolInputSchema, string(requireResponsesClientToolValue[json.RawMessage](t, discoveredCustom["parameters"])))
 	output := requireResponsesClientToolValue[map[string]any](t, requireResponsesClientToolValue[[]any](t, req["input"])[0])
 	require.Equal(t, "function_call_output", output["type"])
 	require.IsType(t, "", output["output"])
@@ -608,6 +722,106 @@ func TestRestoreResponsesClientToolPayload_RestoresClientAndNamespaceCalls(t *te
 	require.JSONEq(t, `{"id":"resp","output":[{"type":"custom_tool_call","id":"i1","call_id":"c1","name":"exec","input":"dir"},{"type":"tool_search_call","id":"i2","call_id":"s1","execution":"client","arguments":{"query":"git"}},{"type":"function_call","id":"i3","call_id":"n1","name":"send","namespace":"team","arguments":"{}"}]}`, string(restored))
 }
 
+func TestAdaptResponsesClientTools_NamespaceCustomRoundTrip(t *testing.T) {
+	req := map[string]any{
+		"tools": []any{map[string]any{
+			"type": "namespace", "name": "functions", "tools": []any{
+				map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+			},
+		}},
+		"input": []any{map[string]any{
+			"type": "custom_tool_call", "id": "ctc_old", "call_id": "call_1",
+			"name": "exec", "namespace": "functions", "input": "pwd",
+		}},
+	}
+
+	mapping, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, ResponsesNamespaceName{Namespace: "functions", Name: "exec", Custom: true}, mapping.NamespaceTools["functions__exec"])
+
+	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
+	tool := requireResponsesClientToolValue[map[string]any](t, tools[0])
+	require.Equal(t, "function", tool["type"])
+	require.Equal(t, "functions__exec", tool["name"])
+	require.JSONEq(t, customToolInputSchema, string(requireResponsesClientToolValue[json.RawMessage](t, tool["parameters"])))
+	call := requireResponsesClientToolValue[map[string]any](t, requireResponsesClientToolValue[[]any](t, req["input"])[0])
+	require.Equal(t, "function_call", call["type"])
+	require.Equal(t, "functions__exec", call["name"])
+	require.Equal(t, "fc_old", call["id"])
+	require.NotContains(t, call, "namespace")
+
+	restored, changed, err := RestoreResponsesClientToolPayload([]byte(`{"output":[{"type":"function_call","id":"fc_upstream","call_id":"call_2","name":"functions__exec","arguments":"{\"input\":\"ls\"}"}]}`), mapping)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.JSONEq(t, `{"output":[{"type":"custom_tool_call","id":"ctc_upstream","call_id":"call_2","name":"exec","namespace":"functions","input":"ls"}]}`, string(restored))
+}
+
+func TestAdaptResponsesClientTools_LiftsAdditionalToolsWithNamespaceCustom(t *testing.T) {
+	req := map[string]any{
+		"input": []any{
+			map[string]any{"type": "additional_tools", "tools": []any{
+				map[string]any{"type": "namespace", "name": "functions", "tools": []any{
+					map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+				}},
+				map[string]any{"type": "function", "name": "wait"},
+			}},
+			map[string]any{"type": "message", "role": "user", "content": "run pwd"},
+		},
+	}
+
+	mapping, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.True(t, mapping.NamespaceTools["functions__exec"].Custom)
+	input := requireResponsesClientToolValue[[]any](t, req["input"])
+	require.Len(t, input, 1, "custom additional_tools carrier should be lifted for function-only upstreams")
+	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
+	require.Len(t, tools, 2)
+	assert.Equal(t, "functions__exec", requireResponsesClientToolValue[map[string]any](t, tools[0])["name"])
+	assert.Equal(t, "wait", requireResponsesClientToolValue[map[string]any](t, tools[1])["name"])
+}
+
+func TestAdaptResponsesClientTools_NamespaceCustomToolChoiceIsLowered(t *testing.T) {
+	req := map[string]any{
+		"tools": []any{map[string]any{
+			"type": "namespace", "name": "functions", "tools": []any{
+				map[string]any{"type": "custom", "name": "exec"},
+			},
+		}},
+		"tool_choice": map[string]any{"type": "custom", "name": "exec", "namespace": "functions"},
+	}
+
+	_, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	choice := requireResponsesClientToolValue[map[string]any](t, req["tool_choice"])
+	require.Equal(t, "function", choice["type"])
+	require.Equal(t, "functions__exec", choice["name"])
+}
+
+func TestAdaptResponsesClientTools_RemovesAllAdditionalCarriersWhenAdapterIsNeeded(t *testing.T) {
+	req := map[string]any{
+		"tools": []any{map[string]any{"type": "custom", "name": "exec"}},
+		"input": []any{
+			map[string]any{"type": "additional_tools", "tools": []any{map[string]any{"type": "function", "name": "wait"}}},
+			map[string]any{"type": "additional_tools", "tools": []any{map[string]any{"type": "function", "name": "read_file"}}},
+			map[string]any{"type": "message", "role": "user", "content": "run pwd"},
+		},
+	}
+
+	_, changed, err := AdaptResponsesClientTools(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	input := requireResponsesClientToolValue[[]any](t, req["input"])
+	require.Len(t, input, 1)
+	tools := requireResponsesClientToolValue[[]any](t, req["tools"])
+	require.Len(t, tools, 3)
+	assert.Equal(t, "exec", requireResponsesClientToolValue[map[string]any](t, tools[0])["name"])
+	assert.Equal(t, "wait", requireResponsesClientToolValue[map[string]any](t, tools[1])["name"])
+	assert.Equal(t, "read_file", requireResponsesClientToolValue[map[string]any](t, tools[2])["name"])
+}
+
 func TestResponsesClientToolStreamRestorer_CustomToolBuffersWrapperAndSequences(t *testing.T) {
 	restorer := NewResponsesClientToolStreamRestorer(ResponsesClientToolMapping{CustomTools: map[string]bool{"exec": true}})
 	added := restorer.Restore(ResponsesStreamEvent{Type: "response.output_item.added", SequenceNumber: 7, OutputIndex: 0, Item: &ResponsesOutput{Type: "function_call", ID: "i1", CallID: "c1", Name: "exec", Status: "in_progress"}})
@@ -627,6 +841,39 @@ func TestResponsesClientToolStreamRestorer_CustomToolBuffersWrapperAndSequences(
 	require.Equal(t, 10, closed[0].SequenceNumber)
 	require.Equal(t, "custom_tool_call", closed[0].Item.Type)
 	require.Equal(t, "dir", closed[0].Item.Input)
+}
+
+func TestResponsesClientToolStreamRestorer_RestoresNamespacedCustomLifecycle(t *testing.T) {
+	restorer := NewResponsesClientToolStreamRestorer(ResponsesClientToolMapping{
+		NamespaceTools: map[string]ResponsesNamespaceName{
+			"functions__exec": {Namespace: "functions", Name: "exec", Custom: true},
+		},
+	})
+
+	added := restorer.Restore(ResponsesStreamEvent{Type: "response.output_item.added", SequenceNumber: 4, OutputIndex: 0, Item: &ResponsesOutput{
+		Type: "function_call", ID: "fc_exec", CallID: "call_exec", Name: "functions__exec", Status: "in_progress",
+	}})
+	require.Len(t, added, 1)
+	require.Equal(t, "custom_tool_call", added[0].Item.Type)
+	require.Equal(t, "exec", added[0].Item.Name)
+	require.Equal(t, "functions", added[0].Item.Namespace)
+	require.Equal(t, "ctc_exec", added[0].Item.ID)
+
+	require.Empty(t, restorer.Restore(ResponsesStreamEvent{Type: "response.function_call_arguments.delta", SequenceNumber: 5, ItemID: "fc_exec", Delta: `{"input":"pwd"}`}))
+	done := restorer.Restore(ResponsesStreamEvent{Type: "response.function_call_arguments.done", SequenceNumber: 6, ItemID: "fc_exec", Arguments: `{"input":"pwd"}`})
+	require.Len(t, done, 2)
+	require.Equal(t, "response.custom_tool_call_input.done", done[1].Type)
+	require.Equal(t, "exec", done[1].Name)
+	require.Equal(t, "functions", done[1].Namespace)
+	require.Equal(t, "pwd", done[1].Input)
+
+	closed := restorer.Restore(ResponsesStreamEvent{Type: "response.output_item.done", SequenceNumber: 7, OutputIndex: 0, Item: &ResponsesOutput{
+		Type: "function_call", ID: "fc_exec", CallID: "call_exec", Name: "functions__exec", Status: "completed",
+	}})
+	require.Len(t, closed, 1)
+	require.Equal(t, "custom_tool_call", closed[0].Item.Type)
+	require.Equal(t, "functions", closed[0].Item.Namespace)
+	require.Equal(t, "pwd", closed[0].Item.Input)
 }
 
 func TestResponsesClientToolStreamRestorer_ToolSearchAndFunction(t *testing.T) {
@@ -671,6 +918,32 @@ func TestResponsesClientToolStreamRestorer_RestoresNamespaceLifecycle(t *testing
 	require.True(t, changed)
 	require.Len(t, done, 1)
 	require.Equal(t, "open", gjson.GetBytes(done[0], "name").String())
+}
+
+func TestResponsesClientToolStreamRestorer_RestoresNamespaceCustomLifecycle(t *testing.T) {
+	restorer := NewResponsesClientToolStreamRestorer(ResponsesClientToolMapping{
+		NamespaceTools: map[string]ResponsesNamespaceName{
+			"functions__exec": {Namespace: "functions", Name: "exec", Custom: true},
+		},
+	})
+
+	added := restorer.Restore(ResponsesStreamEvent{Type: "response.output_item.added", SequenceNumber: 4, OutputIndex: 0, Item: &ResponsesOutput{Type: "function_call", ID: "fc_1", CallID: "call_1", Name: "functions__exec", Status: "in_progress"}})
+	require.Len(t, added, 1)
+	require.Equal(t, "custom_tool_call", added[0].Item.Type)
+	require.Equal(t, "ctc_1", added[0].Item.ID)
+	require.Equal(t, "exec", added[0].Item.Name)
+	require.Equal(t, "functions", added[0].Item.Namespace)
+	require.Empty(t, restorer.Restore(ResponsesStreamEvent{Type: "response.function_call_arguments.delta", SequenceNumber: 5, ItemID: "fc_1", Delta: `{"input":"pwd"}`}))
+	done := restorer.Restore(ResponsesStreamEvent{Type: "response.function_call_arguments.done", SequenceNumber: 6, ItemID: "fc_1", CallID: "call_1", Name: "functions__exec", Arguments: `{"input":"pwd"}`})
+	require.Len(t, done, 2)
+	require.Equal(t, "response.custom_tool_call_input.done", done[1].Type)
+	require.Equal(t, "exec", done[1].Name)
+	require.Equal(t, "functions", done[1].Namespace)
+	require.Equal(t, "pwd", done[1].Input)
+	closed := restorer.Restore(ResponsesStreamEvent{Type: "response.output_item.done", SequenceNumber: 7, OutputIndex: 0, Item: &ResponsesOutput{Type: "function_call", ID: "fc_1", CallID: "call_1", Name: "functions__exec", Arguments: `{"input":"pwd"}`, Status: "completed"}})
+	require.Equal(t, "custom_tool_call", closed[0].Item.Type)
+	require.Equal(t, "ctc_1", closed[0].Item.ID)
+	require.Equal(t, "functions", closed[0].Item.Namespace)
 }
 
 func TestResponsesClientToolStreamRestorer_RawEventsPreserveUnknownFieldsAndOutputFallback(t *testing.T) {

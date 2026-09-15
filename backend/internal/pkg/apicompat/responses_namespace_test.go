@@ -1,6 +1,7 @@
 package apicompat
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -59,6 +60,35 @@ func TestFlattenResponsesNamespaces_RewritesDeclarationHistoryAndChoice(t *testi
 	require.Equal(t, "spawn_agent", message["name"])
 	require.Equal(t, "collaboration", message["namespace"])
 	require.Equal(t, "gpt-5.5", req["model"])
+}
+
+func TestFlattenResponsesNamespaces_FlattensCustomWithRawInputSchemaAndHistory(t *testing.T) {
+	req := map[string]any{
+		"tools": []any{map[string]any{
+			"type": "namespace", "name": "functions", "tools": []any{map[string]any{
+				"type": "custom", "name": "exec", "format": map[string]any{"type": "text"},
+			}},
+		}},
+		"input": []any{map[string]any{
+			"type": "custom_tool_call", "name": "exec", "namespace": "functions", "input": "pwd",
+		}},
+	}
+
+	names, changed, err := FlattenResponsesNamespaces(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, ResponsesNamespaceName{Namespace: "functions", Name: "exec", Custom: true}, names["functions__exec"])
+
+	tool := req["tools"].([]any)[0].(map[string]any)
+	require.Equal(t, "function", tool["type"])
+	require.Equal(t, "functions__exec", tool["name"])
+	require.JSONEq(t, customToolInputSchema, string(tool["parameters"].(json.RawMessage)))
+	require.NotContains(t, tool, "format")
+
+	call := req["input"].([]any)[0].(map[string]any)
+	require.Equal(t, "custom_tool_call", call["type"])
+	require.Equal(t, "functions__exec", call["name"])
+	require.NotContains(t, call, "namespace")
 }
 
 func TestFlattenResponsesNamespaces_RejectsFlatNameCollision(t *testing.T) {
@@ -161,4 +191,41 @@ func TestRestoreResponsesNamespaceCalls_RewritesLifecycleItems(t *testing.T) {
 			require.JSONEq(t, `{"type":"`+eventType+`","item":{"type":"function_call","name":"spawn_agent","namespace":"collaboration","arguments":"{}"}}`, string(got))
 		})
 	}
+}
+
+func TestFlattenAndRestoreResponsesNamespaces_CustomChild(t *testing.T) {
+	req := map[string]any{
+		"tools": []any{map[string]any{
+			"type": "namespace", "name": "functions", "tools": []any{
+				map[string]any{"type": "custom", "name": "exec", "format": map[string]any{"type": "text"}},
+			},
+		}},
+		"input": []any{map[string]any{
+			"type": "custom_tool_call", "id": "ctc_old", "call_id": "call_1",
+			"name": "exec", "namespace": "functions", "input": "pwd",
+		}},
+	}
+
+	names, changed, err := FlattenResponsesNamespaces(req)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, ResponsesNamespaceName{Namespace: "functions", Name: "exec", Custom: true}, names["functions__exec"])
+
+	tools := req["tools"].([]any)
+	tool := tools[0].(map[string]any)
+	require.Equal(t, "function", tool["type"])
+	require.Equal(t, "functions__exec", tool["name"])
+	require.JSONEq(t, customToolInputSchema, string(tool["parameters"].(json.RawMessage)))
+	input := req["input"].([]any)[0].(map[string]any)
+	require.Equal(t, "functions__exec", input["name"])
+	require.NotContains(t, input, "namespace")
+
+	payload, err := json.Marshal(map[string]any{"output": []any{map[string]any{
+		"type": "function_call", "id": "fc_old", "call_id": "call_1", "name": "functions__exec", "arguments": `{"input":"pwd"}`,
+	}}})
+	require.NoError(t, err)
+	restored, changed, err := RestoreResponsesNamespaceCalls(payload, names)
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.JSONEq(t, `{"output":[{"type":"custom_tool_call","id":"ctc_old","call_id":"call_1","name":"exec","namespace":"functions","input":"pwd"}]}`, string(restored))
 }

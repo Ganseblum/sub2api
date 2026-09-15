@@ -16,6 +16,25 @@ function flattenLeafKeys(value: unknown, prefix = ''): string[] {
   })
 }
 
+function emptyLocaleValues(value: unknown, prefix = ''): string[] {
+  if (typeof value === 'string') {
+    return value.trim() === '' && prefix ? [prefix] : []
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((child, index) => emptyLocaleValues(child, `${prefix}[${index}]`))
+  }
+
+  if (value !== null && typeof value === 'object') {
+    return Object.entries(value as LocaleValue).flatMap(([key, child]) => {
+      const path = prefix ? `${prefix}.${key}` : key
+      return emptyLocaleValues(child, path)
+    })
+  }
+
+  return prefix ? [prefix] : []
+}
+
 function collectStaticSourceKeys(source: string): string[] {
   const keys = new Set<string>()
 
@@ -72,13 +91,7 @@ describe('locale key completeness', () => {
 
   it('contains a non-empty message for every locale leaf', () => {
     for (const [locale, messages] of Object.entries({ en, zh })) {
-      const emptyKeys = flattenLeafKeys(messages).filter((key) => {
-        let current: unknown = messages
-        for (const segment of key.split('.')) {
-          current = (current as LocaleValue)[segment]
-        }
-        return typeof current !== 'string' || current.trim() === ''
-      })
+      const emptyKeys = emptyLocaleValues(messages)
       expect(emptyKeys, `${locale} has empty or non-string messages`).toEqual([])
     }
   })

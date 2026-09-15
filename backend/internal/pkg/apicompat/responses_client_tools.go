@@ -23,6 +23,10 @@ func AdaptResponsesClientTools(req map[string]any) (ResponsesClientToolMapping, 
 	if req == nil {
 		return ResponsesClientToolMapping{}, false, nil
 	}
+	additionalToolsChanged, err := liftResponsesAdditionalClientTools(req)
+	if err != nil {
+		return ResponsesClientToolMapping{}, false, err
+	}
 	tools, ok := req["tools"].([]any)
 	if !ok || len(tools) == 0 {
 		return ResponsesClientToolMapping{}, false, nil
@@ -80,7 +84,7 @@ func AdaptResponsesClientTools(req map[string]any) (ResponsesClientToolMapping, 
 
 	tools, _ = req["tools"].([]any)
 	lowered := make([]any, 0, len(tools))
-	changed := discovered || flattened
+	changed := additionalToolsChanged || discovered || flattened
 	seenSearch := false
 	for _, raw := range tools {
 		tool, ok := raw.(map[string]any)
@@ -180,6 +184,20 @@ func AdaptResponsesClientToolsWithInheritedMapping(
 	if _, toolsPresent := req["tools"]; toolsPresent {
 		return AdaptResponsesClientTools(req)
 	}
+	additionalToolsChanged, err := liftResponsesAdditionalClientTools(req)
+	if err != nil {
+		return ResponsesClientToolMapping{}, false, err
+	}
+	if additionalToolsChanged {
+		inheritedDeclarations := inheritedResponsesClientToolDeclarations(inherited, inheritedLoweredTools...)
+		currentTools, _ := req["tools"].([]any)
+		merged, mergeErr := mergeResponsesClientToolDeclarations(inheritedDeclarations, currentTools)
+		if mergeErr != nil {
+			return ResponsesClientToolMapping{}, false, mergeErr
+		}
+		req["tools"] = merged
+		return AdaptResponsesClientTools(req)
+	}
 	if len(inherited.CustomTools) == 0 && !inherited.ToolSearch && len(inherited.NamespaceTools) == 0 {
 		return ResponsesClientToolMapping{}, false, nil
 	}
@@ -231,7 +249,12 @@ func rewriteClientToolHistory(value any, adapter *ResponsesClientToolMapping) (b
 			typ := strings.TrimSpace(stringValue(typed["type"]))
 			switch typ {
 			case "custom_tool_call":
-				if adapter.CustomTools[strings.TrimSpace(stringValue(typed["name"]))] {
+				name := strings.TrimSpace(stringValue(typed["name"]))
+				if rewriteNamespaceQualifiedCall(typed, adapter.NamespaceTools) {
+					changed = true
+					name = strings.TrimSpace(stringValue(typed["name"]))
+				}
+				if adapter.CustomTools[name] || (adapter.NamespaceTools[name].Custom && name != "") {
 					typed["type"] = "function_call"
 					typed["arguments"] = customToolCallArguments(stringValue(typed["input"]))
 					delete(typed, "input")
@@ -440,7 +463,7 @@ func rewriteClientToolChoice(req map[string]any, adapter *ResponsesClientToolMap
 	}
 	typ := strings.TrimSpace(stringValue(choice["type"]))
 	name := strings.TrimSpace(stringValue(choice["name"]))
-	if typ == "custom" && adapter.CustomTools[name] {
+	if typ == "custom" && (adapter.CustomTools[name] || adapter.NamespaceTools[name].Custom) {
 		choice["type"] = "function"
 		return true
 	}
@@ -547,8 +570,10 @@ type ResponsesClientToolStreamRestorer struct {
 }
 
 type responsesClientToolStreamCall struct {
-	kind string
-	name string
+	kind      string
+	name      string
+	upstream  string
+	namespace string
 	// callID and itemID stay as the upstream sent them so later upstream
 	// events keep matching this call; clientItemID is what we emit.
 	callID       string
@@ -587,7 +612,8 @@ func (r *ResponsesClientToolStreamRestorer) Restore(event ResponsesStreamEvent) 
 				event.Item.Type = "custom_tool_call"
 				event.Item.Input = ""
 				event.Item.Arguments = ""
-				event.Item.Namespace = ""
+				event.Item.Name = call.name
+				event.Item.Namespace = call.namespace
 			} else {
 				event.Item.Type = "tool_search_call"
 				event.Item.Name = ""
@@ -614,9 +640,9 @@ func (r *ResponsesClientToolStreamRestorer) Restore(event ResponsesStreamEvent) 
 			if call.kind == "custom" {
 				input := extractCustomToolCallInput(call.arguments.String())
 				if input != "" {
-					emit(ResponsesStreamEvent{Type: "response.custom_tool_call_input.delta", OutputIndex: call.outputIdx, ItemID: call.clientItemID, Delta: input})
+					emit(ResponsesStreamEvent{Type: "response.custom_tool_call_input.delta", OutputIndex: call.outputIdx, ItemID: call.clientItemID, Name: call.name, Namespace: call.namespace, Delta: input})
 				}
-				emit(ResponsesStreamEvent{Type: "response.custom_tool_call_input.done", OutputIndex: call.outputIdx, ItemID: call.clientItemID, CallID: call.callID, Name: call.name, Input: input})
+				emit(ResponsesStreamEvent{Type: "response.custom_tool_call_input.done", OutputIndex: call.outputIdx, ItemID: call.clientItemID, CallID: call.callID, Name: call.name, Namespace: call.namespace, Input: input})
 			}
 			return out
 		}
@@ -627,7 +653,8 @@ func (r *ResponsesClientToolStreamRestorer) Restore(event ResponsesStreamEvent) 
 				event.Item.Type = "custom_tool_call"
 				event.Item.Input = extractCustomToolCallInput(call.arguments.String())
 				event.Item.Arguments = ""
-				event.Item.Namespace = ""
+				event.Item.Name = call.name
+				event.Item.Namespace = call.namespace
 			} else {
 				event.Item.Type = "tool_search_call"
 				event.Item.Name = ""
@@ -790,9 +817,15 @@ func (r *ResponsesClientToolStreamRestorer) recordItem(event ResponsesStreamEven
 		return nil
 	}
 	name := event.Item.Name
+	upstreamName := name
 	kind := ""
+	namespace := ""
 	if r.adapter.CustomTools[name] {
 		kind = "custom"
+	} else if mapped, ok := r.adapter.NamespaceTools[name]; ok && mapped.Custom {
+		kind = "custom"
+		name = mapped.Name
+		namespace = mapped.Namespace
 	} else if r.adapter.ToolSearch && name == toolSearchProxyName {
 		kind = "tool_search"
 	}
@@ -808,6 +841,8 @@ func (r *ResponsesClientToolStreamRestorer) recordItem(event ResponsesStreamEven
 		call = &responsesClientToolStreamCall{
 			kind:         kind,
 			name:         name,
+			upstream:     upstreamName,
+			namespace:    namespace,
 			callID:       event.Item.CallID,
 			itemID:       event.Item.ID,
 			clientItemID: retypedResponsesToolCallItemID(event.Item.ID, responsesClientToolItemType(kind)),
@@ -834,7 +869,7 @@ func (r *ResponsesClientToolStreamRestorer) callFor(event ResponsesStreamEvent) 
 		return call
 	}
 	for _, call := range r.calls {
-		if (event.CallID != "" && call.callID == event.CallID) || (event.ItemID == "" && event.Name != "" && call.name == event.Name) {
+		if (event.CallID != "" && call.callID == event.CallID) || (event.ItemID == "" && event.Name != "" && (call.name == event.Name || call.upstream == event.Name)) {
 			return call
 		}
 	}
@@ -847,12 +882,21 @@ func (r *ResponsesClientToolStreamRestorer) restoreNamespaceEvent(event Response
 	}
 	if event.Item != nil && event.Item.Type == "function_call" {
 		if name, ok := r.adapter.NamespaceTools[event.Item.Name]; ok {
-			event.Item.Name, event.Item.Namespace = name.Name, name.Namespace
+			if name.Custom {
+				event.Item.Type = "custom_tool_call"
+				event.Item.Input = extractCustomToolCallInput(event.Item.Arguments)
+				event.Item.Arguments = ""
+				event.Item.Name, event.Item.Namespace = name.Name, name.Namespace
+				event.Item.ID = retypedResponsesToolCallItemID(event.Item.ID, "custom_tool_call")
+			} else {
+				event.Item.Name, event.Item.Namespace = name.Name, name.Namespace
+			}
 		}
 	}
 	if event.Type == "response.function_call_arguments.delta" || event.Type == "response.function_call_arguments.done" {
 		if name, ok := r.adapter.NamespaceTools[event.Name]; ok {
 			event.Name = name.Name
+			event.Namespace = name.Namespace
 		}
 	}
 	return event
@@ -870,6 +914,13 @@ func restoreResponsesOutputClientTools(outputs []ResponsesOutput, adapter *Respo
 			output.Input = extractCustomToolCallInput(output.Arguments)
 			output.Arguments = ""
 			output.Namespace = ""
+		} else if name, ok := adapter.NamespaceTools[output.Name]; ok && name.Custom {
+			output.Type = "custom_tool_call"
+			output.ID = retypedResponsesToolCallItemID(output.ID, output.Type)
+			output.Name = name.Name
+			output.Namespace = name.Namespace
+			output.Input = extractCustomToolCallInput(output.Arguments)
+			output.Arguments = ""
 		} else if adapter.ToolSearch && output.Name == toolSearchProxyName {
 			output.Type = "tool_search_call"
 			output.ID = retypedResponsesToolCallItemID(output.ID, output.Type)

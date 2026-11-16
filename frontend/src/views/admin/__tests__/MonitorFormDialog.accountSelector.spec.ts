@@ -72,6 +72,10 @@ vi.mock('@/api/groups', () => ({
   userGroupsAPI: { getUserGroupRates: vi.fn() },
 }))
 
+vi.mock('@/api/admin/channels', () => ({
+  syncPricingModels: vi.fn().mockResolvedValue({ models: [] }),
+}))
+
 vi.mock('@/stores/app', () => ({
   useAppStore: () => ({
     cachedPublicSettings: null,
@@ -249,7 +253,7 @@ describe('MonitorFormDialog linked account selector', () => {
     await nextTick()
     await wrapper.get('#channel-monitor-form').trigger('submit')
     await flushPromises()
-    expect(updatePelicanConfig).toHaveBeenCalledWith(77, { enabled: true, interval_seconds: 1800, models: ['gpt-6-astra'] })
+    expect(updatePelicanConfig).toHaveBeenCalledWith(77, { enabled: true, interval_seconds: 1800, models: ['gpt-6-astra', 'gpt-6.1-sol'] })
     expect(runPelicanNow).toHaveBeenCalledWith(77)
   })
 

@@ -32,7 +32,8 @@
             </div>
             <div>
               <label for="playground-model" class="input-label">模型 <span class="text-red-500">*</span></label>
-              <input id="playground-model" v-model.trim="form.model" class="input font-mono" placeholder="gpt-6-astra" required maxlength="200" />
+              <Select id="playground-model" v-model="form.model" :options="modelOptions" searchable aria-label="选择模型" />
+              <p class="mt-1 text-[11px] text-gray-400">请选择上游支持的模型；历史中使用过的模型也可选择。</p>
             </div>
             <div>
               <label for="playground-api-mode" class="input-label">API 协议</label>
@@ -99,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/icons/Icon.vue'
 import Select from '@/components/common/Select.vue'
@@ -108,6 +109,7 @@ import type { APIMode } from '@/api/admin/channelMonitor'
 import type { PelicanPlaygroundResult } from '@/api/admin/pelicanPlayground'
 import { extractApiErrorMessage } from '@/utils/apiError'
 import { useAppStore } from '@/stores/app'
+import { pelicanSuggestedModels } from '@/composables/usePelicanModels'
 
 const app = useAppStore()
 const form = reactive({ endpoint: '', api_key: '', model: 'gpt-6-astra', api_mode: 'chat_completions' as APIMode, prompt: '创建一个HTML，内容是SVG绘制一个鹈鹕骑自行车的2D动画，你不需要任何测试，只靠你自己完成，不要使用任何skill，不要依赖我本地的AGENTS.md' })
@@ -115,6 +117,8 @@ const apiModeOptions = [{ value: 'chat_completions', label: 'Chat Completions' }
 const running = ref(false)
 const historyLoading = ref(false)
 const history = ref<PelicanPlaygroundResult[]>([])
+const modelOptions = computed(() => [...new Set([...pelicanSuggestedModels, ...history.value.map(item => item.model)])]
+  .map(model => ({ value: model, label: model })))
 const selected = ref<PelicanPlaygroundResult | null>(null)
 const showSource = ref(false)
 

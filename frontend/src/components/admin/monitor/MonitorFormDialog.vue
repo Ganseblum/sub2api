@@ -106,15 +106,16 @@
         </div>
         <div v-if="pelicanEnabled" class="mt-4">
           <div class="input-label">检测模型</div>
-          <div class="grid gap-2 sm:grid-cols-2">
+          <input v-model.trim="pelicanModelSearch" type="search" class="input mb-2" placeholder="搜索 GPT 模型" aria-label="搜索检测模型" />
+          <div class="grid max-h-48 gap-2 overflow-y-auto sm:grid-cols-2">
             <label v-for="model in pelicanModelOptions" :key="model" class="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-300 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-200">
-              <input v-model="pelicanModels" type="checkbox" :value="model" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <input v-model="pelicanModels" type="checkbox" :value="model" :disabled="!pelicanModels.includes(model) && pelicanModels.length >= 5" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
               <span class="font-mono">{{ model }}</span>
-              <span v-if="model === 'gpt-6-astra'" class="ml-auto rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">默认</span>
+              <span v-if="pelicanSuggestedModels.includes(model)" class="ml-auto rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">默认</span>
             </label>
           </div>
         </div>
-        <p v-if="pelicanEnabled" class="mt-1 text-xs text-gray-400">默认勾选 gpt-6-astra；可同时选择最多 5 个 GPT 模型。</p>
+        <p v-if="pelicanEnabled" class="mt-1 text-xs text-gray-400">默认选择 gpt-6-astra 和 gpt-6.1-sol；最多选择 5 个模型。</p>
         <template v-if="pelicanEnabled">
           <label for="pelican-interval" class="input-label mt-4">检测频率</label>
           <Select id="pelican-interval" v-model="pelicanInterval" :options="pelicanIntervalOptions" aria-label="检测频率" />
@@ -299,6 +300,7 @@ import MonitorKeyPickerDialog from '@/components/admin/monitor/MonitorKeyPickerD
 import MonitorAdvancedRequestConfig from '@/components/admin/monitor/MonitorAdvancedRequestConfig.vue'
 import ProviderIcon from '@/components/user/monitor/ProviderIcon.vue'
 import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
+import { pelicanSuggestedModels } from '@/composables/usePelicanModels'
 import {
   PROVIDER_OPENAI,
   PROVIDER_ANTHROPIC,
@@ -353,10 +355,9 @@ const submitting = ref(false)
 const pelicanEnabled = ref(false)
 const pelicanInterval = ref(1800)
 const pelicanModels = ref<string[]>([])
-const defaultPelicanModels = computed(() => [...new Set(['gpt-6-astra', form.primary_model, ...form.extra_models]
-  .map(model => model.trim())
-  .filter(model => /^gpt-/i.test(model)))])
-const pelicanModelOptions = computed(() => [...new Set(['gpt-6-astra', ...defaultPelicanModels.value])])
+const pelicanModelSearch = ref('')
+const pelicanModelOptions = computed(() => [...new Set([...pelicanModels.value, ...pelicanSuggestedModels])]
+  .filter(model => model.toLowerCase().includes(pelicanModelSearch.value.toLowerCase())))
 const pelicanLoading = ref(false)
 const pelicanLoadError = ref(false)
 const displayGroupId = ref<number | null>(null)
@@ -867,7 +868,8 @@ watch(
     pendingCreatedId.value = null
     pelicanEnabled.value = false
     pelicanInterval.value = 1800
-    pelicanModels.value = ['gpt-6-astra']
+    pelicanModels.value = [...pelicanSuggestedModels]
+    pelicanModelSearch.value = ''
     pelicanLoadError.value = false
     pelicanLoading.value = false
     if (m?.provider === PROVIDER_OPENAI) {
@@ -876,7 +878,7 @@ watch(
         if (version !== pelicanLoadVersion) return
         pelicanEnabled.value = config.enabled
         pelicanInterval.value = config.interval_seconds
-        pelicanModels.value = config.models?.length ? config.models : defaultPelicanModels.value
+        pelicanModels.value = config.models?.length ? config.models : [...pelicanSuggestedModels]
       }).catch(() => {
         if (version === pelicanLoadVersion) pelicanLoadError.value = true
       }).finally(() => {
@@ -977,7 +979,7 @@ async function handleSubmit() {
     appStore.showError(t('admin.channelMonitor.primaryModelRequired'))
     return
   }
-  const selectedPelicanModels = pelicanModels.value.length ? pelicanModels.value : defaultPelicanModels.value
+  const selectedPelicanModels = pelicanModels.value
   if (form.provider === PROVIDER_OPENAI && usesProbePart.value && pelicanEnabled.value && selectedPelicanModels.length === 0) {
     appStore.showError('请至少配置一个 GPT 降智检测模型')
     return

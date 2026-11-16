@@ -61,8 +61,9 @@ type ChannelMonitorRunner struct {
 
 	// inFlight 跟踪正在执行的 monitor.ID。fire 调度前会检查避免重复提交，
 	// 防止单次检测耗时 > interval 时同一 monitor 被并发执行。
-	inFlight   map[int64]struct{}
-	inFlightMu sync.Mutex
+	inFlight     map[int64]struct{}
+	inFlightMu   sync.Mutex
+	pelicanSlots chan struct{}
 }
 
 // scheduledMonitor 单个监控的运行时上下文。
@@ -109,6 +110,7 @@ func newChannelMonitorRunner(svc monitorRunnerSvc, settingService *SettingServic
 		parentCancel:   cancel,
 		tasks:          make(map[int64]*scheduledMonitor),
 		inFlight:       make(map[int64]struct{}),
+		pelicanSlots:   make(chan struct{}, 4),
 	}
 }
 
@@ -191,10 +193,41 @@ func (r *ChannelMonitorRunner) Schedule(m *ChannelMonitor) {
 		cancel:   cancel,
 	}
 	r.tasks[m.ID] = task
-	r.wg.Add(1)
+	r.wg.Add(2)
 	r.mu.Unlock()
 
 	go r.runScheduled(ctx, task)
+	go r.runPelicanScheduled(ctx, task)
+}
+
+// Pelican scheduling is independent from the short availability probe. The
+// repository coordinates due checks between replicas using a database lock.
+func (r *ChannelMonitorRunner) runPelicanScheduled(ctx context.Context, task *scheduledMonitor) {
+	defer r.wg.Done()
+	svc, ok := r.svc.(interface {
+		RunPelicanDue(context.Context, int64) error
+	})
+	if !ok {
+		return
+	}
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+	for {
+		select {
+		case r.pelicanSlots <- struct{}{}:
+			if err := svc.RunPelicanDue(ctx, task.id); err != nil && ctx.Err() == nil {
+				slog.Warn("channel_monitor: pelican check failed", "monitor_id", task.id, "error", err)
+			}
+			<-r.pelicanSlots
+		default:
+			// Capacity is bounded; this monitor will retry on the next tick.
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+	}
 }
 
 // Unschedule 取消指定监控的定时任务（若存在）。

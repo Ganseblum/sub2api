@@ -1,22 +1,20 @@
 <template>
-  <button
-    type="button"
+  <div
+    role="button"
+    tabindex="0"
     class="group text-left p-5 rounded-2xl min-h-[280px] w-full bg-white/70 backdrop-blur-xl border border-gray-200/80 shadow-card dark:bg-dark-800/60 dark:border-dark-700/70 hover:-translate-y-1 hover:shadow-card-hover dark:hover:border-primary-500/30 hover:border-gray-300 transition-all duration-300 ease-out flex flex-col"
     @click="emit('click')"
+    @keydown.enter.self="emit('click')"
+    @keydown.space.self.prevent="emit('click')"
   >
     <!-- Header: icon + name/model + status chip -->
     <div class="flex items-start gap-3">
-      <span
-        class="w-9 h-9 rounded-xl ring-1 ring-black/5 dark:ring-white/10 grid place-items-center flex-shrink-0"
-        :class="[providerGradient(item.provider), providerTintClass]"
-      >
-        <ProviderIcon :provider="item.provider" :size="20" />
-      </span>
+      <ProviderIconBadge :provider="item.provider" />
       <div class="flex-1 min-w-0">
         <div class="text-base font-semibold truncate text-gray-900 dark:text-gray-100">
           {{ item.name }}
         </div>
-        <div class="mt-0.5 flex items-center gap-1.5 min-w-0">
+        <div class="mt-1 flex flex-wrap items-center gap-1.5 min-w-0">
           <span
             class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium flex-shrink-0"
             :class="providerBadgeClass(item.provider)"
@@ -33,6 +31,7 @@
           >
             {{ item.group_name }}
           </span>
+          <span class="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-dark-700 dark:text-gray-300">倍率 {{ item.display_metrics?.display_rate != null ? `${item.display_metrics.display_rate}×` : '未设置' }}</span>
         </div>
       </div>
       <span
@@ -44,65 +43,45 @@
     </div>
 
     <!-- Metrics -->
-    <MonitorMetricPair
-      primary-icon="bolt"
-      :primary-label="t('monitorCommon.dialogLatency')"
-      :primary-value="formatLatency(item.primary_latency_ms)"
-      primary-unit="ms"
-      secondary-icon="globe"
-      :secondary-label="t('monitorCommon.endpointPing')"
-      :secondary-value="formatLatency(item.primary_ping_latency_ms)"
-      secondary-unit="ms"
-    />
+    <div class="mt-5 grid grid-cols-3 gap-2">
+      <div class="min-w-0 rounded-xl border border-gray-100 bg-gray-50/80 p-3 dark:border-dark-700/50 dark:bg-dark-900/40" title="关联分组近 3 天缓存读取 Token 占输入 Token 的比例">
+        <div class="text-[10px] font-semibold tracking-wider text-gray-400">缓存率</div>
+        <div class="mt-1.5 text-lg font-bold font-mono tabular-nums text-gray-900 dark:text-gray-100">{{ item.display_metrics?.cache_rate == null ? '—' : `${item.display_metrics.cache_rate.toFixed(1)}%` }}</div>
+        <div class="mt-1 text-[10px] text-gray-400">近 3 天 · 分组</div>
+      </div>
+      <div class="min-w-0 rounded-xl border border-gray-100 bg-gray-50/80 p-3 dark:border-dark-700/50 dark:bg-dark-900/40">
+        <div class="text-[10px] font-semibold tracking-wider text-gray-400">可用率 · {{ window }}</div>
+        <div class="mt-1.5 text-lg font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400">{{ availabilityValue == null ? '—' : `${availabilityValue.toFixed(2)}%` }}</div>
+      </div>
+      <div class="min-w-0 rounded-xl border border-gray-100 bg-gray-50/80 p-3 dark:border-dark-700/50 dark:bg-dark-900/40" title="关联分组近 90 分钟有效请求的平均首 Token 时间">
+        <div class="text-[10px] font-semibold tracking-wider text-gray-400">首 Token</div>
+        <div class="mt-1.5 text-lg font-bold font-mono tabular-nums text-gray-900 dark:text-gray-100">{{ item.display_metrics?.first_token_ms == null ? '—' : `${(item.display_metrics.first_token_ms / 1000).toFixed(2)}s` }}</div>
+        <div class="mt-1 text-[10px] text-gray-400">近 90 分钟 · 分组</div>
+      </div>
+    </div>
+    <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">探活延迟 {{ formatLatency(item.primary_latency_ms) }} ms · Ping {{ formatLatency(item.primary_ping_latency_ms) }} ms</div>
 
     <!-- 配额模式：最新用量/余额快照（服务端已按系统开关剥离，此处 flag 为纵深防御） -->
     <MonitorQuotaView v-if="quotaVisible" :snapshot="item.latest_quota" class="mt-2" />
-
-    <!-- Divider -->
-    <div class="mt-4 border-t border-gray-100 dark:border-dark-700/60"></div>
-
-    <!-- Availability row -->
-    <MonitorAvailabilityRow
-      :window-label="availabilityLabel"
-      :value="availabilityValue"
-      :samples-label="extraModelsCountLabel"
-    />
 
     <!-- Timeline -->
     <MonitorTimeline
       :buckets="item.timeline"
       :countdown-seconds="countdownSeconds"
     />
-  </button>
+    <PelicanMonitor v-if="item.provider === 'openai'" :monitor-id="item.id" :monitor-name="item.name" @click.stop />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import type { UserMonitorView } from '@/api/channelMonitor'
-import {
-  useChannelMonitorFormat,
-  providerGradient,
-} from '@/composables/useChannelMonitorFormat'
+import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
 import { isChannelMonitorQuotaVisible } from '@/utils/featureFlags'
-import ProviderIcon from './ProviderIcon.vue'
-import MonitorMetricPair from './MonitorMetricPair.vue'
-import MonitorAvailabilityRow from './MonitorAvailabilityRow.vue'
+import ProviderIconBadge from './ProviderIconBadge.vue'
 import MonitorTimeline from './MonitorTimeline.vue'
 import MonitorQuotaView from '@/components/common/MonitorQuotaView.vue'
-
-// 图标配色与 utils/platformColors.ts 的平台色对齐（新 4 家）。
-const PROVIDER_TINT: Record<string, string> = {
-  openai: 'text-emerald-600 dark:text-emerald-300',
-  anthropic: 'text-orange-600 dark:text-orange-300',
-  gemini: 'text-sky-600 dark:text-sky-300',
-  grok: 'text-zinc-700 dark:text-zinc-200',
-  antigravity: 'text-purple-600 dark:text-purple-300',
-  kimi: 'text-pink-600 dark:text-pink-300',
-  zhipu: 'text-indigo-600 dark:text-indigo-300',
-  deepseek: 'text-teal-600 dark:text-teal-300',
-  opencode_go: 'text-amber-700 dark:text-amber-300',
-}
+import PelicanMonitor from './PelicanMonitor.vue'
 
 const props = defineProps<{
   item: UserMonitorView
@@ -115,7 +94,6 @@ const emit = defineEmits<{
   (e: 'click'): void
 }>()
 
-const { t } = useI18n()
 const {
   statusLabel,
   statusBadgeClass,
@@ -125,22 +103,8 @@ const {
   formatMonitorModel,
 } = useChannelMonitorFormat()
 
-const providerTintClass = computed(() =>
-  PROVIDER_TINT[props.item.provider] ?? 'text-gray-500 dark:text-gray-300'
-)
-
 const quotaVisible = computed(
   () => isChannelMonitorQuotaVisible() && !!props.item.latest_quota
 )
 
-const availabilityLabel = computed(() => {
-  const win = t(`channelStatus.windowTab.${props.window}`)
-  return `${t('monitorCommon.availabilityPrefix')} · ${win}`
-})
-
-const extraModelsCountLabel = computed(() => {
-  const count = props.item.extra_models?.length ?? 0
-  if (count === 0) return undefined
-  return t('monitorCommon.extraModelsCount', { n: count })
-})
 </script>

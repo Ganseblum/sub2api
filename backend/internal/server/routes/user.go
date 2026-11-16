@@ -147,6 +147,7 @@ func RegisterUserRoutes(
 		{
 			monitors.GET("", h.ChannelMonitor.List)
 			monitors.GET("/:id/status", h.ChannelMonitor.GetStatus)
+			monitors.GET("/:id/pelican", h.ChannelMonitor.GetPelicanResults)
 		}
 
 		// V2 passive views require feature on + mode=v2.

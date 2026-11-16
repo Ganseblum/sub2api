@@ -68,11 +68,20 @@ func (s *ChannelMonitorService) ListUserView(ctx context.Context) ([]*UserMonito
 	summaries := s.BatchMonitorStatusSummary(ctx, ids, primaryByID, extrasByID)
 	latestMap := s.batchLatest(ctx, ids)
 	timelineMap := s.batchTimeline(ctx, ids, primaryByID)
+	var displayMetrics map[int64]MonitorDisplayMetrics
+	if repo, ok := s.repo.(MonitorDisplayRepository); ok {
+		displayMetrics, err = repo.ListMonitorDisplayMetrics(ctx, ids)
+		if err != nil {
+			slog.Warn("channel_monitor: display metrics unavailable", "error", err)
+		}
+	}
 
 	views := make([]*UserMonitorView, 0, len(monitors))
 	for _, m := range monitors {
 		primaryLatest := pickLatest(latestMap[m.ID], m.PrimaryModel)
-		views = append(views, buildUserViewFromSummary(m, summaries[m.ID], primaryLatest, timelineMap[m.ID]))
+		view := buildUserViewFromSummary(m, summaries[m.ID], primaryLatest, timelineMap[m.ID])
+		view.DisplayMetrics = displayMetrics[m.ID]
+		views = append(views, view)
 	}
 	return views, nil
 }

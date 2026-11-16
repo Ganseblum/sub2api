@@ -805,12 +805,19 @@ func registerChannelMonitorRoutes(admin *gin.RouterGroup, h *handler.Handlers, s
 	{
 		monitors.GET("", h.Admin.ChannelMonitor.List)
 		monitors.POST("", h.Admin.ChannelMonitor.Create)
+		monitors.GET("/provider-orders", h.Admin.ChannelMonitor.GetProviderOrders)
+		monitors.PUT("/provider-orders", h.Admin.ChannelMonitor.UpdateProviderOrders)
 		monitors.GET("/:id", h.Admin.ChannelMonitor.Get)
 		monitors.POST("/:id/duplicate", h.Admin.ChannelMonitor.Duplicate)
 		monitors.PUT("/:id", h.Admin.ChannelMonitor.Update)
 		monitors.DELETE("/:id", h.Admin.ChannelMonitor.Delete)
 		monitors.POST("/:id/run", h.Admin.ChannelMonitor.Run)
 		monitors.GET("/:id/history", h.Admin.ChannelMonitor.History)
+		monitors.GET("/:id/pelican-config", h.Admin.ChannelMonitor.GetPelicanConfig)
+		monitors.PUT("/:id/pelican-config", h.Admin.ChannelMonitor.UpdatePelicanConfig)
+		monitors.GET("/:id/display-config", h.Admin.ChannelMonitor.GetDisplayConfig)
+		monitors.PUT("/:id/display-config", h.Admin.ChannelMonitor.UpdateDisplayConfig)
+		monitors.POST("/:id/pelican/run", h.Admin.ChannelMonitor.RunPelicanNow)
 	}
 
 	templates := admin.Group("/channel-monitor-templates")

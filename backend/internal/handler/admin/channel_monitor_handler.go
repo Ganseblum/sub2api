@@ -458,6 +458,104 @@ func (h *ChannelMonitorHandler) Update(c *gin.Context) {
 	response.Success(c, channelMonitorToResponse(m))
 }
 
+func (h *ChannelMonitorHandler) GetPelicanConfig(c *gin.Context) {
+	id, ok := ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	config, err := h.monitorService.GetPelicanConfig(c.Request.Context(), id)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, config)
+}
+
+func (h *ChannelMonitorHandler) GetDisplayConfig(c *gin.Context) {
+	id, ok := ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	config, err := h.monitorService.GetMonitorDisplayConfig(c.Request.Context(), id)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, config)
+}
+
+func (h *ChannelMonitorHandler) GetProviderOrders(c *gin.Context) {
+	items, err := h.monitorService.GetMonitorProviderOrders(c.Request.Context())
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, gin.H{"items": items})
+}
+
+func (h *ChannelMonitorHandler) UpdateProviderOrders(c *gin.Context) {
+	var req struct {
+		Items []service.MonitorProviderOrder `json:"items"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("VALIDATION_ERROR", err.Error()))
+		return
+	}
+	if err := h.monitorService.SetMonitorProviderOrders(c.Request.Context(), req.Items); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("INVALID_PROVIDER_ORDER", err.Error()))
+		return
+	}
+	response.Success(c, gin.H{"items": req.Items})
+}
+
+func (h *ChannelMonitorHandler) UpdateDisplayConfig(c *gin.Context) {
+	id, ok := ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	var config service.MonitorDisplayConfig
+	if err := c.ShouldBindJSON(&config); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("VALIDATION_ERROR", err.Error()))
+		return
+	}
+	if err := h.monitorService.SetMonitorDisplayConfig(c.Request.Context(), id, config); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("INVALID_DISPLAY_CONFIG", "分组或倍率无效"))
+		return
+	}
+	response.Success(c, config)
+}
+
+func (h *ChannelMonitorHandler) UpdatePelicanConfig(c *gin.Context) {
+	id, ok := ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	var config service.PelicanConfig
+	if err := c.ShouldBindJSON(&config); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("VALIDATION_ERROR", err.Error()))
+		return
+	}
+	if err := h.monitorService.SetPelicanConfig(c.Request.Context(), id, config); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("INVALID_PELICAN_CONFIG", err.Error()))
+		return
+	}
+	response.Success(c, config)
+}
+
+// RunPelicanNow POST /api/v1/admin/channel-monitors/:id/pelican/run
+func (h *ChannelMonitorHandler) RunPelicanNow(c *gin.Context) {
+	id, ok := ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	results, err := h.monitorService.RunPelicanNow(c.Request.Context(), id)
+	if err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("PELICAN_RUN_FAILED", err.Error()))
+		return
+	}
+	response.Success(c, gin.H{"items": results})
+}
+
 // Delete DELETE /api/v1/admin/channel-monitors/:id
 func (h *ChannelMonitorHandler) Delete(c *gin.Context) {
 	id, ok := ParseChannelMonitorID(c)

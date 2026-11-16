@@ -11,12 +11,22 @@ const {
   accountsGetById,
   monitorCreate,
   monitorUpdate,
+  getPelicanConfig,
+  updatePelicanConfig,
+  updateDisplayConfig,
+  getDisplayConfig,
+  getDisplayGroups,
 } = vi.hoisted(() => ({
   listTemplates: vi.fn(),
   accountsList: vi.fn(),
   accountsGetById: vi.fn(),
   monitorCreate: vi.fn(),
   monitorUpdate: vi.fn(),
+  getPelicanConfig: vi.fn().mockResolvedValue({ enabled: false, interval_seconds: 1800, models: [] }),
+  updatePelicanConfig: vi.fn().mockResolvedValue({ enabled: false, interval_seconds: 1800, models: [] }),
+  updateDisplayConfig: vi.fn().mockResolvedValue({ group_id: null, display_rate: null }),
+  getDisplayConfig: vi.fn(),
+  getDisplayGroups: vi.fn(),
 }))
 
 
@@ -35,7 +45,12 @@ vi.mock('@/api/admin', () => ({
     channelMonitor: {
       create: monitorCreate,
       update: monitorUpdate,
+      getPelicanConfig,
+      updatePelicanConfig,
+      getDisplayConfig,
+      updateDisplayConfig,
     },
+    groups: { getAllIncludingInactive: getDisplayGroups },
     channelMonitorTemplate: {
       list: listTemplates,
     },
@@ -168,6 +183,45 @@ describe('MonitorFormDialog linked account selector', () => {
     accountsGetById.mockReset()
     monitorCreate.mockReset().mockResolvedValue({})
     monitorUpdate.mockReset().mockResolvedValue({})
+    getPelicanConfig.mockReset().mockResolvedValue({ enabled: false, interval_seconds: 1800, models: [] })
+    updatePelicanConfig.mockReset().mockResolvedValue({ enabled: true, interval_seconds: 600, models: ['gpt-4o-mini'] })
+    getDisplayConfig.mockReset().mockResolvedValue({ group_id: null, display_rate: null })
+    getDisplayGroups.mockReset().mockResolvedValue([])
+    updateDisplayConfig.mockReset().mockResolvedValue({ group_id: null, display_rate: null })
+  })
+
+  it('saves the OpenAI pelican schedule when editing a monitor', async () => {
+    const wrapper = mountDialog(makeMonitor())
+    await flushPromises()
+    const toggle = wrapper.getComponent('[aria-label="开启 GPT 鹈鹕降智检测"]')
+    toggle.vm.$emit('update:modelValue', true)
+    await nextTick()
+    await wrapper.get('#pelican-interval').trigger('click')
+    await nextTick()
+    const intervalOption = [...document.querySelectorAll<HTMLElement>('.select-option')].find(option => option.textContent?.includes('每 10 分钟'))
+    expect(intervalOption).toBeDefined()
+    intervalOption!.click()
+    await nextTick()
+    await wrapper.get('#channel-monitor-form').trigger('submit')
+    await flushPromises()
+    expect(updatePelicanConfig).toHaveBeenCalledWith(42, { enabled: true, interval_seconds: 600, models: ['gpt-4o-mini'] })
+  })
+
+  it('saves the selected statistics group and an overridden display rate', async () => {
+    getDisplayGroups.mockResolvedValue([{ id: 7, name: 'GPT', platform: 'openai', rate_multiplier: 0.2 }])
+    const wrapper = mountDialog(makeMonitor())
+    await flushPromises()
+    await wrapper.get('#monitor-metrics-group').trigger('click')
+    await nextTick()
+    const groupOption = [...document.querySelectorAll<HTMLElement>('.select-option')].find(option => option.textContent?.includes('GPT'))
+    expect(groupOption).toBeDefined()
+    groupOption!.click()
+    await nextTick()
+    expect((wrapper.get('#monitor-display-rate').element as HTMLInputElement).value).toBe('0.2')
+    await wrapper.get('#monitor-display-rate').setValue('0.08')
+    await wrapper.get('#channel-monitor-form').trigger('submit')
+    await flushPromises()
+    expect(updateDisplayConfig).toHaveBeenCalledWith(42, { group_id: 7, display_rate: 0.08, sort_order: 0 })
   })
 
   it('loads the first page of provider accounts when quota mode is enabled', async () => {

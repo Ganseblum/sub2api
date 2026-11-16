@@ -29,6 +29,7 @@ vi.mock('@/features/channel-monitor-v2/MonitorSettingsPanel.vue', () => ({
 
 vi.mock('@/api/admin', () => ({
   adminAPI: {
+    groups: { getAllIncludingInactive: vi.fn().mockResolvedValue([]) },
     channelMonitor: {
       create: vi.fn(),
       update: vi.fn(),

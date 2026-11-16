@@ -31,12 +31,17 @@
       :description="t('channelStatus.empty.description')"
     />
 
-    <div
-      v-else
-      class="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-    >
+    <div v-else class="space-y-8">
+      <section v-for="group in providerGroups" :key="group.provider">
+        <div class="mb-4 flex items-center gap-3">
+          <ProviderIconBadge :provider="group.provider" />
+          <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ providerLabel(group.provider) }}</h2>
+          <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-dark-700">{{ group.items.length }}</span>
+          <div class="h-px flex-1 bg-gray-200 dark:bg-dark-700"></div>
+        </div>
+        <div class="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       <MonitorCard
-        v-for="item in items"
+        v-for="item in group.items"
         :key="item.id"
         :item="item"
         :window="window"
@@ -44,15 +49,20 @@
         :countdown-seconds="countdownSeconds"
         @click="emit('cardClick', item)"
       />
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
 import type { UserMonitorView, UserMonitorDetail } from '@/api/channelMonitor'
+import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
 import EmptyState from '@/components/common/EmptyState.vue'
 import MonitorCard from './MonitorCard.vue'
+import ProviderIconBadge from './ProviderIconBadge.vue'
 
 const props = defineProps<{
   items: UserMonitorView[]
@@ -67,6 +77,19 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { providerLabel } = useChannelMonitorFormat()
+const providerGroups = computed(() => {
+  const groups = new Map<UserMonitorView['provider'], UserMonitorView[]>()
+  for (const item of props.items) {
+    if (!groups.has(item.provider)) groups.set(item.provider, [])
+    groups.get(item.provider)!.push(item)
+  }
+  return Array.from(groups, ([provider, items]) => ({
+    provider,
+    order: items[0]?.display_metrics?.provider_order ?? 0,
+    items: [...items].sort((a, b) => (a.display_metrics?.sort_order ?? 0) - (b.display_metrics?.sort_order ?? 0) || a.id - b.id),
+  })).sort((a, b) => a.order - b.order || String(a.provider).localeCompare(String(b.provider)))
+})
 
 function resolveAvailability(item: UserMonitorView): number | null {
   if (props.window === '7d') {

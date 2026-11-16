@@ -96,6 +96,30 @@
         </div>
       </div>
 
+      <div v-if="form.provider === PROVIDER_OPENAI && usesProbePart" class="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-dark-700 dark:bg-dark-900/30">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">开启 GPT 鹈鹕降智检测</div>
+            <p class="mt-1 text-xs text-gray-400">每个 GPT 模型定时生成 HTML 作品；最多保存最近 10 次，会产生上游请求费用。</p>
+          </div>
+          <Toggle v-model="pelicanEnabled" :disabled="pelicanLoading" aria-label="开启 GPT 鹈鹕降智检测" />
+        </div>
+        <label v-if="pelicanEnabled" class="input-label mt-4">检测模型</label>
+        <ModelTagInput
+          v-if="pelicanEnabled"
+          :models="pelicanModels.length ? pelicanModels : defaultPelicanModels"
+          platform="openai"
+          placeholder="输入 GPT 模型名，回车添加"
+          @update:models="pelicanModels = $event"
+        />
+        <p v-if="pelicanEnabled" class="mt-1 text-xs text-gray-400">最多配置 5 个 GPT 模型；多个模型会同时检测。未自定义时默认使用渠道中配置的 GPT 模型。</p>
+        <template v-if="pelicanEnabled">
+          <label for="pelican-interval" class="input-label mt-4">检测频率</label>
+          <Select id="pelican-interval" v-model="pelicanInterval" :options="pelicanIntervalOptions" aria-label="检测频率" />
+        </template>
+        <p v-if="pelicanLoadError" class="mt-1 text-xs text-red-600">检测设置加载失败，请关闭后重试。</p>
+      </div>
+
       <div v-if="usesProbePart">
         <label class="input-label">{{ t('admin.channelMonitor.form.endpoint') }} <span class="text-red-500">*</span></label>
         <div class="flex gap-2">
@@ -151,6 +175,19 @@
       <div>
         <label class="input-label">{{ t('admin.channelMonitor.form.groupName') }}</label>
         <input v-model="form.group_name" type="text" class="input" :placeholder="t('admin.channelMonitor.form.groupNamePlaceholder')" />
+      </div>
+
+      <div class="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-dark-700 dark:bg-dark-900/30">
+        <label class="input-label" for="monitor-metrics-group">用量统计分组</label>
+        <Select id="monitor-metrics-group" v-model="displayGroupId" :options="displayGroupOptions" :disabled="displayLoading" aria-label="用量统计分组" @change="applyDisplayGroupRate" />
+        <p class="mt-1 text-xs text-gray-400">用于统计该分组近 3 天缓存率与近 90 分钟平均首 Token；请选择与渠道对应的分组。</p>
+        <label class="input-label mt-3" for="monitor-display-rate">展示倍率</label>
+        <input id="monitor-display-rate" v-model="displayRateInput" type="number" min="0" max="100000" step="any" class="input" placeholder="留空使用关联分组标准倍率" />
+        <p class="mt-1 text-xs text-gray-400">留空时使用关联分组的标准倍率；未关联分组则显示未设置。仅用于展示，不改变计费。</p>
+        <label class="input-label mt-3" for="monitor-display-order">渠道展示顺序</label>
+        <input id="monitor-display-order" v-model.number="displaySortOrder" type="number" min="-10000" max="10000" step="1" class="input" />
+        <p class="mt-1 text-xs text-gray-400">同一供应商内数字越小越靠前；相同数字按创建顺序排列。</p>
+        <p v-if="displayLoadError" class="mt-1 text-xs text-red-600">分组或展示配置加载失败，请关闭后重试。</p>
       </div>
 
       <div>
@@ -250,7 +287,7 @@ import type {
   UpdateParams,
 } from '@/api/admin/channelMonitor'
 import type { ChannelMonitorTemplate } from '@/api/admin/channelMonitorTemplate'
-import type { ApiKey } from '@/types'
+import type { ApiKey, AdminGroup } from '@/types'
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import Toggle from '@/components/common/Toggle.vue'
 import Select from '@/components/common/Select.vue'
@@ -311,6 +348,34 @@ const systemDefaultInterval = computed<number>(() => {
 const editing = computed<ChannelMonitor | null>(() => props.monitor)
 
 const submitting = ref(false)
+const pelicanEnabled = ref(false)
+const pelicanInterval = ref(1800)
+const pelicanModels = ref<string[]>([])
+const defaultPelicanModels = computed(() => [...new Set([form.primary_model, ...form.extra_models]
+  .map(model => model.trim())
+  .filter(model => /^gpt-/i.test(model)))])
+const pelicanLoading = ref(false)
+const pelicanLoadError = ref(false)
+const displayGroupId = ref<number | null>(null)
+const displayRateInput = ref('')
+const displaySortOrder = ref(0)
+const displayGroups = ref<AdminGroup[]>([])
+const displayGroupOptions = computed(() => [
+  { value: null, label: '不关联分组' },
+  ...displayGroups.value.map(group => ({ value: group.id, label: `${group.name} · ${group.platform} · ${group.rate_multiplier}×` })),
+])
+const pelicanIntervalOptions = [
+  { value: 600, label: '每 10 分钟' },
+  { value: 1800, label: '每 30 分钟' },
+  { value: 3600, label: '每 1 小时' },
+]
+const displayLoading = ref(false)
+const displayLoadError = ref(false)
+let displayLoadVersion = 0
+let pelicanLoadVersion = 0
+// Retain the newly created ID until the second configuration request succeeds,
+// so retrying a transient failure does not create a duplicate monitor.
+const pendingCreatedId = ref<number | null>(null)
 
 // API key picker
 const showKeyPicker = ref(false)
@@ -774,7 +839,47 @@ function loadFromMonitor(m: ChannelMonitor) {
 watch(
   () => [props.show, props.monitor] as const,
   ([show, m]) => {
+    const version = ++pelicanLoadVersion
+    const displayVersion = ++displayLoadVersion
     if (!show) return
+    displayGroupId.value = null
+    displayRateInput.value = ''
+    displaySortOrder.value = 0
+    displayLoadError.value = false
+    displayLoading.value = true
+    void Promise.all([
+      adminAPI.groups.getAllIncludingInactive(),
+      m ? adminAPI.channelMonitor.getDisplayConfig(m.id) : Promise.resolve({ group_id: null, display_rate: null, sort_order: 0 }),
+    ]).then(([groups, config]) => {
+      if (displayVersion !== displayLoadVersion) return
+      displayGroups.value = groups
+      displayGroupId.value = config.group_id
+      displayRateInput.value = config.display_rate == null ? '' : String(config.display_rate)
+      displaySortOrder.value = config.sort_order ?? 0
+    }).catch(() => {
+      if (displayVersion === displayLoadVersion) displayLoadError.value = true
+    }).finally(() => {
+      if (displayVersion === displayLoadVersion) displayLoading.value = false
+    })
+    pendingCreatedId.value = null
+    pelicanEnabled.value = false
+    pelicanInterval.value = 1800
+    pelicanModels.value = []
+    pelicanLoadError.value = false
+    pelicanLoading.value = false
+    if (m?.provider === PROVIDER_OPENAI) {
+      pelicanLoading.value = true
+      void adminAPI.channelMonitor.getPelicanConfig(m.id).then(config => {
+        if (version !== pelicanLoadVersion) return
+        pelicanEnabled.value = config.enabled
+        pelicanInterval.value = config.interval_seconds
+        pelicanModels.value = config.models || []
+      }).catch(() => {
+        if (version === pelicanLoadVersion) pelicanLoadError.value = true
+      }).finally(() => {
+        if (version === pelicanLoadVersion) pelicanLoading.value = false
+      })
+    }
     void loadTemplates()
     if (m) loadFromMonitor(m)
     else resetForm()
@@ -812,7 +917,16 @@ async function openMyKeyPicker() {
 
 function pickMyKey(k: ApiKey) {
   form.api_key = k.key
+  if (k.group) {
+    displayGroupId.value = k.group.id
+    displayRateInput.value = String(k.group.rate_multiplier)
+  }
   showKeyPicker.value = false
+}
+
+function applyDisplayGroupRate() {
+  const group = displayGroups.value.find(item => item.id === displayGroupId.value)
+  if (group) displayRateInput.value = String(group.rate_multiplier)
 }
 
 function buildPayload(): CreateParams {
@@ -838,7 +952,16 @@ function buildPayload(): CreateParams {
 }
 
 async function handleSubmit() {
-  if (submitting.value) return
+  if (submitting.value || pelicanLoading.value || pelicanLoadError.value || displayLoading.value || displayLoadError.value) return
+  const displayRate = String(displayRateInput.value).trim() === '' ? null : Number(displayRateInput.value)
+  if (!Number.isInteger(displaySortOrder.value) || displaySortOrder.value < -10000 || displaySortOrder.value > 10000) {
+    appStore.showError('请输入 -10000 到 10000 之间的整数顺序')
+    return
+  }
+  if (displayRate != null && (!Number.isFinite(displayRate) || displayRate < 0 || displayRate > 100000)) {
+    appStore.showError('请输入有效的展示倍率')
+    return
+  }
   if (!form.name.trim()) {
     appStore.showError(t('admin.channelMonitor.nameRequired'))
     return
@@ -851,11 +974,21 @@ async function handleSubmit() {
     appStore.showError(t('admin.channelMonitor.primaryModelRequired'))
     return
   }
+  const selectedPelicanModels = pelicanModels.value.length ? pelicanModels.value : defaultPelicanModels.value
+  if (form.provider === PROVIDER_OPENAI && usesProbePart.value && pelicanEnabled.value && selectedPelicanModels.length === 0) {
+    appStore.showError('请至少配置一个 GPT 降智检测模型')
+    return
+  }
+  if (selectedPelicanModels.length > 5) {
+    appStore.showError('降智检测最多支持 5 个模型')
+    return
+  }
 
   submitting.value = true
   try {
     const target = editing.value
-    if (target) {
+    const targetId = target?.id ?? pendingCreatedId.value
+    if (targetId != null) {
       const { api_key, ...rest } = buildPayload()
       const req: UpdateParams = { ...rest }
       // Only send api_key if user typed a new value
@@ -868,10 +1001,17 @@ async function handleSubmit() {
       // account_id 同理：probe 模式不带账号，update 发 0 显式解绑存量关联
       // （后端 0=清空、null=不动）。仅 update——create 发 0 会落 &0 触发 FK 违约。
       if (!usesQuotaMode.value) req.account_id = 0
-      await adminAPI.channelMonitor.update(target.id, req)
+      await adminAPI.channelMonitor.update(targetId, req)
+      await adminAPI.channelMonitor.updateDisplayConfig(targetId, { group_id: displayGroupId.value, display_rate: displayRate, sort_order: displaySortOrder.value })
+      await adminAPI.channelMonitor.updatePelicanConfig(targetId, { enabled: form.provider === PROVIDER_OPENAI && usesProbePart.value && pelicanEnabled.value, interval_seconds: pelicanInterval.value, models: selectedPelicanModels })
       appStore.showSuccess(t('admin.channelMonitor.updateSuccess'))
     } else {
-      await adminAPI.channelMonitor.create(buildPayload())
+      const created = await adminAPI.channelMonitor.create(buildPayload())
+      pendingCreatedId.value = created.id
+      await adminAPI.channelMonitor.updateDisplayConfig(created.id, { group_id: displayGroupId.value, display_rate: displayRate, sort_order: displaySortOrder.value })
+      if (form.provider === PROVIDER_OPENAI && usesProbePart.value && pelicanEnabled.value) {
+        await adminAPI.channelMonitor.updatePelicanConfig(created.id, { enabled: true, interval_seconds: pelicanInterval.value, models: selectedPelicanModels })
+      }
       appStore.showSuccess(t('admin.channelMonitor.createSuccess'))
     }
     emit('saved')

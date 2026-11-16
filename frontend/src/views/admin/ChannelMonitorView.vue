@@ -49,7 +49,9 @@
 
       <MonitorSettingsPanel v-if="adminMonitorTab === 'v2'" />
 
-      <TablePageLayout v-else>
+      <template v-else>
+      <MonitorProviderOrder />
+      <TablePageLayout>
       <template #filters>
         <MonitorFiltersBar
           v-model:search="searchQuery"
@@ -104,8 +106,10 @@
             <MonitorActionsCell
               :row="row"
               :running="runningId === row.id"
+              :pelican-running="pelicanRunningId === row.id"
               :duplicating="duplicatingIds.has(row.id)"
               @run="handleRunNow"
+              @pelican-run="handlePelicanRunNow"
               @duplicate="handleDuplicate"
               @edit="openEditDialog"
               @delete="handleDelete"
@@ -134,6 +138,7 @@
         />
       </template>
       </TablePageLayout>
+      </template>
     </div>
 
     <MonitorFormDialog
@@ -153,6 +158,12 @@
       :show="showRunResult"
       :results="runResults"
       @close="showRunResult = false"
+    />
+
+    <PelicanRunResultDialog
+      :show="showPelicanRunResult"
+      :items="pelicanRunResults"
+      @close="showPelicanRunResult = false"
     />
 
     <ConfirmDialog
@@ -179,6 +190,7 @@ import type {
   CheckResult,
   ListParams,
   Provider,
+  PelicanResult,
 } from '@/api/admin/channelMonitor'
 import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -194,8 +206,10 @@ import MonitorFiltersBar from '@/components/admin/monitor/MonitorFiltersBar.vue'
 import MonitorFormDialog from '@/components/admin/monitor/MonitorFormDialog.vue'
 import MonitorTemplateManagerDialog from '@/components/admin/monitor/MonitorTemplateManagerDialog.vue'
 import MonitorRunResultDialog from '@/components/admin/monitor/MonitorRunResultDialog.vue'
+import PelicanRunResultDialog from '@/components/admin/monitor/PelicanRunResultDialog.vue'
 import MonitorPrimaryModelCell from '@/components/admin/monitor/MonitorPrimaryModelCell.vue'
 import MonitorActionsCell from '@/components/admin/monitor/MonitorActionsCell.vue'
+import MonitorProviderOrder from '@/components/admin/monitor/MonitorProviderOrder.vue'
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 import { useChannelMonitorFormat } from '@/composables/useChannelMonitorFormat'
 import MonitorSettingsPanel from '@/features/channel-monitor-v2/MonitorSettingsPanel.vue'
@@ -217,6 +231,7 @@ const {
 const monitors = ref<ChannelMonitor[]>([])
 const loading = ref(false)
 const runningId = ref<number | null>(null)
+const pelicanRunningId = ref<number | null>(null)
 const searchQuery = ref('')
 const providerFilter = ref<Provider | ''>('')
 const enabledFilter = ref<'' | 'true' | 'false'>('')
@@ -229,6 +244,8 @@ const showDeleteDialog = ref(false)
 const deleting = ref<ChannelMonitor | null>(null)
 const showRunResult = ref(false)
 const runResults = ref<CheckResult[]>([])
+const showPelicanRunResult = ref(false)
+const pelicanRunResults = ref<PelicanResult[]>([])
 const duplicatingIds = reactive(new Set<number>())
 
 let abortController: AbortController | null = null
@@ -342,6 +359,21 @@ async function handleRunNow(row: ChannelMonitor) {
     appStore.showError(extractApiErrorMessage(err, t('admin.channelMonitor.runFailed')))
   } finally {
     runningId.value = null
+  }
+}
+
+async function handlePelicanRunNow(row: ChannelMonitor) {
+  if (pelicanRunningId.value != null) return
+  pelicanRunningId.value = row.id
+  try {
+    const res = await adminAPI.channelMonitor.runPelicanNow(row.id)
+    pelicanRunResults.value = res.items || []
+    showPelicanRunResult.value = true
+    appStore.showSuccess('降智检测已完成')
+  } catch (err: unknown) {
+    appStore.showError(extractApiErrorMessage(err, '降智检测失败，请确认该 OpenAI 监控已开启降智检测'))
+  } finally {
+    pelicanRunningId.value = null
   }
 }
 

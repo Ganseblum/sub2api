@@ -63,6 +63,7 @@ type channelMonitorUserListItem struct {
 	Availability7d       float64                              `json:"availability_7d"`
 	ExtraModels          []dto.ChannelMonitorExtraModelStatus `json:"extra_models"`
 	Timeline             []channelMonitorUserTimelinePoint    `json:"timeline"`
+	DisplayMetrics       service.MonitorDisplayMetrics        `json:"display_metrics"`
 	// LatestQuota 主模型最近配额快照；channel_monitor_show_quota=false 时
 	// 由 userMonitorViewToItem 的调用方传入 false 剥离（服务端脱敏，非仅前端隐藏）。
 	LatestQuota *domain.MonitorQuotaSnapshot `json:"latest_quota,omitempty"`
@@ -125,6 +126,7 @@ func userMonitorViewToItem(v *service.UserMonitorView, includeQuota bool) channe
 		Availability7d:       v.Availability7d,
 		ExtraModels:          extras,
 		Timeline:             timeline,
+		DisplayMetrics:       v.DisplayMetrics,
 	}
 	if includeQuota {
 		item.LatestQuota = v.LatestQuota
@@ -192,4 +194,32 @@ func (h *ChannelMonitorUserHandler) GetStatus(c *gin.Context) {
 		return
 	}
 	response.Success(c, userMonitorDetailToResponse(detail))
+}
+
+func (h *ChannelMonitorUserHandler) GetPelicanResults(c *gin.Context) {
+	if !h.featureEnabled(c) {
+		response.ErrorFrom(c, service.ErrChannelMonitorNotFound)
+		return
+	}
+	id, ok := admin.ParseChannelMonitorID(c)
+	if !ok {
+		return
+	}
+	items, err := h.monitorService.ListPelicanResults(c.Request.Context(), id)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	if items == nil {
+		items = []service.PelicanResult{}
+	}
+	config, err := h.monitorService.GetPelicanConfig(c.Request.Context(), id)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	if !config.Enabled {
+		items = []service.PelicanResult{}
+	}
+	response.Success(c, gin.H{"enabled": config.Enabled, "models": config.Models, "items": items})
 }

@@ -33,6 +33,7 @@ export interface UserMonitorView {
   availability_7d: number
   extra_models: UserMonitorExtraModel[]
   timeline: MonitorTimelinePoint[]
+  display_metrics?: { cache_rate: number | null; first_token_ms: number | null; display_rate: number | null; sort_order: number; provider_order: number }
   /**
    * 主模型最近配额快照。仅当系统开启 channel_monitor_show_quota 时
    * 服务端才会下发（关闭时服务端已剥离，前端 flag 仅作纵深防御）。
@@ -60,6 +61,22 @@ export interface UserMonitorDetail {
   provider: Provider
   group_name: string
   models: UserMonitorModelDetail[]
+}
+
+export interface PelicanResult {
+  id: number
+  model: string
+  status: 'passed' | 'failed' | 'error'
+  source_length: number
+  artifact?: string
+  message?: string
+  started_at: string
+  finished_at: string
+}
+
+export async function pelican(id: number): Promise<{ enabled: boolean; models: string[]; items: PelicanResult[] }> {
+  const { data } = await apiClient.get<{ enabled: boolean; models: string[]; items: PelicanResult[] }>(`/channel-monitors/${id}/pelican`)
+  return data
 }
 
 /**

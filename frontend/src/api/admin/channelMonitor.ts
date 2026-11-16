@@ -25,6 +25,64 @@ export type APIMode = 'chat_completions' | 'responses'
  */
 export type CheckMode = 'probe' | 'quota' | 'quota_probe'
 
+export interface PelicanConfig {
+  enabled: boolean
+  interval_seconds: number
+  models: string[]
+}
+
+export interface MonitorDisplayConfig {
+  group_id: number | null
+  display_rate: number | null
+  sort_order: number
+}
+
+export interface ProviderOrder { provider: Provider; sort_order: number }
+export async function getProviderOrders(): Promise<{ items: ProviderOrder[] }> {
+  const { data } = await apiClient.get<{ items: ProviderOrder[] }>('/admin/channel-monitors/provider-orders')
+  return data
+}
+export async function updateProviderOrders(items: ProviderOrder[]): Promise<void> {
+  await apiClient.put('/admin/channel-monitors/provider-orders', { items })
+}
+
+export async function getDisplayConfig(id: number): Promise<MonitorDisplayConfig> {
+  const { data } = await apiClient.get<MonitorDisplayConfig>(`/admin/channel-monitors/${id}/display-config`)
+  return data
+}
+
+export async function updateDisplayConfig(id: number, config: MonitorDisplayConfig): Promise<MonitorDisplayConfig> {
+  const { data } = await apiClient.put<MonitorDisplayConfig>(`/admin/channel-monitors/${id}/display-config`, config)
+  return data
+}
+
+export interface PelicanResult {
+  id: number
+  monitor_id: number
+  model: string
+  status: 'passed' | 'failed' | 'error'
+  source_length: number
+  artifact?: string
+  message?: string
+  started_at: string
+  finished_at: string
+}
+
+export async function getPelicanConfig(id: number): Promise<PelicanConfig> {
+  const { data } = await apiClient.get<PelicanConfig>(`/admin/channel-monitors/${id}/pelican-config`)
+  return data
+}
+
+export async function updatePelicanConfig(id: number, config: PelicanConfig): Promise<PelicanConfig> {
+  const { data } = await apiClient.put<PelicanConfig>(`/admin/channel-monitors/${id}/pelican-config`, config)
+  return data
+}
+
+export async function runPelicanNow(id: number): Promise<{ items: PelicanResult[] }> {
+  const { data } = await apiClient.post<{ items: PelicanResult[] }>(`/admin/channel-monitors/${id}/pelican/run`, undefined, { timeout: 11 * 60 * 1000 })
+  return data
+}
+
 /** 配额快照中的单个用量窗口（与后端 domain.MonitorQuotaTier 一致）。 */
 export interface MonitorQuotaTier {
   /** 5h | 7d | 7d-sonnet | 7d-fable | 30d | daily | weekly | total */
@@ -354,6 +412,13 @@ export const channelMonitorAPI = {
   del,
   runNow,
   listHistory,
+  getPelicanConfig,
+  updatePelicanConfig,
+  getDisplayConfig,
+  updateDisplayConfig,
+  getProviderOrders,
+  updateProviderOrders,
+  runPelicanNow,
 }
 
 export default channelMonitorAPI

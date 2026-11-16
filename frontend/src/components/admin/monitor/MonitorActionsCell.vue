@@ -9,6 +9,17 @@
       <span class="text-xs">{{ t('admin.channelMonitor.runNow') }}</span>
     </button>
     <button
+      v-if="row.provider === 'openai'"
+      data-testid="monitor-pelican-run"
+      :disabled="pelicanRunning"
+      title="立即执行降智检测"
+      @click="$emit('pelican-run', row)"
+      class="flex flex-col items-center gap-0.5 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-primary-600 disabled:cursor-wait disabled:opacity-50 dark:hover:bg-dark-700 dark:hover:text-primary-400"
+    >
+      <Icon name="sparkles" size="sm" :class="pelicanRunning ? 'animate-pulse' : ''" />
+      <span class="text-xs">{{ pelicanRunning ? '检测中' : '降智检测' }}</span>
+    </button>
+    <button
       data-testid="monitor-duplicate"
       :title="duplicateTitle"
       :disabled="duplicating || Boolean(row.api_key_decrypt_failed)"
@@ -46,11 +57,13 @@ import Icon from '@/components/icons/Icon.vue'
 const props = defineProps<{
   row: ChannelMonitor
   running: boolean
+  pelicanRunning: boolean
   duplicating: boolean
 }>()
 
 defineEmits<{
   (e: 'run', row: ChannelMonitor): void
+  (e: 'pelican-run', row: ChannelMonitor): void
   (e: 'duplicate', row: ChannelMonitor): void
   (e: 'edit', row: ChannelMonitor): void
   (e: 'delete', row: ChannelMonitor): void

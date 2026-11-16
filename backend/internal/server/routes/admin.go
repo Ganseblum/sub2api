@@ -120,6 +120,7 @@ func RegisterAdminRoutes(
 		// 渠道监控
 		registerChannelMonitorRoutes(admin, h, settingService)
 		registerChannelMonitorV2Routes(admin, h, settingService)
+		registerPelicanPlaygroundRoutes(admin, h)
 
 		// 风控中心
 		registerContentModerationRoutes(admin, h)
@@ -133,6 +134,12 @@ func RegisterAdminRoutes(
 		// 操作审计日志
 		registerAuditLogRoutes(admin, h, stepUpAuth)
 	}
+}
+
+func registerPelicanPlaygroundRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
+	playground := admin.Group("/pelican-playground")
+	playground.POST("/run", h.Admin.ChannelMonitor.RunPelicanPlayground)
+	playground.GET("/history", h.Admin.ChannelMonitor.ListPelicanPlaygroundHistory)
 }
 
 func registerPromptAuditRoutes(admin *gin.RouterGroup, h *handler.Handlers) {

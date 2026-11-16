@@ -16,6 +16,7 @@ const {
   updateDisplayConfig,
   getDisplayConfig,
   getDisplayGroups,
+  runPelicanNow,
 } = vi.hoisted(() => ({
   listTemplates: vi.fn(),
   accountsList: vi.fn(),
@@ -27,6 +28,7 @@ const {
   updateDisplayConfig: vi.fn().mockResolvedValue({ group_id: null, display_rate: null }),
   getDisplayConfig: vi.fn(),
   getDisplayGroups: vi.fn(),
+  runPelicanNow: vi.fn().mockResolvedValue({ items: [] }),
 }))
 
 
@@ -47,6 +49,7 @@ vi.mock('@/api/admin', () => ({
       update: monitorUpdate,
       getPelicanConfig,
       updatePelicanConfig,
+      runPelicanNow,
       getDisplayConfig,
       updateDisplayConfig,
     },
@@ -90,6 +93,13 @@ const BaseDialogStub = defineComponent({
   template: '<div v-if="show"><slot /><slot name="footer" /></div>',
 })
 
+const ToggleStub = defineComponent({
+  inheritAttrs: true,
+  props: { modelValue: { type: Boolean, default: false } },
+  emits: ['update:modelValue'],
+  template: '<button type="button" v-bind="$attrs" role="switch" :aria-checked="modelValue" @click="$emit(\'update:modelValue\', !modelValue)" />',
+})
+
 function makeMonitor(overrides: Partial<ChannelMonitor> = {}): ChannelMonitor {
   return {
     id: 42,
@@ -130,7 +140,7 @@ function mountDialog(monitor: ChannelMonitor | null = null) {
     global: {
       stubs: {
         BaseDialog: BaseDialogStub,
-        Toggle: true,
+        Toggle: ToggleStub,
         ModelTagInput: true,
         MonitorKeyPickerDialog: true,
         MonitorAdvancedRequestConfig: true,
@@ -183,10 +193,11 @@ describe('MonitorFormDialog linked account selector', () => {
     accountsGetById.mockReset()
     monitorCreate.mockReset().mockResolvedValue({})
     monitorUpdate.mockReset().mockResolvedValue({})
-    getPelicanConfig.mockReset().mockResolvedValue({ enabled: false, interval_seconds: 1800, models: [] })
-    updatePelicanConfig.mockReset().mockResolvedValue({ enabled: true, interval_seconds: 600, models: ['gpt-4o-mini'] })
+    getPelicanConfig.mockReset().mockResolvedValue({ enabled: false, interval_seconds: 1800, models: ['gpt-6-astra', 'gpt-4o-mini'] })
+    updatePelicanConfig.mockReset().mockResolvedValue({ enabled: true, interval_seconds: 600, models: ['gpt-6-astra', 'gpt-4o-mini'] })
     getDisplayConfig.mockReset().mockResolvedValue({ group_id: null, display_rate: null })
     getDisplayGroups.mockReset().mockResolvedValue([])
+    runPelicanNow.mockReset().mockResolvedValue({ items: [] })
     updateDisplayConfig.mockReset().mockResolvedValue({ group_id: null, display_rate: null })
   })
 
@@ -204,7 +215,7 @@ describe('MonitorFormDialog linked account selector', () => {
     await nextTick()
     await wrapper.get('#channel-monitor-form').trigger('submit')
     await flushPromises()
-    expect(updatePelicanConfig).toHaveBeenCalledWith(42, { enabled: true, interval_seconds: 600, models: ['gpt-4o-mini'] })
+    expect(updatePelicanConfig).toHaveBeenCalledWith(42, { enabled: true, interval_seconds: 600, models: ['gpt-6-astra', 'gpt-4o-mini'] })
   })
 
   it('saves the selected statistics group and an overridden display rate', async () => {
@@ -222,6 +233,24 @@ describe('MonitorFormDialog linked account selector', () => {
     await wrapper.get('#channel-monitor-form').trigger('submit')
     await flushPromises()
     expect(updateDisplayConfig).toHaveBeenCalledWith(42, { group_id: 7, display_rate: 0.08, sort_order: 0 })
+  })
+
+  it('starts the first pelican run after creating an enabled OpenAI monitor', async () => {
+    monitorCreate.mockResolvedValue({ id: 77 })
+    const wrapper = mountDialog()
+    await flushPromises()
+    await wrapper.get('[data-testid="monitor-provider-openai"]').trigger('click')
+    await wrapper.find('input[type="text"]').setValue('new pelican monitor')
+    await wrapper.get('[data-testid="monitor-endpoint"]').setValue('https://api.example.com')
+    await wrapper.get('[data-testid="monitor-primary-model"]').setValue('gpt-6.1-sol')
+    const pelicanToggle = wrapper.findAllComponents(ToggleStub).find(toggle => toggle.attributes('aria-label') === '开启 GPT 鹈鹕降智检测')
+    expect(pelicanToggle).toBeDefined()
+    pelicanToggle!.vm.$emit('update:modelValue', true)
+    await nextTick()
+    await wrapper.get('#channel-monitor-form').trigger('submit')
+    await flushPromises()
+    expect(updatePelicanConfig).toHaveBeenCalledWith(77, { enabled: true, interval_seconds: 1800, models: ['gpt-6-astra'] })
+    expect(runPelicanNow).toHaveBeenCalledWith(77)
   })
 
   it('loads the first page of provider accounts when quota mode is enabled', async () => {

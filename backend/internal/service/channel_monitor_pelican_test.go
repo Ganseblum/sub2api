@@ -43,7 +43,7 @@ func TestPelicanConfiguration(t *testing.T) {
 	if err := svc.SetPelicanConfig(ctx, 1, PelicanConfig{Enabled: true, IntervalSeconds: 1800}); err != nil {
 		t.Fatal(err)
 	}
-	if repo.writes != 1 || !repo.config.Enabled || len(repo.config.Models) != 1 || repo.config.Models[0] != "gpt-test" {
+	if repo.writes != 1 || !repo.config.Enabled || len(repo.config.Models) != 2 || repo.config.Models[0] != "gpt-6-astra" || repo.config.Models[1] != "gpt-test" {
 		t.Fatal("valid configuration was not stored")
 	}
 	if err := svc.SetPelicanConfig(ctx, 1, PelicanConfig{Enabled: true, IntervalSeconds: 120}); err == nil {
@@ -73,7 +73,7 @@ func TestPelicanConfiguration(t *testing.T) {
 func TestDefaultPelicanModelsSkipsNonGPTModels(t *testing.T) {
 	monitor := &ChannelMonitor{PrimaryModel: "gpt-a", ExtraModels: []string{"other-model", "gpt-b", "gpt-a"}}
 	models := defaultPelicanModels(monitor)
-	if len(models) != 2 || models[0] != "gpt-a" || models[1] != "gpt-b" {
+	if len(models) != 3 || models[0] != "gpt-6-astra" || models[1] != "gpt-a" || models[2] != "gpt-b" {
 		t.Fatalf("unexpected default GPT models: %v", models)
 	}
 }

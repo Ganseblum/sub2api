@@ -127,7 +127,10 @@ func (r *ChannelMonitorRunner) Start() {
 	}
 	r.started = true
 	r.mu.Unlock()
-
+	if cleaner, ok := r.svc.(interface{ CleanupPelicanPlaygroundResults(context.Context) error }); ok {
+		r.wg.Add(1)
+		go r.runPelicanPlaygroundCleanup(cleaner)
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), monitorStartupLoadTimeout)
 	defer cancel()
 	enabled, err := r.svc.ListEnabledMonitors(ctx)
@@ -139,6 +142,24 @@ func (r *ChannelMonitorRunner) Start() {
 		r.Schedule(m)
 	}
 	slog.Info("channel_monitor: runner started", "scheduled_tasks", len(enabled))
+}
+
+func (r *ChannelMonitorRunner) runPelicanPlaygroundCleanup(cleaner interface{ CleanupPelicanPlaygroundResults(context.Context) error }) {
+	defer r.wg.Done()
+	ticker := time.NewTicker(15 * time.Minute)
+	defer ticker.Stop()
+	for {
+		ctx, cancel := context.WithTimeout(r.parentCtx, 30*time.Second)
+		if err := cleaner.CleanupPelicanPlaygroundResults(ctx); err != nil && r.parentCtx.Err() == nil {
+			slog.Warn("channel_monitor: pelican playground retention cleanup failed", "error", err)
+		}
+		cancel()
+		select {
+		case <-r.parentCtx.Done():
+			return
+		case <-ticker.C:
+		}
+	}
 }
 
 // Schedule 为指定监控创建（或重置）独立定时任务。

@@ -68,14 +68,18 @@ func (s *ChannelMonitorService) SetPelicanConfig(ctx context.Context, id int64, 
 
 func defaultPelicanModels(monitor *ChannelMonitor) []string {
 	if monitor == nil {
-		return []string{}
+		return []string{"gpt-6-astra"}
 	}
-	candidates := make([]string, 0, len(monitor.ExtraModels)+1)
+	candidates := []string{"gpt-6-astra"}
 	for _, model := range append([]string{monitor.PrimaryModel}, monitor.ExtraModels...) {
 		model = strings.TrimSpace(model)
 		if strings.HasPrefix(strings.ToLower(model), "gpt-") {
 			candidates = append(candidates, model)
 		}
+	}
+	// Keep the Astra default and at most four additional channel GPT models.
+	if len(candidates) > 5 {
+		candidates = candidates[:5]
 	}
 	models, err := normalizePelicanModels(candidates)
 	if err != nil {
@@ -245,20 +249,27 @@ const pelicanResponseLimit = 2 << 20
 // separate timeout and response limit allow a complete HTML generation while
 // bounding the resources consumed by a single scheduled run.
 func requestPelican(ctx context.Context, endpoint, apiKey, model, apiMode string, extraHeaders map[string]string) (string, error) {
+	if !strings.HasPrefix(strings.ToLower(strings.TrimSpace(model)), "gpt-") {
+		return "", fmt.Errorf("pelican check requires a GPT model")
+	}
+	return requestPelicanPrompt(ctx, endpoint, apiKey, model, apiMode, extraHeaders, PelicanPrompt)
+}
+
+func requestPelicanPrompt(ctx context.Context, endpoint, apiKey, model, apiMode string, extraHeaders map[string]string, prompt string) (string, error) {
 	if err := validateEndpoint(endpoint); err != nil {
 		return "", err
 	}
-	if !strings.HasPrefix(strings.ToLower(strings.TrimSpace(model)), "gpt-") {
-		return "", fmt.Errorf("pelican check requires a GPT model")
+	if strings.TrimSpace(model) == "" {
+		return "", fmt.Errorf("model is required")
 	}
 	path := providerOpenAIPath
 	body := map[string]any{
 		"model": model, "stream": false,
-		"messages": []map[string]string{{"role": "user", "content": PelicanPrompt}},
+		"messages": []map[string]string{{"role": "user", "content": prompt}},
 	}
 	if apiMode == MonitorAPIModeResponses {
 		path = providerOpenAIResponsesPath
-		body = map[string]any{"model": model, "stream": false, "input": PelicanPrompt}
+		body = map[string]any{"model": model, "stream": false, "input": prompt}
 	} else if apiMode != "" && apiMode != MonitorAPIModeChatCompletions {
 		return "", fmt.Errorf("unsupported API mode")
 	}

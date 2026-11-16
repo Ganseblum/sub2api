@@ -536,6 +536,17 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/pelican-playground',
+    name: 'AdminPelicanPlayground',
+    component: () => import('@/views/admin/PelicanPlaygroundView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+      title: 'Pelican Playground',
+      titleKey: 'nav.pelicanPlayground'
+    }
+  },
+  {
     path: '/monitor',
     name: 'ChannelStatus',
     component: () => import('@/views/user/ChannelStatusView.vue'),

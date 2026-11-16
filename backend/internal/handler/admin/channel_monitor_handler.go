@@ -556,6 +556,39 @@ func (h *ChannelMonitorHandler) RunPelicanNow(c *gin.Context) {
 	response.Success(c, gin.H{"items": results})
 }
 
+func (h *ChannelMonitorHandler) RunPelicanPlayground(c *gin.Context) {
+	subject, ok := middleware2.GetAuthSubjectFromContext(c)
+	if !ok || subject.UserID <= 0 {
+		response.ErrorFrom(c, infraerrors.Unauthorized("UNAUTHORIZED", "管理员身份不可用"))
+		return
+	}
+	var request service.PelicanPlaygroundRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("VALIDATION_ERROR", "请检查 URL、模型和 Prompt"))
+		return
+	}
+	item, err := h.monitorService.RunPelicanPlayground(c.Request.Context(), subject.UserID, request)
+	if err != nil {
+		response.ErrorFrom(c, infraerrors.BadRequest("PELICAN_PLAYGROUND_FAILED", "生成失败，请检查 URL、Key、模型和 Prompt"))
+		return
+	}
+	response.Success(c, item)
+}
+
+func (h *ChannelMonitorHandler) ListPelicanPlaygroundHistory(c *gin.Context) {
+	subject, ok := middleware2.GetAuthSubjectFromContext(c)
+	if !ok || subject.UserID <= 0 {
+		response.ErrorFrom(c, infraerrors.Unauthorized("UNAUTHORIZED", "管理员身份不可用"))
+		return
+	}
+	items, err := h.monitorService.ListPelicanPlaygroundResults(c.Request.Context(), subject.UserID)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return
+	}
+	response.Success(c, gin.H{"items": items})
+}
+
 // Delete DELETE /api/v1/admin/channel-monitors/:id
 func (h *ChannelMonitorHandler) Delete(c *gin.Context) {
 	id, ok := ParseChannelMonitorID(c)

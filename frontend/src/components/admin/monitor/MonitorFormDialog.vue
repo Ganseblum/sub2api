@@ -104,15 +104,17 @@
           </div>
           <Toggle v-model="pelicanEnabled" :disabled="pelicanLoading" aria-label="开启 GPT 鹈鹕降智检测" />
         </div>
-        <label v-if="pelicanEnabled" class="input-label mt-4">检测模型</label>
-        <ModelTagInput
-          v-if="pelicanEnabled"
-          :models="pelicanModels.length ? pelicanModels : defaultPelicanModels"
-          platform="openai"
-          placeholder="输入 GPT 模型名，回车添加"
-          @update:models="pelicanModels = $event"
-        />
-        <p v-if="pelicanEnabled" class="mt-1 text-xs text-gray-400">最多配置 5 个 GPT 模型；多个模型会同时检测。未自定义时默认使用渠道中配置的 GPT 模型。</p>
+        <div v-if="pelicanEnabled" class="mt-4">
+          <div class="input-label">检测模型</div>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <label v-for="model in pelicanModelOptions" :key="model" class="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-primary-300 dark:border-dark-700 dark:bg-dark-800 dark:text-gray-200">
+              <input v-model="pelicanModels" type="checkbox" :value="model" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <span class="font-mono">{{ model }}</span>
+              <span v-if="model === 'gpt-6-astra'" class="ml-auto rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">默认</span>
+            </label>
+          </div>
+        </div>
+        <p v-if="pelicanEnabled" class="mt-1 text-xs text-gray-400">默认勾选 gpt-6-astra；可同时选择最多 5 个 GPT 模型。</p>
         <template v-if="pelicanEnabled">
           <label for="pelican-interval" class="input-label mt-4">检测频率</label>
           <Select id="pelican-interval" v-model="pelicanInterval" :options="pelicanIntervalOptions" aria-label="检测频率" />
@@ -351,9 +353,10 @@ const submitting = ref(false)
 const pelicanEnabled = ref(false)
 const pelicanInterval = ref(1800)
 const pelicanModels = ref<string[]>([])
-const defaultPelicanModels = computed(() => [...new Set([form.primary_model, ...form.extra_models]
+const defaultPelicanModels = computed(() => [...new Set(['gpt-6-astra', form.primary_model, ...form.extra_models]
   .map(model => model.trim())
   .filter(model => /^gpt-/i.test(model)))])
+const pelicanModelOptions = computed(() => [...new Set(['gpt-6-astra', ...defaultPelicanModels.value])])
 const pelicanLoading = ref(false)
 const pelicanLoadError = ref(false)
 const displayGroupId = ref<number | null>(null)
@@ -864,7 +867,7 @@ watch(
     pendingCreatedId.value = null
     pelicanEnabled.value = false
     pelicanInterval.value = 1800
-    pelicanModels.value = []
+    pelicanModels.value = ['gpt-6-astra']
     pelicanLoadError.value = false
     pelicanLoading.value = false
     if (m?.provider === PROVIDER_OPENAI) {
@@ -873,7 +876,7 @@ watch(
         if (version !== pelicanLoadVersion) return
         pelicanEnabled.value = config.enabled
         pelicanInterval.value = config.interval_seconds
-        pelicanModels.value = config.models || []
+        pelicanModels.value = config.models?.length ? config.models : defaultPelicanModels.value
       }).catch(() => {
         if (version === pelicanLoadVersion) pelicanLoadError.value = true
       }).finally(() => {
@@ -1011,6 +1014,14 @@ async function handleSubmit() {
       await adminAPI.channelMonitor.updateDisplayConfig(created.id, { group_id: displayGroupId.value, display_rate: displayRate, sort_order: displaySortOrder.value })
       if (form.provider === PROVIDER_OPENAI && usesProbePart.value && pelicanEnabled.value) {
         await adminAPI.channelMonitor.updatePelicanConfig(created.id, { enabled: true, interval_seconds: pelicanInterval.value, models: selectedPelicanModels })
+        // Start the first artifact run only for an active channel, as soon as
+        // its Pelican configuration is persisted. Keep the form responsive
+        // while the model generation may take several minutes.
+        if (form.enabled) {
+        void adminAPI.channelMonitor.runPelicanNow(created.id).catch((runError: unknown) => {
+          appStore.showError(extractApiErrorMessage(runError, '渠道已创建，但首次降智检测启动失败；可在监控列表手动重试'))
+        })
+        }
       }
       appStore.showSuccess(t('admin.channelMonitor.createSuccess'))
     }

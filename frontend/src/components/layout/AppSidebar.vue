@@ -671,6 +671,13 @@ const SignalIcon = {
     )
 }
 
+const PelicanIcon = {
+  render: () =>
+    h('svg', { fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', 'stroke-width': '1.5' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', d: 'M12 3.5c-2.6 0-4.6 2.1-4.6 4.7 0 1.3.5 2.4 1.4 3.2l-1.6 2.2c-.7 1-.4 2.4.7 3l2.3 1.3c.6.3 1 .9 1.1 1.6l.2 1h1.2l.2-1a2.5 2.5 0 011.1-1.6l2.3-1.3c1.1-.6 1.4-2 .7-3l-1.6-2.2c.9-.8 1.4-1.9 1.4-3.2 0-2.6-2-4.7-4.8-4.7zm-1.4 5.2h.1m3.9 0h.1M9.2 11.4c1.6.7 4 .7 5.6 0m-3.2 7.1-1.2 2.4m3.1-2.4 1.2 2.4' })
+    ])
+}
+
 const ShieldIcon = {
   render: () =>
     h(
@@ -827,6 +834,7 @@ const adminNavItems = computed((): NavItem[] => {
       children: [
         { path: '/admin/channels/pricing', label: t('nav.channelPricing'), icon: PriceTagIcon },
         { path: '/admin/channels/monitor', label: t('nav.channelMonitor'), icon: SignalIcon, featureFlag: flagChannelMonitor },
+        { path: '/admin/pelican-playground', label: t('nav.pelicanPlayground'), icon: PelicanIcon, featureFlag: flagChannelMonitor },
       ],
     },
     // 「仅充值」站点连管理端的「订阅管理」入口也一并收起（路由本身不拦截）。
